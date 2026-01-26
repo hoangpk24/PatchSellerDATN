@@ -1,0 +1,6 @@
+@PatchSeller.API_HostAddress = http://localhost:5276
+
+GET {{PatchSeller.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

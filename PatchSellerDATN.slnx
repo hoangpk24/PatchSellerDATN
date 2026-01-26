@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="PatchSeller.API/PatchSeller.API.csproj" />
+  <Project Path="PatchSeller.DAL/PatchSeller.DAL.csproj" />
+  <Project Path="PatchSeller.Web/PatchSeller.Web.csproj" />
+</Solution>
