@@ -1,0 +1,22 @@
+﻿@page "/admin/version/{id:int}/edit"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Patch Version Edit</PageTitle>
+
+<section class="p-6">
+    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+
+    <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa phiên bản việt hóa</h1>
+</section>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home),
+        new("Phiên Bản Việt Hóa", href: RouterConfig.Admin.Version),
+        new("Tạo Phiên Bản Việt Hóa", href: "#", disabled: true),
+    ];
+}

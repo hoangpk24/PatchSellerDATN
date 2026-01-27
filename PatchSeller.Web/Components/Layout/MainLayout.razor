@@ -1,20 +1,30 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@* Required *@
+<MudThemeProvider />
+<MudPopoverProvider />
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+@* Needed for dialogs *@
+<MudDialogProvider />
 
-        <article class="content px-4">
-            @Body
-        </article>
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+
+<PageTitle>@Constant.PageTitleUser.Replace("-", "")</PageTitle>
+
+<MudLayout Class="bg-black-layout pt-20">
+    <Header />
+
+    <main class="mx-auto max-w-[1520px] lg:min-h-[calc(100lvh-621px)] sm:px-3 md:px-4 lg:px-6">
+        @Body
     </main>
-</div>
+
+    <Footer />
+</MudLayout>
+
+<MudScrollToTop Class="group !bottom-10 !right-10 !border-2 !border-solid !border-white !bg-transparent !shadow-none hover:!bg-black-default">
+    <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Large" Class="!text-white" />
+</MudScrollToTop>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

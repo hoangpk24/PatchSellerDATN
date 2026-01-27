@@ -1,0 +1,22 @@
+﻿@page "/admin/game/{id:int}/edit"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Game Edit</PageTitle>
+
+<section class="p-6">
+    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+
+    <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa game</h1>
+</section>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home),
+        new("Game", href: RouterConfig.Admin.Game),
+        new("Tạo Game", href: "#", disabled: true),
+    ];
+}

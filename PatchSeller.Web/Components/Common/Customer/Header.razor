@@ -1,0 +1,73 @@
+﻿<header class="fixed top-0 z-20 w-full border-b border-white/5 bg-black-default">
+    <div class="mx-auto flex max-w-[1520px] items-center justify-between py-1">
+
+        <div class="flex-shrink-0">
+            <a href="@RouterConfig.Customer.Home">
+                <img src="/assets/icons/logo.svg"
+                     alt="AviGames Logo"
+                     class="h-[72px] w-auto object-cover" />
+            </a>
+        </div>
+
+        <nav class="hidden items-center gap-2 lg:flex">
+            <ul class="flex items-center">
+                <li class="px-4 py-2">
+                    <a class="cursor-pointer font-bold text-[15px] text-white transition-colors hover:text-purple-500">Tất Cả Sản Phẩm</a>
+                </li>
+                <li class="group relative cursor-pointer px-4 py-2">
+                    <a class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
+                        Thể Loại
+                        <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" />
+                    </a>
+                    <div class="absolute left-0 top-full z-50 mt-4 hidden min-w-[180px] border border-gray-800 bg-[#1e1e1e] py-2 shadow-xl group-hover:block">
+                        <a class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Action Games</a>
+                        <a class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Indie Games</a>
+                    </div>
+                </li>
+                <li class="group relative cursor-pointer px-4 py-2">
+                    <a class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
+                        Nền Tảng
+                        <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" />
+                    </a>
+                </li>
+                <li class="group relative cursor-pointer px-4 py-2">
+                    <a class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
+                        Mã Giảm Giá
+                    </a>
+                </li>
+                <li class="px-4 py-2">
+                    <a class="cursor-pointer font-bold text-[15px] text-white transition-colors hover:text-purple-500">Tra Cứu Đơn Hàng</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="flex items-center gap-6">
+            <div class="relative flex w-full max-w-[300px] items-center rounded-full border border-gray-700 bg-[#1e1e1e] p-1 transition-all focus-within:border-purple-500">
+                <input type="text"
+                       placeholder="Tìm games bạn cần"
+                       class="w-full bg-transparent py-1.5 pl-4 pr-10 text-sm font-light text-gray-200 placeholder-gray-500 outline-none" />
+                <button class="absolute right-1 flex h-8 w-8 items-center justify-center rounded-full bg-purple-500 text-white transition-transform hover:scale-105 active:scale-95">
+                    <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
+                </button>
+            </div>
+
+            <div class="h-8 w-[1px] bg-gray-700"></div>
+
+            <div class="flex items-center gap-5">
+                <a class="flex cursor-pointer items-center gap-2 text-white transition-colors hover:text-purple-500">
+                    <MudIcon Icon="@Icons.Material.Outlined.Person" Size="Size.Medium" />
+                    <span class="whitespace-nowrap text-sm font-bold">Đăng nhập / Đăng ký</span>
+                </a>
+
+                <div class="group cursor-pointer">
+                    <MudIcon Icon="@Icons.Material.Outlined.FavoriteBorder" Class="text-white group-hover:text-purple-500" />
+                </div>
+
+                <div class="group relative flex cursor-pointer items-center gap-3">
+                    <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Class="text-white group-hover:text-purple-500" />
+                    <span class="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 font-bold text-[10px] text-white">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

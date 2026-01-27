@@ -1,0 +1,21 @@
+﻿@page "/admin/category"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Category</PageTitle>
+
+<section class="p-6">
+    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+
+    <div class="flex items-center justify-between">
+        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách thể loại</h1>
+        <a href="@RouterConfig.Admin.CreateCategory" class="leading-[1.5rem] h-10 rounded-lg bg-material-default px-6 py-2 text-white">Tạo mới</a>
+    </div>
+</section>
+
+@code {
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home),
+        new("Thể Loại", href: "#", disabled: true),
+    ];
+}
