@@ -1,0 +1,19 @@
+﻿@page "/admin/member/create"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Member Create</PageTitle>
+
+<section class="p-6">
+    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+
+    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo quản trị</h1>
+</section>
+
+@code {
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home),
+        new("Quản Trị", href: RouterConfig.Admin.Member),
+        new("Tạo Quản Trị", href: "#", disabled: true),
+    ];
+}

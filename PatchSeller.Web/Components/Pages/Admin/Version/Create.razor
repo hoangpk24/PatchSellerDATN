@@ -1,0 +1,19 @@
+﻿@page "/admin/version/create"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Patch Version Create</PageTitle>
+
+<section class="p-6">
+    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+
+    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo phiên bản việt hóa</h1>
+</section>
+
+@code {
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home),
+        new("Phiên Bản Việt Hóa", href: RouterConfig.Admin.Version),
+        new("Tạo Phiên Bản Việt Hóa", href: "#", disabled: true),
+    ];
+}
