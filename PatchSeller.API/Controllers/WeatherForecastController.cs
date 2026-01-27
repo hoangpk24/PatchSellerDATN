@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using PatchSeller.API.Utilities;
 
 namespace PatchSeller.API.Controllers
 {
@@ -18,16 +19,33 @@ namespace PatchSeller.API.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpPost("upload")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            string _storagePath = "D:\\OutS\\Upload";
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            var trustedFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(_storagePath, trustedFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                await file.CopyToAsync(stream);
+            }
+
+            string fullFilePath = Path.Combine(_storagePath, trustedFileName);
+            SecurityService securityService = new SecurityService();
+            var result = await securityService.ScanWithDefenderAsync(fullFilePath);
+            if (result != true)
+            {
+               System.IO.File.Delete(fullFilePath);
+                return BadRequest("Có mã độc");
+            }    
+
+
+            return Ok(new { FileName = trustedFileName, Path = filePath });
         }
     }
 }
