@@ -1,0 +1,22 @@
+﻿@page "/admin/voucher/{id:int}/edit"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Voucher Edit</PageTitle>
+
+<section class="p-6">
+    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+
+    <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa mã giảm giá</h1>
+</section>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home),
+        new("Mã Giảm Giá", href: RouterConfig.Admin.Voucher),
+        new("Tạo Mã Giảm Giá", href: "#", disabled: true),
+    ];
+}

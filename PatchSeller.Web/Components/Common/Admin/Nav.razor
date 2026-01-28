@@ -1,0 +1,94 @@
+﻿
+<style>
+    .active-menu {
+        background-color: #594ae20f;
+        border-right: 2px solid #29A69A;
+    }
+
+    .active-menu div svg,
+    .active-menu div div {
+        color: #29A69A !important;
+        font-weight: 700 !important;
+    }
+
+    .mud-menu-item {
+        min-width: 15rem;
+    }
+</style>
+
+<nav class="relative h-full w-[18.75rem] bg-white pb-4 pt-6 shadow-lg">
+    <MudNavMenu Class="mud-width-full" Color="Color.Primary" Bordered="true">
+        <a href="@RouterConfig.Admin.Home" class="flex items-center justify-center">
+            <img src="/assets/icons/logo-admin.svg" alt="logo admin" width="180" />
+        </a>
+
+        <MudDivider Class="my-5 !border-slate-200" />
+
+        <div class="max-h-[calc(100lvh-280px)] flex flex-col gap-2 overflow-y-auto px-3">
+            <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Home))" Class="@ActiveMenuClass(RouterConfig.Admin.Home)" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
+            <MudNavGroup Title="Quản lý game">
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Game))" Class="@ActiveMenuClass(RouterConfig.Admin.Game)" Icon="@Icons.Material.Filled.VideogameAsset">Game</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Category))" Class="@ActiveMenuClass(RouterConfig.Admin.Category)" Icon="@Icons.Material.Filled.Category">Thể loại</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Platform))" Class="@ActiveMenuClass(RouterConfig.Admin.Platform)" Icon="@Icons.Material.Filled.Airplay">Nền tảng</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Publisher))" Class="@ActiveMenuClass(RouterConfig.Admin.Publisher)" Icon="@Icons.Material.Filled.DeveloperMode">Nhà phát hành</MudNavLink>
+            </MudNavGroup>
+            <MudNavGroup Title="Quản lý gói việt hóa">
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Patch))" Class="@ActiveMenuClass(RouterConfig.Admin.Patch)" Icon="@Icons.Material.Filled.Backpack">Gói việt hóa</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Version))" Class="@ActiveMenuClass(RouterConfig.Admin.Version)" Icon="@Icons.Material.Filled.Difference">Phiên bản</MudNavLink>
+            </MudNavGroup>
+            <MudNavGroup Title="Quản lý tài khoản">
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Member))" Class="@ActiveMenuClass(RouterConfig.Admin.Member)" Icon="@Icons.Material.Filled.SupervisedUserCircle">Quản trị</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Customer))" Class="@ActiveMenuClass(RouterConfig.Admin.Customer)" Icon="@Icons.Material.Filled.Group">Khách hàng</MudNavLink>
+            </MudNavGroup>
+            <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Voucher))" Class="@ActiveMenuClass(RouterConfig.Admin.Voucher)" Icon="@Icons.Material.Filled.PanoramaHorizontalSelect">Mã giảm giá</MudNavLink>
+            <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Order))" Class="@ActiveMenuClass(RouterConfig.Admin.Order)" Icon="@Icons.Material.Filled.Payments">Hóa đơn</MudNavLink>
+            <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Statistical))" Class="@ActiveMenuClass(RouterConfig.Admin.Statistical)" Icon="@Icons.Material.Filled.SsidChart">Thống kê</MudNavLink>
+        </div>
+    </MudNavMenu>
+
+    <div class="absolute bottom-4 left-0 right-0">
+        <MudDivider Class="my-5 !border-slate-200" />
+
+        <MudMenu Class="w-full px-3" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.BottomLeft">
+            <ActivatorContent>
+                <div class="flex w-full cursor-pointer items-center gap-2 rounded-xl bg-white p-2 hover:bg-gray-100">
+                    <MudAvatar Size="@Size.Medium" Class="!bg-material-default !font-bold !text-white">A</MudAvatar>
+                    <div class="w-full">
+                        <p class="line-clamp-1 text-base font-medium text-material-default">Admin</p>
+                        <p class="line-clamp-1 text-sm font-medium text-gray-400">SuperAdmin</p>
+                    </div>
+                </div>
+            </ActivatorContent>
+            <ChildContent>
+                <MudMenuItem Disabled>
+                        <MudAvatar Size="@Size.Small" Class="!bg-material-default !text-white">A</MudAvatar>
+                </MudMenuItem>
+                <MudMenuItem Disabled>
+                    <p class="whitespace-nowrap text-sm font-medium text-gray-900">Admin</p>
+                </MudMenuItem>
+                <MudDivider />
+                <MudMenuItem>
+                    <button class="flex w-full justify-start whitespace-nowrap px-1.5 py-1 text-sm font-medium text-[#666666] hover:bg-gray-100 hover:text-black">Đăng Xuất</button>
+                </MudMenuItem>
+            </ChildContent>
+        </MudMenu>
+    </div>
+</nav>
+
+@code {
+    private string ActiveMenuClass(string path)
+    {
+        var contentUrl = "/" + navigation.ToBaseRelativePath(navigation.Uri);
+
+        if (contentUrl.Equals(path)) return "active-menu";
+
+        return "item-menu";
+    }
+
+    void HandleRedirect(string path)
+    {
+        if (path == "") return;
+
+        navigation.NavigateTo(path);
+    }
+}

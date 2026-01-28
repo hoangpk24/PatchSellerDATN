@@ -1,0 +1,19 @@
+﻿@page "/admin/platform/create"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Platform Create</PageTitle>
+
+<section class="p-6">
+    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+
+    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo nền tảng</h1>
+</section>
+
+@code {
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home),
+        new("Nền Tảng", href: RouterConfig.Admin.Platform),
+        new("Tạo Nền Tảng", href: "#", disabled: true),
+    ];
+}

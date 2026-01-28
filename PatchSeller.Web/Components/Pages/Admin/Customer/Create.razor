@@ -1,0 +1,19 @@
+﻿@page "/admin/customer/create"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Customer Create</PageTitle>
+
+<section class="p-6">
+    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+
+    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo khách hàng</h1>
+</section>
+
+@code {
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home),
+        new("Khách Hàng", href: RouterConfig.Admin.Member),
+        new("Tạo Khách Hàng", href: "#", disabled: true),
+    ];
+}

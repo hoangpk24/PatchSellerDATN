@@ -8,3 +8,17 @@
 @using Microsoft.JSInterop
 @using PatchSeller.Web
 @using PatchSeller.Web.Components
+@using MudBlazor
+@using MudBlazor.Services
+@using PatchSeller.Web.Components.Layout
+@using PatchSeller.Web.Constant
+@using PatchSeller.Web.DTOs
+@using PatchSeller.Web.Models
+@using PatchSeller.Web.Schema
+@using PatchSeller.Web.Components.Common.Admin
+@using PatchSeller.Web.Components.Common.Customer
+@inject IJSRuntime JS
+@inject NavigationManager navigation
+@inject ISnackbar _snackbar
+@inject IDialogService _dialogService
+@using FluentValidation

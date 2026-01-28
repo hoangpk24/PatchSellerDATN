@@ -1,0 +1,20 @@
+﻿@page "/admin/order"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Order</PageTitle>
+
+<section class="p-6">
+    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+
+    <div class="flex items-center justify-between">
+        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách hóa đơn</h1>
+    </div>
+</section>
+
+@code {
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home),
+        new("Hóa Đơn", href: "#", disabled: true),
+    ];
+}
