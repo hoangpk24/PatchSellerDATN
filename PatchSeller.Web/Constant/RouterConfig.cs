@@ -8,7 +8,7 @@
             public const string Home = "/";
 
             // Auth
-            public const string SignUp = "/sign-up";
+            public const string SignUp = "/register";
             public const string Login = "/login";
             public const string ForgotPassword = "/forgot-password";
             public const string ChangePassword = "/change-password";

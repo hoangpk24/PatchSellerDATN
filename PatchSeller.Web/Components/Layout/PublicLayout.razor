@@ -1,0 +1,27 @@
+﻿@inherits LayoutComponentBase
+
+@* Required *@
+<MudThemeProvider Theme="@_theme" />
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+
+<PageTitle>@Constant.PageTitleAdmin.Replace(" -", "")</PageTitle>
+
+<main class="h-screen w-screen overflow-hidden">
+    @Body
+</main>
+
+@code {
+    private MudTheme _theme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#29A69A",
+        },
+    };
+}

@@ -15,7 +15,7 @@
 <MudLayout Class="bg-black-layout pt-20">
     <Header />
 
-    <main class="mx-auto max-w-[1520px] lg:min-h-[calc(100lvh-621px)] sm:px-3 md:px-4 lg:px-6">
+    <main class="lg:min-h-[calc(100lvh-621px)]">
         @Body
     </main>
 
@@ -31,3 +31,13 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+<style>
+    .mud-breadcrumb-item a {
+        color: white !important;
+    }
+
+    .mud-breadcrumb-separator span {
+        color: white !important;
+    }
+</style>
