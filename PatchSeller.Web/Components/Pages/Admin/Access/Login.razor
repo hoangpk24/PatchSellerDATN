@@ -1,0 +1,89 @@
+﻿@page "/admin/login"
+@layout PublicLayout
+
+<section class="flex h-full w-full items-center justify-center bg-material-default">
+    <div class="flex w-full max-w-[550px] flex-col items-center rounded-[32px] bg-white p-8 shadow-2xl">
+        <div class="flex max-w-40 items-center">
+            <img src="/assets//icons/logo-admin.svg" alt="logo admin" />
+        </div>
+
+        <MudDivider Class="mb-6 !border-material-default"/>
+
+        <MudForm Class="w-full" Model="@_model" @ref="@_form" Validation="@_adminLoginSchema.ValidateValue">
+            <div class="mb-4">
+                <label class="mb-1 block text-sm font-medium text-material-default">
+                    Tài khoản
+                </label>
+                <MudTextField T="string"
+                              @bind-Value="_model.UserName"
+                              For="@(() => _model.UserName)"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-4">
+                <label class="mb-1 block text-sm font-medium text-material-default">
+                    Mật khẩu
+                </label>
+                <MudTextField T="string"
+                              @bind-Value="_model.PasswordHash"
+                              For="@(() => _model.PasswordHash)"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              InputType="@(_passwordVisibility ? InputType.Text : InputType.Password)"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@(_passwordVisibility ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
+                              OnAdornmentClick="TogglePasswordVisibility"
+                              AdornmentAriaLabel="Show Password" />
+            </div>
+
+            <MudButton Variant="Variant.Filled"
+                       OnClick="@(async () => await OnSubmit())"
+                       Class="w-full !rounded-full !bg-material-default py-3 !font-bold !text-white transition-all hover:opacity-80">
+                Đăng Nhập
+            </MudButton>
+        </MudForm>
+    </div>
+</section>
+
+@code {
+    MudForm _form = new MudForm();
+    LoginModel _model = new LoginModel();
+    AccessSchema.AdminLogin _adminLoginSchema = new AccessSchema.AdminLogin();
+
+    private bool _passwordVisibility = false;
+
+    private void TogglePasswordVisibility() => _passwordVisibility = !_passwordVisibility;
+
+    private async Task OnSubmit()
+    {
+        await _form.Validate();
+
+        if (!_form.IsValid) return;
+
+        _snackbar.Add("Submitted", MudBlazor.Severity.Success);
+    }
+}
+
+<style>
+    .mud-input-outlined-border {
+        border-radius: 9999px !important;
+        color: #000000 !important;
+    }
+
+    .mud-input-outlined {
+        border-radius: 9999px !important;
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+    }
+
+    .mud-input-slot {
+        padding: 16px !important;
+    }
+
+    .mud-icon-button-label svg {
+        margin: 0 !important;
+        height: 100%;
+        color: #29A69A !important;
+    }
+</style>

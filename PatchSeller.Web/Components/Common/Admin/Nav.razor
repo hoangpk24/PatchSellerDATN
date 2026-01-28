@@ -1,8 +1,8 @@
 ﻿
 <style>
     .active-menu {
-        background-color: #FFFFFF;
-        border-radius: 8px;
+        background-color: #594ae20f;
+        border-right: 2px solid #29A69A;
     }
 
     .active-menu div svg,
@@ -14,41 +14,29 @@
     .mud-menu-item {
         min-width: 15rem;
     }
-
-    .item-menu,
-    .item-menu div svg {
-        color: #FFFFFF !important;
-    }
-
-    .group-item-menu button,
-    .group-item-menu button svg,
-    .group-item-menu .mud-transform {
-        color: #FFFFFF !important;
-        fill: #FFFFFF !important;
-    }
 </style>
 
-<nav class="relative h-full w-[18.75rem] bg-material-default pb-4 pt-6 shadow-lg">
+<nav class="relative h-full w-[18.75rem] bg-white pb-4 pt-6 shadow-lg">
     <MudNavMenu Class="mud-width-full" Color="Color.Primary" Bordered="true">
-        <a href="@RouterConfig.Admin.Home" class="flex h-10 items-center justify-center px-10">
-            <img src="/assets/icons/logo-admin.svg" alt="logo" class="h-full w-full object-cover" />
+        <a href="@RouterConfig.Admin.Home" class="flex items-center justify-center">
+            <img src="/assets/icons/logo-admin.svg" alt="logo admin" width="180" />
         </a>
 
         <MudDivider Class="my-5 !border-slate-200" />
 
-        <div class="max-h-[calc(100lvh-15.5rem)] flex flex-col gap-2 overflow-y-auto px-3">
+        <div class="max-h-[calc(100lvh-280px)] flex flex-col gap-2 overflow-y-auto px-3">
             <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Home))" Class="@ActiveMenuClass(RouterConfig.Admin.Home)" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
-            <MudNavGroup Title="Quản lý game" Class="group-item-menu">
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Game))" Class="@ActiveMenuClass(RouterConfig.Admin.Game)" Icon="@Icons.Material.Filled.Games">Game</MudNavLink>
+            <MudNavGroup Title="Quản lý game">
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Game))" Class="@ActiveMenuClass(RouterConfig.Admin.Game)" Icon="@Icons.Material.Filled.VideogameAsset">Game</MudNavLink>
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Category))" Class="@ActiveMenuClass(RouterConfig.Admin.Category)" Icon="@Icons.Material.Filled.Category">Thể loại</MudNavLink>
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Platform))" Class="@ActiveMenuClass(RouterConfig.Admin.Platform)" Icon="@Icons.Material.Filled.Category">Nền tảng</MudNavLink>
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Publisher))" Class="@ActiveMenuClass(RouterConfig.Admin.Publisher)" Icon="@Icons.Material.Filled.Category">Nhà phát hành</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Platform))" Class="@ActiveMenuClass(RouterConfig.Admin.Platform)" Icon="@Icons.Material.Filled.Airplay">Nền tảng</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Publisher))" Class="@ActiveMenuClass(RouterConfig.Admin.Publisher)" Icon="@Icons.Material.Filled.DeveloperMode">Nhà phát hành</MudNavLink>
             </MudNavGroup>
-            <MudNavGroup Title="Quản lý gói việt hóa" Class="group-item-menu">
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Patch))" Class="@ActiveMenuClass(RouterConfig.Admin.Patch)" Icon="@Icons.Material.Filled.Category">Gói việt hóa</MudNavLink>
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Version))" Class="@ActiveMenuClass(RouterConfig.Admin.Version)" Icon="@Icons.Material.Filled.Category">Phiên bản</MudNavLink>
+            <MudNavGroup Title="Quản lý gói việt hóa">
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Patch))" Class="@ActiveMenuClass(RouterConfig.Admin.Patch)" Icon="@Icons.Material.Filled.Backpack">Gói việt hóa</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Version))" Class="@ActiveMenuClass(RouterConfig.Admin.Version)" Icon="@Icons.Material.Filled.Difference">Phiên bản</MudNavLink>
             </MudNavGroup>
-            <MudNavGroup Title="Quản lý tài khoản" Class="group-item-menu">
+            <MudNavGroup Title="Quản lý tài khoản">
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Member))" Class="@ActiveMenuClass(RouterConfig.Admin.Member)" Icon="@Icons.Material.Filled.SupervisedUserCircle">Quản trị</MudNavLink>
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Customer))" Class="@ActiveMenuClass(RouterConfig.Admin.Customer)" Icon="@Icons.Material.Filled.Group">Khách hàng</MudNavLink>
             </MudNavGroup>
