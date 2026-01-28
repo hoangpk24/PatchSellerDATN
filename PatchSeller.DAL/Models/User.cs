@@ -15,6 +15,7 @@ public class User
     public string PasswordHash { get; set; }
     public double RewardPoint { get; set; }
     public int Status { get; set; }
+    public DateTime? LastLogin { get; set; }
     public bool Delete { get; set; }
 
     [ForeignKey("RankId")]
