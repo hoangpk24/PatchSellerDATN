@@ -8,8 +8,7 @@
 @using Microsoft.JSInterop
 @using PatchSeller.Web
 @using PatchSeller.Web.Components
-@using MudBlazor
-@using MudBlazor.Services
+@using PatchSeller.Web.Services
 @using PatchSeller.Web.Components.Layout
 @using PatchSeller.Web.Constant
 @using PatchSeller.Web.DTOs
@@ -17,8 +16,16 @@
 @using PatchSeller.Web.Schema
 @using PatchSeller.Web.Components.Common.Admin
 @using PatchSeller.Web.Components.Common.Customer
+@using PatchSeller.Web.Components.Common.Error
+@using PatchSeller.Web.Components.Common.Loading
+@using MudBlazor
+@using MudBlazor.Services
+@using Microsoft.AspNetCore.WebUtilities
+@using System.Text.Json
 @inject IJSRuntime JS
+@inject Blazored.LocalStorage.ILocalStorageService _localStorage
 @inject NavigationManager navigation
 @inject ISnackbar _snackbar
 @inject IDialogService _dialogService
 @using FluentValidation
+@inject AccessService _accessService

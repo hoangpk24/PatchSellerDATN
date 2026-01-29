@@ -19,9 +19,11 @@
                         Thể Loại
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" />
                     </a>
-                    <div class="absolute left-0 top-full z-50 mt-4 hidden min-w-[180px] border border-gray-800 bg-[#1e1e1e] py-2 shadow-xl group-hover:block">
-                        <a class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Action Games</a>
-                        <a class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Indie Games</a>
+                    <div class="absolute left-0 top-full z-50 hidden min-w-[180px] group-hover:block">
+                        <div class="mt-5 border border-gray-800 bg-[#1e1e1e] py-2 shadow-xl">
+                            <a href="@RouterConfig.Customer.Home" class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Category 1</a>
+                            <a href="@RouterConfig.Customer.Home" class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Category 2</a>
+                        </div>
                     </div>
                 </li>
                 <li class="group relative cursor-pointer px-4 py-2">
@@ -54,10 +56,27 @@
             <div class="h-8 w-[1px] bg-gray-700"></div>
 
             <div class="flex items-center gap-5">
-                <a href="@RouterConfig.Customer.Login" class="flex cursor-pointer items-center gap-2 text-white transition-colors hover:text-purple-500">
-                    <MudIcon Icon="@Icons.Material.Outlined.Person" Size="Size.Medium" />
-                    <span class="whitespace-nowrap text-sm font-bold">Đăng nhập / Đăng ký</span>
-                </a>
+                @if (_mine != null)
+                {
+                    <div class="group relative">
+                        <MudAvatar Size="@Size.Medium" Class="cursor-pointer !bg-purple-500 !text-white">@GetInitials(_mine.FullName)</MudAvatar>
+                        <div class="absolute left-0 top-full z-50 hidden min-w-[180px] group-hover:block">
+                            <div class="mt-5 border border-gray-800 bg-[#1e1e1e] py-2 shadow-xl">
+                                <a href="@RouterConfig.Customer.Home" class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Thông tin tài khoản</a>
+                                <a href="@RouterConfig.Customer.Home" class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Đơn hàng</a>
+                                <MudDivider Class="!border-white/15"/>
+                                <button @onclick="Logout" class="!w-full !justify-start !px-4 !py-2 !text-sm !text-gray-300 hover:!bg-purple-600 hover:!text-white">Đăng Xuất</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                } else
+                {
+                    <a href="@RouterConfig.Customer.Login" class="flex cursor-pointer items-center gap-2 text-white transition-colors hover:text-purple-500">
+                        <MudIcon Icon="@Icons.Material.Outlined.Person" Size="Size.Medium" />
+                        <span class="whitespace-nowrap text-sm font-bold">Đăng nhập / Đăng ký</span>
+                    </a>
+                }
 
                 <div class="group cursor-pointer">
                     <MudIcon Icon="@Icons.Material.Outlined.FavoriteBorder" Class="text-white group-hover:text-purple-500" />
@@ -71,3 +90,26 @@
         </div>
     </div>
 </header>
+
+@code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public MineResponse _mine { get; set; }
+
+    [Parameter]
+    public EventCallback OnLoggedOut { get; set; }
+
+    [Parameter]
+    public bool FirstLogin { get; set; }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "U";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts[^1][0].ToString().ToUpper();
+    }
+
+    async Task Logout()
+    {
+        await OnLoggedOut.InvokeAsync();
+    }
+}
