@@ -79,7 +79,25 @@
 
         if (!_form.IsValid) return;
 
-        _snackbar.Add("Submitted", MudBlazor.Severity.Success);
+        _model.UserName = _model.UserName.Trim();
+        _model.PasswordHash = _model.PasswordHash.Trim();
+
+        var result = await _accessService.LoginCustomer(_model);
+
+        if (result.LoginSuccess == true)
+        {
+            await _localStorage.SetItemAsync(Constant.TokenNameLocalStorage, result.Token);
+            await _localStorage.SetItemAsync(Constant.TokenExpiredLocalStorage, result.Expiration);
+            await _localStorage.SetItemAsync(Constant.UserFirstLoginLocalStorage, result.FirstLogin);
+
+           _snackbar.Add("Đăng nhập thành công!", MudBlazor.Severity.Success);
+            navigation.NavigateTo(RouterConfig.Customer.Home);
+
+        }
+        else
+        {
+            _snackbar.Add("Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu", MudBlazor.Severity.Warning);
+        }
     }
 }
 

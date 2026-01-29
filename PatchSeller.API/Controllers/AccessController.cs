@@ -154,8 +154,12 @@ namespace PatchSeller.API.Controllers
                         }
                     }
                 }
-                int rankId = int.Parse(User.FindFirst(ClaimTypes.Surname)?.Value);
-                string rankName =  rankRepository.GetById(rankId).Result.RankName;
+                int rankId = string.IsNullOrEmpty(User.FindFirst(ClaimTypes.Surname)?.Value) ? -1 : int.Parse(User.FindFirst(ClaimTypes.Surname)?.Value);
+                string rankName = string.Empty;
+                if(rankId != -1)
+                {
+                    rankName = rankRepository.GetById(rankId).Result.RankName;
+                }
 
                 var userInfo = new
                 {

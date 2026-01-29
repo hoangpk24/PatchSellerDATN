@@ -28,7 +28,7 @@
         // Data store
         public static class CascadingNameParams
         {
-            public const string UserInfo = "userInfo";
+            public const string Mine = "mine";
             public const string Token = "token";
         }
 
@@ -89,6 +89,13 @@
         {
             public const int DefaultPage = 1;
             public const int DefaultPerPage = 20;
+        }
+
+        public static class Role
+        {
+            public const string Admin = "Admin";
+            public const string Manager = "Manager";
+            public const string Customer = "Customer";
         }
     }
 }

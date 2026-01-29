@@ -2,6 +2,10 @@
 {
     public static class RouterConfig
     {
+
+        public const string AccessDenied = "/access-denined";
+        public const string NotFound = "/not-found";
+
         public static class Customer
         {
             // Home

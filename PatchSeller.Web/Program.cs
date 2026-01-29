@@ -1,6 +1,8 @@
+using Blazored.LocalStorage;
 using MudBlazor;
 using MudBlazor.Services;
 using PatchSeller.Web.Components;
+using PatchSeller.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,10 +24,14 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
 
+builder.Services.AddScoped<AccessService>();
+
 builder.Services.AddScoped(http => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7179/")
+    BaseAddress = new Uri("https://localhost:7226/")
 });
+
+builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 

@@ -1,36 +1,184 @@
 ﻿@inherits LayoutComponentBase
 
-@* Required *@
 <MudThemeProvider />
 <MudPopoverProvider />
-
-@* Needed for dialogs *@
 <MudDialogProvider />
-
-@* Needed for snackbars *@
 <MudSnackbarProvider />
 
 <PageTitle>@Constant.PageTitleUser.Replace("-", "")</PageTitle>
 
-<MudLayout Class="bg-black-layout pt-20">
-    <Header />
 
-    <main class="lg:min-h-[calc(100lvh-621px)]">
-        @Body
-    </main>
+@if (_isLoading)
+{
+    <LoadingUser />
+} else
+{   
+    <CascadingValue Value="_mine" Name="@Constant.CascadingNameParams.Mine">
+        <CascadingValue Value="_token" Name="@Constant.CascadingNameParams.Token">
+            <MudLayout Class="bg-black-layout pt-20">
+                <Header OnLoggedOut="HandleLogout" FirstLogin="@_firstLogin" />
 
-    <Footer />
-</MudLayout>
+                <main class="lg:min-h-[calc(100lvh-621px)]">
+                    @Body
+                </main>
 
-<MudScrollToTop Class="group !bottom-10 !right-10 !border-2 !border-solid !border-white !bg-transparent !shadow-none hover:!bg-black-default">
-    <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Large" Class="!text-white" />
-</MudScrollToTop>
+                <Footer />
+            </MudLayout>
+        </CascadingValue>
+    </CascadingValue>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+    <MudScrollToTop Class="group !bottom-10 !right-10 !border-2 !border-solid !border-white !bg-transparent !shadow-none hover:!bg-black-default">
+        <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Large" Class="!text-white" />
+    </MudScrollToTop>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+}
+
+@code {
+    private MineResponse _mine = null;
+    private bool _isLoading = true;
+    private string _token = string.Empty;
+    private bool _firstLogin = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        navigation.LocationChanged += HandleLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeAuth();
+        }
+    }
+
+    private async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (_mine == null && !_isLoading)
+        {
+            await InitializeAuth();
+        }
+    }
+
+    private async Task InitializeAuth()
+    {
+        _isLoading = true;
+        try
+        {
+            await PerformAuthCheck();
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task PerformAuthCheck()
+    {
+        _token = await _localStorage.GetItemAsStringAsync(Constant.TokenNameLocalStorage);
+        var expired = await _localStorage.GetItemAsStringAsync(Constant.TokenExpiredLocalStorage);
+        var FirstLogin = await _localStorage.GetItemAsStringAsync(Constant.UserFirstLoginLocalStorage);
+
+        // if (!string.IsNullOrEmpty(FirstLogin))
+        // {
+        //     _firstLogin = bool.Parse(FirstLogin);
+        //     if (_firstLogin == true && !navigation.ToBaseRelativePath(navigation.Uri).Equals(RouterConfig.Customer.ChangePassword.Replace("/", "")))
+        //     {
+        //         navigation.NavigateTo(RouterConfig.Customer.ChangePassword, true);
+        //         _isLoading = false;
+        //         return;
+        //     }
+        // }
+
+        if (!string.IsNullOrEmpty(_token))
+        {
+            if (!string.IsNullOrEmpty(expired))
+            {
+                if (DateTime.TryParse(expired.Trim('"'), out DateTime expirationTime))
+                {
+                    if (expirationTime <= DateTime.Now)
+                    {
+                        await ClearLocalStorageAndNavigate(RouterConfig.Customer.Login);
+                        return;
+                    }
+                }
+            }
+
+            try
+            {
+                _mine = await _accessService.AccessCheck(_token.Trim('"'));
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is HttpRequestException)
+            {
+                await ClearLocalStorageAndNavigate(RouterConfig.Customer.Login);
+                return;
+            }
+            catch (Exception)
+            {
+                await ClearLocalStorageAndNavigate(RouterConfig.Customer.Login);
+                return;
+            }
+
+            if (_mine != null && _mine.IsExpired)
+            {
+                await ClearLocalStorageAndNavigate(RouterConfig.Customer.Login);
+                return;
+            }
+
+            if (_mine != null && _mine.Role != Constant.Role.Customer)
+            {
+                navigation.NavigateTo(RouterConfig.AccessDenied, true);
+                _isLoading = false;
+                return;
+            }
+
+            if (_mine != null)
+            {
+                var currentUrl = "/" + navigation.ToBaseRelativePath(navigation.Uri);
+                var forbiddenPages = new[] { RouterConfig.Customer.Login, RouterConfig.Customer.SignUp, RouterConfig.Customer.ForgotPassword };
+
+                if (forbiddenPages.Contains(currentUrl))
+                {
+                    navigation.NavigateTo(RouterConfig.Customer.Home, true);
+                    _isLoading = false;
+                    return;
+                }
+            }
+        }
+        else
+        {
+            _mine = null;
+            _firstLogin = false;
+        }
+    }
+
+    private async Task HandleLogout()
+    {
+        await ClearLocalStorageAndNavigate(RouterConfig.Customer.Login);
+    }
+
+    public async Task ClearLocalStorageAndNavigate(string route)
+    {
+        await _localStorage.RemoveItemAsync(Constant.TokenNameLocalStorage);
+        await _localStorage.RemoveItemAsync(Constant.TokenExpiredLocalStorage);
+        await _localStorage.RemoveItemAsync(Constant.UserInfoLocalStorage);
+        await _localStorage.RemoveItemAsync(Constant.UserFirstLoginLocalStorage);
+        _mine = null;
+        _isLoading = false;
+        navigation.NavigateTo(route);
+    }
+
+    public void Dispose()
+    {
+        navigation.LocationChanged -= HandleLocationChanged;
+    }
+}
 
 <style>
     .mud-breadcrumb-item a {
