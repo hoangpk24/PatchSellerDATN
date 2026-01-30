@@ -10,6 +10,7 @@
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="MudBlazor" Version="8.14.0" />
+    <PackageReference Include="Spillgebees.Blazor.RichTextEditor" Version="2.2.0" />
   </ItemGroup>
 
 </Project>
