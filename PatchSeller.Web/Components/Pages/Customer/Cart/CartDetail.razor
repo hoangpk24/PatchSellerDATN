@@ -1,0 +1,202 @@
+﻿@page "/cart/detail"
+@layout MainLayout
+
+<PageTitle>@Constant.PageTitleUser Cart Detail</PageTitle>
+
+<section>
+    <div class="w-full bg-[#9797971c] py-6">
+        <div class="mx-auto w-full max-w-[1520px] px-6">
+            <h1 class="mb-2.5 font-medium leading-tight text-[44px] text-white">Giỏ hàng chi tiết</h1>
+            <MudBreadcrumbs Class="custom-breadcrumb !p-0 !text-xs" Items="_itemBreadcrumbs" Separator="/" />
+        </div>
+    </div>
+
+    <div class="mx-auto my-10 max-w-[1520px] px-2">
+        <div class="flex justify-between lg:flex-row sm:flex-col md:flex-col lg:gap-8 md:gap-4 sm:gap-6">
+            <div class="lg:w-2/3 md:w-full sm:w-full">
+                @*giao dien PC*@
+                <div class="overflow-x-auto sm:hidden">
+                    <table class="w-full border-collapse text-left">
+                        <thead>
+                            <tr class="border-b border-white/10 text-sm uppercase tracking-wider text-white">
+                                <th class="w-16 py-4 font-medium"></th>
+                                <th class="min-w-[300px] py-4 text-center font-medium">Sản phẩm</th>
+                                <th class="py-4 text-center font-medium">Giá</th>
+                                <th class="py-4 text-center font-medium">Số lượng</th>
+                                <th class="py-4 text-right font-medium">Tạm tính</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-white">
+                            @foreach (var item in _cartItems)
+                            {
+                                <tr class="group border-b border-white/5">
+                                    <td class="py-6">
+                                        <button class="text-white/40 transition-colors hover:text-red-500">
+                                            <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
+                                        </button>
+                                    </td>
+                                    <td class="py-6">
+                                        <div class="flex items-center gap-6">
+                                            <img src="@item.Image" alt="@item.Name"
+                                                 class="aspect-[3/4] w-20 rounded-md object-cover shadow-lg" />
+                                            <span class="cursor-pointer text-base font-medium transition-colors hover:text-purple-500">
+                                                @item.Name
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <td class="py-6 text-center text-white/80">
+                                        @item.Price.ToString("N0")đ
+                                    </td>
+                                    <td class="py-6">
+                                        <div class="flex justify-center">
+                                            <div class="flex items-center rounded-full border border-white/20 bg-[#1e1e1e] px-2 py-1">
+                                                <button @onclick="() => UpdateQuantity(item, -1)"
+                                                        class="px-2 text-white/50 hover:text-white">
+                                                    -
+                                                </button>
+                                                <input type="text" readonly value="@item.Quantity"
+                                                       class="w-8 bg-transparent text-center text-sm outline-none" />
+                                                <button @onclick="() => UpdateQuantity(item, 1)"
+                                                        class="px-2 text-white/50 hover:text-white">
+                                                    +
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-6 text-right font-bold text-purple-500">
+                                        @((item.Price * item.Quantity).ToString("N0"))đ
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @*giao dien mobile*@
+                <div class="hidden sm:block xs:block">
+                    @foreach (var item in _cartItems)
+                    {
+                        <div class="relative flex flex-col border-b border-white/10 py-6 last:border-0">
+                            <button class="absolute right-0 top-6 text-white/40">
+                                <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
+                            </button>
+
+                            <div class="flex gap-4">
+                                <img src="@item.Image" class="aspect-[1/1.2] w-24 rounded object-cover shadow-lg" />
+
+                                <div class="flex flex-1 flex-col gap-3">
+                                    <h4 class="pr-6 text-base font-bold leading-tight text-white">@item.Name</h4>
+
+                                    <div class="flex items-center justify-between border-b border-dashed border-white/10 pb-2">
+                                        <span class="text-xs uppercase text-white/50">Giá</span>
+                                        <span class="text-sm font-medium text-white">@item.Price.ToString("N0")đ</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between border-b border-dashed border-white/10 pb-2">
+                                        <span class="text-xs uppercase text-white/50">Số lượng</span>
+                                        <div class="flex origin-right scale-90 items-center rounded-full border border-white/20 bg-[#1e1e1e] px-2 py-0.5">
+                                            <button @onclick="() => UpdateQuantity(item, -1)" class="px-2 text-white/50">-</button>
+                                            <span class="w-6 text-center text-xs">@item.Quantity</span>
+                                            <button @onclick="() => UpdateQuantity(item, 1)" class="px-2 text-white/50">+</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-1">
+                                        <span class="text-xs font-bold uppercase text-white/50">Tạm tính</span>
+                                        <span class="text-base font-bold text-purple-500">@((item.Price * item.Quantity).ToString("N0"))đ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="h-fit w-1/3 rounded-md bg-[#9797971c] p-7 md:w-full sm:w-full">
+                <h3 class="mb-5 text-xl font-medium text-white">Đơn hàng</h3>
+                <div class="flex justify-between gap-2">
+                    <span class="w-36 flex-shrink-0 text-base font-medium text-white">Tạm tính:</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-base text-white/70">100.000đ</span>
+                </div>
+                <MudDivider Class="my-6 !border-white/15" />
+                <div class="flex justify-between gap-2">
+                    <span class="w-36 flex-shrink-0 text-2xl font-medium text-white">Tổng tiền:</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-2xl font-bold text-purple-500">100.000đ</span>
+                </div>
+                <MudDivider Class="my-6 !border-white/15" />
+                <a href="@RouterConfig.Customer.Checkout" class="block w-full rounded-full bg-purple-500 py-3.5 text-center text-white">
+                    Tiến hành thanh toán
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mx-auto mb-10 mt-10 max-w-[1520px] px-3 lg:px-0">
+    <div class="mb-6 flex items-center gap-2">
+        <MudIcon Icon="@Icons.Material.Filled.Favorite" Class="!text-purple-500" Size="Size.Large" />
+        <h2 class="text-2xl font-bold text-white xs:text-2xl">Có Thể Bạn Thích</h2>
+    </div>
+
+    <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
+        @for (int i = 0; i < 6; i++)
+        {
+            <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                <a href="@RouterConfig.Customer.Home" class="flex h-full w-full flex-col gap-4">
+                    <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" class="aspect-[1/1.5] object-cover" />
+
+                    <p class="line-clamp-2 text-base font-medium text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
+
+                    <p class="text-base text-purple-500">100.000đ</p>
+                </a>
+
+                <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
+                    <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
+                        <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
+                        <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<CartItem> _cartItems = new()
+    {
+        new CartItem { Name = "The Bus", Price = 29000, Quantity = 1, Image = "https://avigames.net/wp-content/uploads/2024/03/thebus.jpg" },
+        new CartItem { Name = "Mafia: The Old Country Deluxe Edition", Price = 149000, Quantity = 3, Image = "https://avigames.net/wp-content/uploads/2025/08/mafiatoc.jpg" },
+        new CartItem { Name = "Wuchang: Fallen Feathers – Deluxe Edition", Price = 115000, Quantity = 2, Image = "https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" }
+    };
+
+    private void UpdateQuantity(CartItem item, int change)
+    {
+        item.Quantity += change;
+        if (item.Quantity < 1) item.Quantity = 1;
+    }
+
+    public class CartItem
+    {
+        public string Name { get; set; }
+        public long Price { get; set; }
+        public int Quantity { get; set; }
+        public string Image { get; set; }
+    }
+
+    private List<BreadcrumbItem> _itemBreadcrumbs = [
+        new("TRANG CHỦ", href: RouterConfig.Customer.Home),
+        new("GIỎ HÀNG CHI TIẾT", href: null, disabled: true),
+    ];
+}
+
+<style>
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+</style>

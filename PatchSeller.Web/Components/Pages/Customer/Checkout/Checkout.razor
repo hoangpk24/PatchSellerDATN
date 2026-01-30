@@ -1,0 +1,157 @@
+﻿@page "/checkout"
+@layout MainLayout
+
+<section>
+    <div class="w-full bg-[#9797971c] py-6">
+        <div class="mx-auto w-full max-w-[1520px] px-6">
+            <h1 class="mb-2.5 font-medium leading-tight text-[44px] text-white">Thanh Toán</h1>
+            <MudBreadcrumbs Class="custom-breadcrumb !p-0 !text-xs" Items="_itemBreadcrumbs" Separator="/" />
+        </div>
+    </div>
+
+    <div class="mx-auto my-10 max-w-[1520px] px-2">
+        <div class="flex justify-between lg:flex-row sm:flex-col-reverse md:flex-col-reverse lg:gap-8 md:gap-4 sm:gap-6">
+            <div class="h-fit w-3/5 md:w-full sm:w-full">
+                <h3 class="font-semibold text-[22px] text-white"><span class="text-purple-500">1.</span> Thông tin khách hàng</h3>
+
+                <div class="mt-6">
+                    <MudForm>
+                        <div class="mb-5">
+                            <label class="mb-2 block text-sm font-medium text-white">
+                                Họ và tên <span class="text-xs text-red-600">*</span>
+                            </label>
+                            <MudTextField T="string"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
+                        </div>
+                        <div class="mb-5">
+                            <label class="mb-2 block text-sm font-medium text-white">
+                                Email <span class="text-xs text-red-600">*</span>
+                            </label>
+                            <MudTextField T="string"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Class="custom-text-field" />
+                        </div>
+                        <div class="mb-5">
+                            <label class="mb-2 block text-sm font-medium text-white">
+                                Số điện thoại
+                            </label>
+                            <MudTextField T="string"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Class="custom-text-field" />
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-medium text-white">
+                                Ghi chú
+                            </label>
+                            <MudTextField T="string"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Class="custom-text-field" />
+                        </div>
+                    </MudForm>
+                </div>
+
+                <h3 class="mt-10 font-semibold text-[22px] text-white"><span class="text-purple-500">2.</span> Phương thức thanh toán</h3>
+
+                <div class="mt-6 bg-[#9797971c] p-6">
+                    <div class="flex items-center gap-3">
+                        <p class="text-base font-medium text-white">Thanh toán bằng chuyển khoản ngân hàng (quét mã QR)</p>
+                        <img src="/assets/images/payos_crop.png" width="100" logo="logo payment" />
+                    </div>
+                    <MudDivider Class="my-6 !border-white/15" />
+                    <div class="flex w-full items-center gap-2">
+                        <MudTextField T="string" placeholder="nhập mã giảm giá" Variant="Variant.Outlined" Style="height: 40px" />
+                        <MudIcon Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Class="cursor-pointer" />
+                        <MudButton Class="!h-10 w-[8rem] flex-shrink-0 !rounded-full !bg-purple-500 !text-white" Variant="Variant.Filled">
+                            Áp Dụng
+                        </MudButton>
+                    </div>
+                    <MudDivider Class="my-6 !border-white/15" />
+                    <MudButton class="!w-full !rounded-full !bg-purple-500 !py-3 !text-white">
+                        Thanh toán
+                    </MudButton>
+                </div>
+            </div>
+
+            <div class="h-fit w-2/5 rounded-md bg-[#9797971c] p-7 md:w-full sm:w-full">
+                <h3 class="mb-5 text-xl font-medium text-white">Thông tin đơn hàng</h3>
+                <div class="flex justify-between gap-2">
+                    <span class="w-36 flex-shrink-0 text-base font-medium text-white">Sản phẩm</span>
+                    <span class="w-36 flex-shrink-0 text-right text-base font-medium text-white/70">(4)</span>
+                </div>
+                <MudDivider Class="my-4 !border-white/15" />
+                <div class="hide-scrollbar flex max-h-[350px] flex-col gap-3 overflow-y-auto">
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        <div class="flex items-center gap-2 border-b border-solid border-white/15 pb-3 last:!border-0">
+                            <div class="h-full w-full max-w-[6.25rem] flex-shrink-0">
+                                <a>
+                                    <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" />
+                                </a>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <p class="whitespace-pre-wrap text-sm text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
+                                <span class="whitespace-pre-wrap text-sm font-medium text-white">100.000đ x 1</span>
+                                <div class="flex w-fit scale-90 items-center rounded-full border border-white/20 bg-[#1e1e1e] px-2 py-0.5">
+                                    <butto class="px-2 text-white/50">-</butto>
+                                    <span class="w-6 text-center text-xs text-white">1</span>
+                                    <button class="px-2 text-white/50">+</button>
+                                </div>
+                                <button class="w-fit p-2 text-xs text-purple-500 hover:text-red-500">Xóa</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <MudDivider Class="my-4 !border-white/15" />
+                <div class="flex justify-between gap-2">
+                    <span class="w-36 flex-shrink-0 text-base font-medium text-white">Tạm tính:</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-base text-white/70">100.000đ</span>
+                </div>
+                <MudDivider Class="my-4 !border-white/15" />
+                <div class="flex justify-between gap-2">
+                    <span class="w-36 flex-shrink-0 text-2xl font-medium text-white">Tổng tiền:</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-2xl font-bold text-purple-500">100.000đ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private List<BreadcrumbItem> _itemBreadcrumbs = [
+        new("TRANG CHỦ", href: RouterConfig.Customer.Home),
+        new("THANH TOÁN", href: null, disabled: true),
+    ];
+}
+
+<style>
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .mud-input-outlined-border {
+        border-color: rgba(156, 163, 175, 0.3) !important;
+        border-radius: 9999px !important;
+    }
+
+    .mud-input-outlined {
+        background-color: #242424 !important;
+        border-radius: 9999px !important;
+        color: white !important;
+    }
+
+    .mud-icon-button-label svg {
+        margin: 0 !important;
+        height: 100%;
+        color: #a855f7 !important;
+    }
+</style>

@@ -1,20 +1,20 @@
 ﻿<header class="fixed top-0 z-20 w-full border-b border-white/5 bg-black-default">
-    <div class="mx-auto flex max-w-[1520px] items-center justify-between py-1">
-
+    <div class="mx-auto flex max-w-[1520px] items-center justify-between gap-6 px-2 py-1 lg:pc-0 md:gap-0 lg:gap-0 md:px-0">
         <div class="flex-shrink-0">
-            <a href="@RouterConfig.Customer.Home">
+            <a href="@RouterConfig.Customer.Home" class="hidden md:block lg:block">
                 <img src="/assets/icons/logo.svg"
                      alt="AviGames Logo"
                      class="h-[72px] w-auto object-cover" />
             </a>
+            <MudIcon @onclick="OpenHeaderDrawer" Icon="@Icons.Material.Filled.Menu" Class="!block cursor-pointer !text-white md:!hidden lg:!hidden" />
         </div>
 
-        <nav class="hidden items-center gap-2 lg:flex">
-            <ul class="flex items-center">
-                <li class="px-4 py-2">
+        <nav class="hidden items-center gap-2 lg:flex md:flex">
+            <ul class="flex flex-wrap items-center">
+                <li class="flex-shrink-0 px-4 py-2">
                     <a class="cursor-pointer font-bold text-[15px] text-white transition-colors hover:text-purple-500">Tất Cả Sản Phẩm</a>
                 </li>
-                <li class="group relative cursor-pointer px-4 py-2">
+                <li class="group relative flex-shrink-0 cursor-pointer px-4 py-2">
                     <a class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
                         Thể Loại
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" />
@@ -26,25 +26,25 @@
                         </div>
                     </div>
                 </li>
-                <li class="group relative cursor-pointer px-4 py-2">
+                <li class="group relative flex-shrink-0 cursor-pointer px-4 py-2">
                     <a class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
                         Nền Tảng
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" />
                     </a>
                 </li>
-                <li class="group relative cursor-pointer px-4 py-2">
+                <li class="group relative flex-shrink-0 cursor-pointer px-4 py-2">
                     <a class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
                         Mã Giảm Giá
                     </a>
                 </li>
-                <li class="px-4 py-2">
+                <li class="flex-shrink-0 px-4 py-2">
                     <a class="cursor-pointer font-bold text-[15px] text-white transition-colors hover:text-purple-500">Tra Cứu Đơn Hàng</a>
                 </li>
             </ul>
         </nav>
 
-        <div class="flex items-center gap-6">
-            <div class="relative flex w-full max-w-[300px] items-center rounded-full border border-gray-700 bg-[#1e1e1e] p-1 transition-all focus-within:border-purple-500">
+        <div class="flex w-full items-center gap-6 md:w-auto lg:w-auto">
+            <div class="relative flex w-full max-w-[500px] items-center rounded-full border border-gray-700 bg-[#1e1e1e] p-1 transition-all focus-within:border-purple-500 md:max-w-[300px] lg:max-w-[300px]">
                 <input type="text"
                        placeholder="Tìm games bạn cần"
                        class="w-full bg-transparent py-1.5 pl-4 pr-10 text-sm font-light text-gray-200 placeholder-gray-500 outline-none" />
@@ -53,7 +53,7 @@
                 </button>
             </div>
 
-            <div class="h-8 w-[1px] bg-gray-700"></div>
+            <div class="h-8 w-[1px] bg-gray-700 lg:block sm:hidden :md:block"></div>
 
             <div class="flex items-center gap-5">
                 @if (_mine != null)
@@ -74,7 +74,7 @@
                 {
                     <a href="@RouterConfig.Customer.Login" class="flex cursor-pointer items-center gap-2 text-white transition-colors hover:text-purple-500">
                         <MudIcon Icon="@Icons.Material.Outlined.Person" Size="Size.Medium" />
-                        <span class="whitespace-nowrap text-sm font-bold">Đăng nhập / Đăng ký</span>
+                        @* <span class="whitespace-nowrap text-sm font-bold">Đăng nhập / Đăng ký</span> *@
                     </a>
                 }
 
@@ -82,7 +82,7 @@
                     <MudIcon Icon="@Icons.Material.Outlined.FavoriteBorder" Class="text-white group-hover:text-purple-500" />
                 </div>
 
-                <div class="group relative flex cursor-pointer items-center gap-3">
+                <div @onclick="OpenCartDrawer" class="group relative flex cursor-pointer items-center gap-3">
                     <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Class="text-white group-hover:text-purple-500" />
                     <span class="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 font-bold text-[10px] text-white">0</span>
                 </div>
@@ -99,6 +99,12 @@
     public EventCallback OnLoggedOut { get; set; }
 
     [Parameter]
+    public EventCallback OnOpenCartDrawer { get; set; }
+
+    [Parameter]
+    public EventCallback OnOpenHeaderDrawer { get; set; }
+
+    [Parameter]
     public bool FirstLogin { get; set; }
 
     private string GetInitials(string name)
@@ -106,6 +112,16 @@
         if (string.IsNullOrWhiteSpace(name)) return "U";
         var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         return parts[^1][0].ToString().ToUpper();
+    }
+
+    async Task OpenCartDrawer()
+    {
+        await OnOpenCartDrawer.InvokeAsync();
+    }
+
+    async Task OpenHeaderDrawer()
+    {
+        await OnOpenHeaderDrawer.InvokeAsync();
     }
 
     async Task Logout()

@@ -25,6 +25,7 @@ builder.Services.AddMudServices(config =>
 });
 
 builder.Services.AddScoped<AccessService>();
+builder.Services.AddScoped<DrawerService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {
