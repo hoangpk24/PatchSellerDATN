@@ -22,8 +22,6 @@
                                 <th class="w-16 py-4 font-medium"></th>
                                 <th class="min-w-[300px] py-4 text-center font-medium">Sản phẩm</th>
                                 <th class="py-4 text-center font-medium">Giá</th>
-                                <th class="py-4 text-center font-medium">Số lượng</th>
-                                <th class="py-4 text-right font-medium">Tạm tính</th>
                             </tr>
                         </thead>
                         <tbody class="text-white">
@@ -48,25 +46,6 @@
                                     <td class="py-6 text-center text-white/80">
                                         @item.Price.ToString("N0")đ
                                     </td>
-                                    <td class="py-6">
-                                        <div class="flex justify-center">
-                                            <div class="flex items-center rounded-full border border-white/20 bg-[#1e1e1e] px-2 py-1">
-                                                <button @onclick="() => UpdateQuantity(item, -1)"
-                                                        class="px-2 text-white/50 hover:text-white">
-                                                    -
-                                                </button>
-                                                <input type="text" readonly value="@item.Quantity"
-                                                       class="w-8 bg-transparent text-center text-sm outline-none" />
-                                                <button @onclick="() => UpdateQuantity(item, 1)"
-                                                        class="px-2 text-white/50 hover:text-white">
-                                                    +
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-6 text-right font-bold text-purple-500">
-                                        @((item.Price * item.Quantity).ToString("N0"))đ
-                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -88,23 +67,9 @@
                                 <div class="flex flex-1 flex-col gap-3">
                                     <h4 class="pr-6 text-base font-bold leading-tight text-white">@item.Name</h4>
 
-                                    <div class="flex items-center justify-between border-b border-dashed border-white/10 pb-2">
+                                    <div class="flex items-center justify-between border-t border-dashed border-white/10 pt-2">
                                         <span class="text-xs uppercase text-white/50">Giá</span>
                                         <span class="text-sm font-medium text-white">@item.Price.ToString("N0")đ</span>
-                                    </div>
-
-                                    <div class="flex items-center justify-between border-b border-dashed border-white/10 pb-2">
-                                        <span class="text-xs uppercase text-white/50">Số lượng</span>
-                                        <div class="flex origin-right scale-90 items-center rounded-full border border-white/20 bg-[#1e1e1e] px-2 py-0.5">
-                                            <button @onclick="() => UpdateQuantity(item, -1)" class="px-2 text-white/50">-</button>
-                                            <span class="w-6 text-center text-xs">@item.Quantity</span>
-                                            <button @onclick="() => UpdateQuantity(item, 1)" class="px-2 text-white/50">+</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center justify-between pt-1">
-                                        <span class="text-xs font-bold uppercase text-white/50">Tạm tính</span>
-                                        <span class="text-base font-bold text-purple-500">@((item.Price * item.Quantity).ToString("N0"))đ</span>
                                     </div>
                                 </div>
                             </div>

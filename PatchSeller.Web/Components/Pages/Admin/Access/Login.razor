@@ -63,7 +63,7 @@ else
 
     private void TogglePasswordVisibility() => _passwordVisibility = !_passwordVisibility;
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
@@ -98,25 +98,10 @@ else
                 }
             }
 
-            var getMe = await _localStorage.GetItemAsStringAsync(Constant.UserInfoLocalStorage);
-
-            if (string.IsNullOrEmpty(getMe))
-            {
-                await _localStorage.RemoveItemAsync(Constant.TokenNameLocalStorage);
-                await _localStorage.RemoveItemAsync(Constant.TokenExpiredLocalStorage);
-                await _localStorage.RemoveItemAsync(Constant.UserInfoLocalStorage);
-
-                _isLoading = false;
-                StateHasChanged();
-                return;
-                
-            }
-
             MineResponse mine = null;
-
             try
             {
-                mine = JsonSerializer.Deserialize<MineResponse>(getMe);
+                mine = await _accessService.AccessCheck(token);
             }
             catch (JsonException)
             {
@@ -128,6 +113,19 @@ else
                 StateHasChanged();
                 return;
             }
+
+            if (mine == null)
+            {
+                await _localStorage.RemoveItemAsync(Constant.TokenNameLocalStorage);
+                await _localStorage.RemoveItemAsync(Constant.TokenExpiredLocalStorage);
+                await _localStorage.RemoveItemAsync(Constant.UserInfoLocalStorage);
+
+                _isLoading = false;
+                StateHasChanged();
+                return;
+                
+            }
+
             if (mine != null && mine.Role != null)
             {
                 if (mine.Role == Constant.Role.Customer)

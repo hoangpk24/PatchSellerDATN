@@ -15,7 +15,7 @@
 {   
     <CascadingValue Value="_mine" Name="@Constant.CascadingNameParams.Mine">
         <CascadingValue Value="_token" Name="@Constant.CascadingNameParams.Token">
-            <MudLayout Class="bg-black-layout pt-[50px] lg:mt-20 md:pt-20">
+            <MudLayout Class="bg-black-layout pt-[50px] lg:pt-20 md:pt-20">
                 <Header OnLoggedOut="HandleLogout" OnOpenCartDrawer="HandleOpenCartDrawer" OnOpenHeaderDrawer="HandleOpenHeaderDrawer" FirstLogin="@_firstLogin" />
 
                 <main class="lg:min-h-[calc(100lvh-621px)]">
@@ -153,6 +153,9 @@
                     _isLoading = false;
                     return;
                 }
+
+                var userInfoJson = JsonSerializer.Serialize(_mine);
+                await _localStorage.SetItemAsStringAsync(Constant.UserInfoLocalStorage, userInfoJson);
             }
         }
         else
