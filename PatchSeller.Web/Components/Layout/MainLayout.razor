@@ -15,14 +15,17 @@
 {   
     <CascadingValue Value="_mine" Name="@Constant.CascadingNameParams.Mine">
         <CascadingValue Value="_token" Name="@Constant.CascadingNameParams.Token">
-            <MudLayout Class="bg-black-layout pt-20">
-                <Header OnLoggedOut="HandleLogout" FirstLogin="@_firstLogin" />
+            <MudLayout Class="bg-black-layout pt-[50px] lg:mt-20 md:pt-20">
+                <Header OnLoggedOut="HandleLogout" OnOpenCartDrawer="HandleOpenCartDrawer" OnOpenHeaderDrawer="HandleOpenHeaderDrawer" FirstLogin="@_firstLogin" />
 
                 <main class="lg:min-h-[calc(100lvh-621px)]">
                     @Body
                 </main>
 
                 <Footer />
+
+                <HeaderDrawer />
+                <CartDrawer />
             </MudLayout>
         </CascadingValue>
     </CascadingValue>
@@ -44,9 +47,10 @@
     private string _token = string.Empty;
     private bool _firstLogin = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        navigation.LocationChanged += HandleLocationChanged;
+        navigation.LocationChanged += HandleLocationChanged; 
+        _drawerService.OnChange += StateHasChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -156,6 +160,16 @@
             _mine = null;
             _firstLogin = false;
         }
+    }
+
+    public void HandleOpenCartDrawer()
+    {
+        _drawerService.OpenDrawer();
+    }
+
+    public  void HandleOpenHeaderDrawer()
+    {
+        _drawerService.OpenHeaderDrawer();
     }
 
     private async Task HandleLogout()

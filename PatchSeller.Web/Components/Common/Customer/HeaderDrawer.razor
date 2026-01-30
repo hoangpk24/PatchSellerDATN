@@ -1,0 +1,63 @@
+﻿<MudDrawer @bind-Open="@_drawerService.IsOpenHeader" Width="340px" Class="!bg-black-default2 px-2" Height="100lvh" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Temporary">
+    <MudDrawerHeader Class="!items-center !justify-between">
+        <h1 class="text-lg text-white">Menu</h1>
+        <MudIconButton Icon="@Icons.Material.Filled.Close" Class="!text-white" Edge="Edge.End" OnClick="@_drawerService.CloseHeaderDrawer" />
+    </MudDrawerHeader>
+
+
+    <div>
+        <MudDivider Class="!border-white/15" />
+        <div class="max-h-[calc(100lvh-84px)] flex flex-col overflow-y-auto">
+            <MudNavMenu Class="custom-nav-menu">
+                <MudNavLink Href="/about" Class="border-b border-white/5 !py-2 !text-white hover:!bg-white/15">Tất Cả Sản Phẩm</MudNavLink>
+                <MudNavLink Href="/about" Class="border-b border-white/5 !py-2 !text-white hover:!bg-white/15">Mã Giảm Giá</MudNavLink>
+                <MudNavLink Href="/about" Class="border-b border-white/5 !py-2 !text-white hover:!bg-white/15">Tra Cứu Đơn Hàng</MudNavLink>
+
+                <MudNavGroup Title="Thể Loại" Expanded="false" Class="border-b border-white/15 !py-2">
+                    <MudNavLink Href="/translate/pc" Class="!py-2 !pl-3 !text-white/70 hover:!text-white">Game Việt Hoá PC</MudNavLink>
+                    <MudNavLink Href="/translate/switch" Class="!py-2 !pl-3 !text-white/70 hover:!text-white">Game Việt Hoá Switch</MudNavLink>
+                </MudNavGroup>
+
+                <MudNavGroup Title="Nền tảng" Expanded="false" Class="border-b border-white/15 !py-2">
+                    <MudNavLink Href="/service/1" Class="!py-2 !pl-3 !text-white/70 hover:!text-white">Nạp Steam Wallet</MudNavLink>
+                    <MudNavLink Href="/service/2" Class="!py-2 !pl-3 !text-white/70 hover:!text-white">Acc Full Games</MudNavLink>
+                    <MudNavLink Href="/service/2" Class="!py-2 !pl-3 !text-white/70 hover:!text-white">Acc Full Games</MudNavLink>
+                </MudNavGroup>
+            </MudNavMenu>
+        </div>
+    </div>
+</MudDrawer>
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        _drawerService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        _drawerService.OnChange -= StateHasChanged;
+    }
+}
+
+<style>
+    .custom-nav-menu .mud-nav-link {
+        color: white !important;
+        font-weight: 500 !important;
+        font-size: 16px !important;
+    }
+
+    .custom-nav-menu .mud-nav-group-button {
+        padding: 1rem 0.5rem !important;
+        color: white !important;
+    }
+
+    .custom-nav-menu .mud-nav-group-button .mud-nav-group-expand-icon {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    .custom-nav-menu .mud-nav-group-button:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+</style>

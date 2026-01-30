@@ -191,7 +191,7 @@ public static class PatchSellerDbSeeder
             {
                 StaffId = 1,
                 UserName = "admin",
-                PasswordHash = "dev-hash:admin@123",
+                PasswordHash = "26dc318942685872cf79c5eb96c9bb13",
                 Email = "admin@patchseller.local",
                 Role = "Admin",
                 PhoneNumber = "0987675845",
@@ -201,7 +201,7 @@ public static class PatchSellerDbSeeder
             {
                 StaffId = 2,
                 UserName = "editor",
-                PasswordHash = "dev-hash:editor@123",
+                PasswordHash = "26dc318942685872cf79c5eb96c9bb13",
                 Email = "editor@patchseller.local",
                 Role = "Editor",
                 PhoneNumber = "0987675866",

@@ -22,10 +22,10 @@
         <h2 class="text-2xl font-bold text-white xs:text-2xl">Hot Nhất</h2>
     </div>
 
-    <div class="grid gap-4 rounded-md border border-solid border-purple-500 px-3 py-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-6">
+    <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md border border-solid border-purple-500 px-3 py-4">
         @for(int i = 0; i< 6; i++)
-        {   
-            <div class="group relative overflow-hidden">
+        {
+            <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[325px] sm:w-[325px]">
                 <a href="@RouterConfig.Customer.Home" class="flex h-full w-full flex-col gap-4">
                     <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" class="aspect-[1/1.5] object-cover" />
 
@@ -45,16 +45,16 @@
     </div>
 </section>
 
-<section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
-    <div class="item-center mb-6 flex gap-2">
+<section class="mx-auto mb-10 mt-10 max-w-[1520px] px-3 lg:px-0">
+    <div class="mb-6 flex items-center gap-2">
         <MudIcon Icon="@Icons.Material.Filled.Games" Class="!text-purple-500" Size="Size.Large" />
         <h2 class="text-2xl font-bold text-white xs:text-2xl">Mới Nhất</h2>
     </div>
 
-    <div class="grid gap-4 rounded-md px-3 py-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-6">
+    <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
         @for (int i = 0; i < 6; i++)
         {
-            <div class="group relative overflow-hidden">
+            <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
                 <a href="@RouterConfig.Customer.Home" class="flex h-full w-full flex-col gap-4">
                     <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" class="aspect-[1/1.5] object-cover" />
 
@@ -165,3 +165,14 @@
         }
     };
 }
+
+<style>
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+</style>
