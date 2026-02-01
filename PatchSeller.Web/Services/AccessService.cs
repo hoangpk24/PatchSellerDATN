@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity.Data;
 using PatchSeller.Web.DTOs;
 using PatchSeller.Web.Models;
 using System.Security.Cryptography;
@@ -84,6 +85,34 @@ namespace PatchSeller.Web.Services
                 return new LoginResponse { LoginSuccess = false };
             }
         }
+        public async Task<ServiceResult<bool>> RegisterCustomer(RegisterModel payload)
+        {
+            var request = new RegisterModel()
+            {
+                UserName = payload.UserName.Trim(),
+                PasswordHash = HashPassword(payload.PasswordHash.Trim()),
+                Email = payload.Email.Trim(),
+                FullName = payload.FullName.Trim(),
+                PhoneNumber = payload.PhoneNumber.Trim(),
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("/Access/customer-register", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ServiceResult<bool>.Success(true);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                    ? Constant.Constant.Errors[errorCode ?? ""]
+                                    : "Đã có lỗi xảy ra. Vui lòng thử lại.";
+                return ServiceResult<bool>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
 
         public async Task<MineResponse> AccessCheck(string token)
         {
@@ -112,6 +141,64 @@ namespace PatchSeller.Web.Services
             {
                 var responseDTO = await response.Content.ReadFromJsonAsync<MineResponse>();
                 return responseDTO ?? new MineResponse { IsExpired = true };
+            }
+        }
+
+        public async Task<ServiceResult<bool>> ForgotPassword(ForgotModel request)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/Access/reset-password", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ServiceResult<bool>.Success(true);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                    ? Constant.Constant.Errors[errorCode ?? ""]
+                                    : "Đã có lỗi xảy ra. Vui lòng thử lại.";
+                return ServiceResult<bool>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
+
+        public async Task<ServiceResult<bool>> ChangePassword(ChangePasswordModel request, string token)
+        {
+
+            var payload = new ChangePasswordModel()
+            {
+                CurrentPassword = HashPassword(request.CurrentPassword.Trim()),
+                NewHashPassword = HashPassword(request.NewHashPassword.Trim())
+            };
+
+            var r = new HttpRequestMessage(HttpMethod.Post, "/Access/change-password");
+
+            r.Content = JsonContent.Create(payload);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                var formatToken = token.Trim('"');
+                r.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", formatToken);
+            }
+
+            var response = await _httpClient.SendAsync(r);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ServiceResult<bool>.Success(true);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                    ? Constant.Constant.Errors[errorCode ?? ""]
+                                    : "Đã có lỗi xảy ra. Vui lòng thử lại.";
+                return ServiceResult<bool>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
     }

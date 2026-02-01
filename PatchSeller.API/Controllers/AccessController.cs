@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using PatchSeller.API.Utilities;
+using PatchSeller.API;
 using PatchSeller.API.DTOs;
+using PatchSeller.API.Utilities;
 using PatchSeller.DAL.Models;
 using PatchSeller.DAL.Repository;
+using Pro219.API.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using PatchSeller.API;
 using System.Threading.Tasks;
 
 namespace PatchSeller.API.Controllers
@@ -187,6 +188,122 @@ namespace PatchSeller.API.Controllers
             }
         }
 
+        [HttpPost("customer-register")]
+        public async Task<ActionResult<bool>> CustomerRegister([FromBody] RegisterModel registerModel) { 
+            var existingByEmail = await _customerRepository.FindUserExistByKeyWord(registerModel.Email);
+            var existingByUsername = await _customerRepository.FindUserExistByKeyWord(registerModel.UserName);
+            if (existingByEmail != null || existingByUsername != null)
+            {
+                return BadRequest(Constant.ErrorCode.EmailOrUsernameAlreadyExit);
+            }
+
+            var newUser = new User
+            {
+                FullName = registerModel.FullName,
+                UserName = registerModel.UserName,
+                Email = registerModel.Email,
+                PhoneNumber = registerModel.PhoneNumber,
+                PasswordHash = registerModel.PasswordHash,
+                RewardPoint = 0,
+                RankId = 1,
+                Status = 1,
+                Delete = false,
+                LastLogin = DateTime.Now,
+            };
+
+            var customerResult = await _customerRepository.Create(newUser);
+
+            if(customerResult == null)
+            {
+                return StatusCode(500, Constant.ErrorCode.DatabaseError);
+            }
+
+            var newCart = new Cart
+            {
+                UserId = customerResult.UserId,
+                Delete = false,
+            };
+
+            var cartResult = await cartRepository.Create(newCart);
+
+            if(cartResult == null)
+            {
+                return StatusCode(500, Constant.ErrorCode.DatabaseError);
+            }
+
+            return Ok(true);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<ActionResult<bool>> ResetPassword([FromBody] ResetPasswordModel resetPasswordModel)
+        {
+            if (string.IsNullOrEmpty(resetPasswordModel.Email))
+            {
+                return BadRequest(Constant.ErrorCode.EmailOrUsernameRequired);
+            }
+
+            var customer = await _customerRepository.FindUserByEmailAndPhoneAndUserName(resetPasswordModel.Email, string.Empty, string.Empty);
+
+            if (customer == null)
+            {
+                return BadRequest(Constant.ErrorCode.EmailOrUsernameNotFound);
+            }
+
+            UtilityFunc utilityFunc = new UtilityFunc();
+            //string newPassword = utilityFunc.GenerateRandomString(16);
+            string newPassword = "User@12345";
+
+            customer.PasswordHash = utilityFunc.HashPassword(newPassword);
+            customer.LastLogin = null;
+
+            var updatedCustomer = await _customerRepository.Update(customer);
+
+            if (updatedCustomer == null)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+
+            return Ok(true);
+        }
+
+        [HttpPost("change-password")]
+        public async Task<ActionResult<bool>> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
+        {
+            string userName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string email = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (userName == null && email == null)
+            {
+                return BadRequest(Constant.ErrorCode.CustomerNotFound);
+            }
+            else
+            {
+                var customer = await _customerRepository.FindUserByEmailAndPhoneAndUserName(email, string.Empty, userName);
+
+                if (customer == null)
+                {
+                    return NotFound(Constant.ErrorCode.CustomerNotFound);
+                }
+
+                if(customer.PasswordHash != changePasswordDTO.CurrentPassword)
+                {
+                    return BadRequest(Constant.ErrorCode.CurrentPasswordFailed);
+                }
+
+                customer.PasswordHash = changePasswordDTO.NewHashPassword;
+                if (customer.LastLogin == null)
+                {
+                    customer.LastLogin = DateTime.Now;
+                }
+                var updatedCustomer = await _customerRepository.Update(customer);
+
+                if (updatedCustomer == null)
+                {
+                    return StatusCode(500, Constant.ErrorCode.OtherError);
+                }
+
+                return Ok(true);
+            }
+        }
     }
 
 }

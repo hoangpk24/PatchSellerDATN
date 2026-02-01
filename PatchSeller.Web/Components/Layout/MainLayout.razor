@@ -89,16 +89,16 @@
         var expired = await _localStorage.GetItemAsStringAsync(Constant.TokenExpiredLocalStorage);
         var FirstLogin = await _localStorage.GetItemAsStringAsync(Constant.UserFirstLoginLocalStorage);
 
-        // if (!string.IsNullOrEmpty(FirstLogin))
-        // {
-        //     _firstLogin = bool.Parse(FirstLogin);
-        //     if (_firstLogin == true && !navigation.ToBaseRelativePath(navigation.Uri).Equals(RouterConfig.Customer.ChangePassword.Replace("/", "")))
-        //     {
-        //         navigation.NavigateTo(RouterConfig.Customer.ChangePassword, true);
-        //         _isLoading = false;
-        //         return;
-        //     }
-        // }
+        if (!string.IsNullOrEmpty(FirstLogin))
+        {
+            _firstLogin = bool.Parse(FirstLogin);
+            if (_firstLogin == true && !navigation.ToBaseRelativePath(navigation.Uri).Equals(RouterConfig.Customer.ChangePassword.Replace("/", "")))
+            {
+                navigation.NavigateTo(RouterConfig.Customer.ChangePassword, true);
+                _isLoading = false;
+                return;
+            }
+        }
 
         if (!string.IsNullOrEmpty(_token))
         {

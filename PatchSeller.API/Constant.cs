@@ -5,8 +5,11 @@
         public static class ErrorCode
         {
             public const string EmailOrPhoneRequired = "email_phone_required";
+            public const string CurrentPasswordFailed = "current_password_failed";
+            public const string EmailOrUsernameRequired = "email_username_required";
             public const string EmailOrPhoneNotFound = "email_phone_not_found";
-            public const string EmailOrPhoneAlreadyExit = "email_phone_already_exit";
+            public const string EmailOrUsernameNotFound = "email_username_not_found";
+            public const string EmailOrUsernameAlreadyExit = "email_username_already_exit";
             public const string CustomerNotFound = "customer_not_found";
             public const string CustomerNotFoundWidthEmailOrPhone = "customer_not_found_with_email_or_phone";
             public const string Unauthorized = "unauthorized";
@@ -27,7 +30,5 @@
             public const string ProductInActiveOrder = "product_in_active_order";
 
         }
-
-      
     }
 }
