@@ -108,7 +108,18 @@
 
         if (!_form.IsValid) return;
 
-        _snackbar.Add("Submitted", MudBlazor.Severity.Success);
+        var response = await _accessService.RegisterCustomer(_model);
+
+        if(response.IsSuccess)
+        {
+            navigation.NavigateTo(RouterConfig.Customer.Login);
+            _snackbar.Add("Đăng ký thành công!", MudBlazor.Severity.Success);
+
+        }
+        else
+        {
+            _snackbar.Add(response.ErrorMessage != null ? response.ErrorMessage : "Đăng ký không thành công!", MudBlazor.Severity.Warning);
+        }
     }
 }
 

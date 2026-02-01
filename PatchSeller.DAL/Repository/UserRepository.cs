@@ -52,6 +52,37 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<User> FindUserExistByKeyWord(string key)
+        {
+            try
+            {
+                var c = _context.Users.FirstOrDefault(x => (x.Email == key || x.PhoneNumber == key) && x.Delete != true);
+
+                if (c == null)
+                    return null;
+                return c;
+
+
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<User> FindUserByEmailAndPhoneAndUserName(string email, string phoneNumber, string username)
+        {
+            try
+            {
+                var customer = await _context.Users.FirstOrDefaultAsync(x => (x.Email == email || x.PhoneNumber == phoneNumber || x.UserName == username) && x.Delete != true);
+                return customer;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task<User> Create(User user)
         {
             try

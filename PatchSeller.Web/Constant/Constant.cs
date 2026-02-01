@@ -34,12 +34,14 @@
 
         public static class ErrorCode
         {
-            public const string EmailOrPhoneAlreadyExit = "email_phone_already_exit";
             public const string EmailOrPhoneRequired = "email_phone_required";
+            public const string CurrentPasswordFailed = "current_password_failed";
+            public const string EmailOrUsernameRequired = "email_username_required";
             public const string EmailOrPhoneNotFound = "email_phone_not_found";
+            public const string EmailOrUsernameNotFound = "email_username_not_found";
+            public const string EmailOrUsernameAlreadyExit = "email_username_already_exit";
             public const string CustomerNotFound = "customer_not_found";
             public const string CustomerNotFoundWidthEmailOrPhone = "customer_not_found_with_email_or_phone";
-
             public const string Unauthorized = "unauthorized";
             public const string TokenExpired = "token_expired";
             public const string InvalidToken = "invalid_token";
@@ -55,13 +57,18 @@
             public const string DatabaseError = "database_error";
 
             public const string OutOfStock = "out_of_stock";
+            public const string ProductInActiveOrder = "product_in_active_order";
+
         }
 
         public static readonly Dictionary<string, string> Errors = new Dictionary<string, string>
         {
-            { ErrorCode.EmailOrPhoneAlreadyExit, "Email hoặc số điện thoại này đã được sử dụng." },
+            { ErrorCode.EmailOrUsernameAlreadyExit, "Email hoặc tên tài khoản này đã được sử dụng." },
             { ErrorCode.EmailOrPhoneRequired, "Hãy nhập email của bạn." },
+            { ErrorCode.CurrentPasswordFailed, "Mật khẩu hiện tại không đúng." },
+            { ErrorCode.EmailOrUsernameRequired, "Hãy nhập email hoặc tên đăng nhập của bạn." },
             { ErrorCode.EmailOrPhoneNotFound, "Email không tồn tại trong hệ thống." },
+            { ErrorCode.EmailOrUsernameNotFound, "Email hoặc tên đăng nhập không tồn tại trong hệ thống." },
             { ErrorCode.CustomerNotFound, "Khách hàng không tồn tại." },
             { ErrorCode.CustomerNotFoundWidthEmailOrPhone, "Khách hàng không tồn tại." },
             { ErrorCode.Unauthorized, "unauthorized" },
