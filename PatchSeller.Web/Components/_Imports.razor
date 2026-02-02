@@ -1,31 +1,32 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
+@using System.Text.Json
+@using FluentValidation
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.JSInterop
+@using MudBlazor
+@using MudBlazor.Services
 @using PatchSeller.Web
 @using PatchSeller.Web.Components
-@using PatchSeller.Web.Services
+@using PatchSeller.Web.Components.Common.Admin
+@using PatchSeller.Web.Components.Common.Customer
+@using PatchSeller.Web.Components.Common.Error
+@using PatchSeller.Web.Components.Common.Loading
 @using PatchSeller.Web.Components.Layout
 @using PatchSeller.Web.Constant
 @using PatchSeller.Web.DTOs
 @using PatchSeller.Web.Models
 @using PatchSeller.Web.Schema
-@using PatchSeller.Web.Components.Common.Admin
-@using PatchSeller.Web.Components.Common.Customer
-@using PatchSeller.Web.Components.Common.Error
-@using PatchSeller.Web.Components.Common.Loading
-@using MudBlazor
-@using MudBlazor.Services
-@using Microsoft.AspNetCore.WebUtilities
-@using System.Text.Json
-@using FluentValidation
+@using PatchSeller.Web.Services
+@using PatchSeller.Web.Services.Admin
 @using Spillgebees.Blazor.RichTextEditor.Components
 @using Spillgebees.Blazor.RichTextEditor.Components.Toolbar
 @using Spillgebees.Blazor.RichTextEditor.Components.Toolbar.Controls
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @inject IJSRuntime JS
 @inject Blazored.LocalStorage.ILocalStorageService _localStorage
 @inject NavigationManager navigation
@@ -33,3 +34,4 @@
 @inject IDialogService _dialogService
 @inject AccessService _accessService
 @inject DrawerService _drawerService
+@inject AdminCategoryService _adminCategoryService
