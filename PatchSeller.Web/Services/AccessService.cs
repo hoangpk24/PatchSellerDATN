@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.Data;
+using PatchSeller.Web.Constant;
 using PatchSeller.Web.DTOs;
 using PatchSeller.Web.Models;
 using System.Security.Cryptography;
@@ -42,7 +43,7 @@ namespace PatchSeller.Web.Services
                 PasswordHash = HashPassword(payload.PasswordHash)
             };
 
-            var response = await _httpClient.PostAsJsonAsync("/Access/LoginCustomer", requestPayload);
+            var response = await _httpClient.PostAsJsonAsync(EndPointApi.AccessLoginCustomer, requestPayload);
 
             if (response.IsSuccessStatusCode)
             {
@@ -68,7 +69,7 @@ namespace PatchSeller.Web.Services
                 PasswordHash = HashPassword(payload.PasswordHash)
             };
 
-            var response = await _httpClient.PostAsJsonAsync("/Access/LoginStaff", requestPayload);
+            var response = await _httpClient.PostAsJsonAsync(EndPointApi.AccessLoginStaff, requestPayload);
 
             if (response.IsSuccessStatusCode)
             {
@@ -96,7 +97,7 @@ namespace PatchSeller.Web.Services
                 PhoneNumber = payload.PhoneNumber.Trim(),
             };
 
-            var response = await _httpClient.PostAsJsonAsync("/Access/customer-register", request);
+            var response = await _httpClient.PostAsJsonAsync(EndPointApi.AccessRegisterCustomer, request);
 
             if (response.IsSuccessStatusCode)
             {
@@ -116,7 +117,7 @@ namespace PatchSeller.Web.Services
 
         public async Task<MineResponse> AccessCheck(string token)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, "/Access/Check");
+            var request = new HttpRequestMessage(HttpMethod.Get, EndPointApi.AccessCheck);
 
             if (!string.IsNullOrEmpty(token))
             {
@@ -146,7 +147,7 @@ namespace PatchSeller.Web.Services
 
         public async Task<ServiceResult<bool>> ForgotPassword(ForgotModel request)
         {
-            var response = await _httpClient.PostAsJsonAsync("/Access/reset-password", request);
+            var response = await _httpClient.PostAsJsonAsync(EndPointApi.AccessResetPassword, request);
 
             if (response.IsSuccessStatusCode)
             {
@@ -173,7 +174,7 @@ namespace PatchSeller.Web.Services
                 NewHashPassword = HashPassword(request.NewHashPassword.Trim())
             };
 
-            var r = new HttpRequestMessage(HttpMethod.Post, "/Access/change-password");
+            var r = new HttpRequestMessage(HttpMethod.Post, EndPointApi.AccessChangePassword);
 
             r.Content = JsonContent.Create(payload);
 

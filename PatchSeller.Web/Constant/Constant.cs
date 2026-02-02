@@ -104,5 +104,11 @@
             public const string Manager = "Manager";
             public const string Customer = "Customer";
         }
+
+        public static class StatusDefault
+        {
+            public const int Active = 1;
+            public const int InActive = 0;
+        }
     }
 }

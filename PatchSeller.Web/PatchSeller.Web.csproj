@@ -13,4 +13,12 @@
     <PackageReference Include="Spillgebees.Blazor.RichTextEditor" Version="2.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PatchSeller.DAL\PatchSeller.DAL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\Customer\" />
+  </ItemGroup>
+
 </Project>

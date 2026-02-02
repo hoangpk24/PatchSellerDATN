@@ -3,20 +3,134 @@
 
 <PageTitle>@Constant.PageTitleAdmin Category Edit</PageTitle>
 
-<section class="p-6">
-    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+<section class="min-h-screen bg-[#f8fafc] p-8">
+    <div class="mx-auto max-w-[1000px]">
+        <MudBreadcrumbs Class="mb-2 !p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
 
-    <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa thể loại</h1>
+        <h1 class="mb-8 text-3xl font-extrabold text-material-default">Sửa thể loại</h1>
+
+        <div class="rounded bg-white p-10 shadow-md">
+            <MudForm @ref="_form" Model="_model" Validation="_categorySchema.ValidateValue" Class="mx-auto max-w-[600px]">
+
+                <div class="mb-6">
+                    <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tên thể loại</label> <span class="ml-1 text-red-500">*</span>
+                    <MudTextField T="string"
+                                  @bind-Value="_model.CategoryName"
+                                  For="@(() => _model.CategoryName)"
+                                  Variant="Variant.Outlined"
+                                  Placeholder="Ví dụ: Hành động, FPS..."
+                                  Margin="Margin.Dense" />
+                </div>
+
+                <div class="mb-6">
+                    <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Mô tả chi tiết</label>
+                    <MudTextField T="string"
+                                  @bind-Value="_model.Description"
+                                  For="@(() => _model.Description)"
+                                  Placeholder="Nhập mô tả ngắn gọn về thể loại này..."
+                                  Variant="Variant.Outlined"
+                                  Lines="4"
+                                  Margin="Margin.Dense" />
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-sm font-bold uppercase tracking-wider text-slate-700">Trạng thái hiển thị</label>
+                    <MudRadioGroup T="int" @bind-Value="_model.Status" For="@(() => _model.Status)">
+                        <div class="flex gap-6">
+                            <MudRadio Value="1" Color="Color.Primary" Class="!ml-0">
+                                <span class="text-sm font-medium text-slate-600">Hoạt động</span>
+                            </MudRadio>
+                            <MudRadio Value="0" Color="Color.Error">
+                                <span class="text-sm font-medium text-slate-600">Tạm ngưng</span>
+                            </MudRadio>
+                        </div>
+                    </MudRadioGroup>
+                </div>
+
+                <MudDivider Class="mb-8 mt-4 !border-slate-200" />
+
+                <div class="flex items-center justify-end gap-3">
+                    <MudButton Variant="Variant.Text"
+                               Class="px-6 py-2 text-slate-500 hover:bg-slate-200"
+                               OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Category)">
+                        Quay lại
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Edit"
+                               OnClick="@(async () => await OnSubmit())"
+                               Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
+                        Sửa
+                    </MudButton>
+                </div>
+            </MudForm>
+        </div>
+    </div>
 </section>
 
 @code {
     [Parameter]
     public int id { get; set; }
 
+    MudForm _form = new MudForm();
+    DAL.Models.Category _model = new DAL.Models.Category();
+    CategorySchema.CreateUpdate _categorySchema = new CategorySchema.CreateUpdate();
+
     private List<BreadcrumbItem> _itemBreadcrumbs =
     [
         new("Trang Chủ", href: RouterConfig.Admin.Home),
         new("Thể Loại", href: RouterConfig.Admin.Category),
-        new("Tạo Thể Loại", href: "#", disabled: true),
+        new("Sửa Thể Loại", href: "#", disabled: true),
     ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        var response = await _adminCategoryService.GetById(id);
+
+        if(response.IsSuccess && response.Data != null)
+        {
+            _model = response.Data;
+        }
+        else if (response.IsSuccess == false && response.StatusCode == "NotFound")
+        {
+            _snackbar.Add("Không tìm thấy danh mục này.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.NotFound);
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho quản trị viên.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.Admin.Category);
+        }
+    }
+
+    async Task OnSubmit()
+    {
+        await _form.Validate();
+
+        if (!_form.IsValid) return;
+
+        _model.CategoryName = _model.CategoryName.Trim();
+        if (!string.IsNullOrEmpty(_model.Description))
+        {
+            _model.Description = _model.Description.Trim();
+        }
+
+        var response = await _adminCategoryService.UpdateCategory(_model);
+
+        if (response.IsSuccess)
+        {
+            _snackbar.Add("Sửa thể loại thành công!", MudBlazor.Severity.Success);
+            navigation.NavigateTo(RouterConfig.Admin.Category);
+        }
+        else
+        {
+            var mess = string.IsNullOrEmpty(response.ErrorMessage) ? "Sửa thể loại thất bại" : response.ErrorMessage;
+            _snackbar.Add(mess, MudBlazor.Severity.Error);
+        }
+    }
 }

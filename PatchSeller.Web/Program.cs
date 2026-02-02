@@ -3,6 +3,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using PatchSeller.Web.Components;
 using PatchSeller.Web.Services;
+using PatchSeller.Web.Services.Admin;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,7 @@ builder.Services.AddMudServices(config =>
 
 builder.Services.AddScoped<AccessService>();
 builder.Services.AddScoped<DrawerService>();
+builder.Services.AddScoped<AdminCategoryService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {
