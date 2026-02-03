@@ -15,6 +15,7 @@ public class Patch
     public string UpdateBy { get; set; }
     public int Status { get; set; }
     public bool Delete { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     [ForeignKey("GameId")]
     public int GameId { get; set; }

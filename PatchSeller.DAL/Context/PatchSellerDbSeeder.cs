@@ -18,6 +18,7 @@ public static class PatchSellerDbSeeder
                 Name = "Electronic Art",
                 Description = "Nhà phát hành lớn (EA). Nổi tiếng với Battlefield, FIFA, Apex Legends.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Publisher
@@ -26,6 +27,7 @@ public static class PatchSellerDbSeeder
                 Name = "Riot Games",
                 Description = "Nhà phát hành game eSports: League of Legends, VALORANT.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Publisher
@@ -34,6 +36,7 @@ public static class PatchSellerDbSeeder
                 Name = "Activision",
                 Description = "Nhà phát hành Call of Duty (MW/Warzone) và nhiều series FPS.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Publisher
@@ -42,6 +45,7 @@ public static class PatchSellerDbSeeder
                 Name = "Ubisoft",
                 Description = "Nhà phát hành nổi tiếng với Rainbow Six, Assassin's Creed, Far Cry.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Publisher
@@ -50,6 +54,7 @@ public static class PatchSellerDbSeeder
                 Name = "Valve",
                 Description = "Nhà phát hành CS2, Dota 2; tập trung hệ sinh thái Steam.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Publisher
@@ -58,6 +63,7 @@ public static class PatchSellerDbSeeder
                 Name = "Epic Games",
                 Description = "Nhà phát hành Fortnite; nền tảng Epic Games Store.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             }
         );
@@ -69,6 +75,7 @@ public static class PatchSellerDbSeeder
                 CategoryName = "FPS",
                 Description = "Bắn súng góc nhìn thứ nhất.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Category
@@ -77,6 +84,7 @@ public static class PatchSellerDbSeeder
                 CategoryName = "Battle Royale",
                 Description = "Sinh tồn, vòng bo, loot đồ.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Category
@@ -85,6 +93,7 @@ public static class PatchSellerDbSeeder
                 CategoryName = "MOBA",
                 Description = "Chiến thuật 5v5, phối hợp đội hình.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Category
@@ -93,6 +102,7 @@ public static class PatchSellerDbSeeder
                 CategoryName = "Tactical Shooter",
                 Description = "Bắn súng chiến thuật, đặt/giải bom, kỹ năng cá nhân + phối hợp.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Category
@@ -101,6 +111,7 @@ public static class PatchSellerDbSeeder
                 CategoryName = "Hành động",
                 Description = "Nhịp nhanh, thiên về chiến đấu.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Category
@@ -109,6 +120,7 @@ public static class PatchSellerDbSeeder
                 CategoryName = "eSports",
                 Description = "Tập trung thi đấu xếp hạng/giải đấu.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Category
@@ -117,6 +129,7 @@ public static class PatchSellerDbSeeder
                 CategoryName = "Co-op",
                 Description = "Chơi hợp tác cùng bạn bè.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             }
         );
@@ -128,6 +141,7 @@ public static class PatchSellerDbSeeder
                 Name = "PC",
                 Description = "Windows (Steam/Battle.net/Epic).",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Platform
@@ -136,6 +150,7 @@ public static class PatchSellerDbSeeder
                 Name = "PlayStation 5",
                 Description = "PS5/PSN.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Platform
@@ -144,6 +159,7 @@ public static class PatchSellerDbSeeder
                 Name = "Xbox Series X|S",
                 Description = "Xbox Series X/S.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Platform
@@ -152,6 +168,7 @@ public static class PatchSellerDbSeeder
                 Name = "Nintendo Switch",
                 Description = "Switch/handheld.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             }
         );
@@ -164,6 +181,7 @@ public static class PatchSellerDbSeeder
                 MiniumSpend = 0,
                 Description = "Mặc định. Tích điểm cơ bản, nhận voucher tân thủ theo sự kiện.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Rank
@@ -173,6 +191,7 @@ public static class PatchSellerDbSeeder
                 MiniumSpend = 500_000,
                 Description = "Ưu đãi tốt hơn, hỗ trợ nhanh hơn, voucher theo rank.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Rank
@@ -182,6 +201,7 @@ public static class PatchSellerDbSeeder
                 MiniumSpend = 2_000_000,
                 Description = "Ưu đãi cao nhất, ưu tiên hỗ trợ, tham gia test patch sớm.",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             }
         );
@@ -195,6 +215,7 @@ public static class PatchSellerDbSeeder
                 Email = "admin@patchseller.local",
                 Role = "Admin",
                 PhoneNumber = "0987675845",
+                CreatedAt = new DateTime(2020, 1, 1),
                 FullName = "Ass Min"
             },
             new Staff
@@ -205,6 +226,7 @@ public static class PatchSellerDbSeeder
                 Email = "editor@patchseller.local",
                 Role = "Editor",
                 PhoneNumber = "0987675866",
+                CreatedAt = new DateTime(2020, 1, 1),
                 FullName = "E Đít Tơ"
             }
         );
@@ -220,6 +242,7 @@ public static class PatchSellerDbSeeder
                 ReleaseDate = new DateTime(2021, 11, 19),
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 PublisherId = 1
             },
             new Game
@@ -232,6 +255,7 @@ public static class PatchSellerDbSeeder
                 ReleaseDate = new DateTime(2018, 11, 20),
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 PublisherId = 1
             },
             new Game
@@ -244,6 +268,7 @@ public static class PatchSellerDbSeeder
                 ReleaseDate = new DateTime(2022, 10, 28),
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 PublisherId = 3
             },
             new Game
@@ -256,6 +281,7 @@ public static class PatchSellerDbSeeder
                 ReleaseDate = new DateTime(2020, 3, 10),
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 PublisherId = 3
             },
             new Game
@@ -268,6 +294,7 @@ public static class PatchSellerDbSeeder
                 ReleaseDate = new DateTime(2020, 6, 2),
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 PublisherId = 2
             },
             new Game
@@ -280,6 +307,7 @@ public static class PatchSellerDbSeeder
                 ReleaseDate = new DateTime(2009, 10, 27),
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 PublisherId = 2
             },
             new Game
@@ -292,6 +320,7 @@ public static class PatchSellerDbSeeder
                 ReleaseDate = new DateTime(2015, 12, 1),
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 PublisherId = 4
             },
             new Game
@@ -304,6 +333,7 @@ public static class PatchSellerDbSeeder
                 ReleaseDate = new DateTime(2023, 9, 27),
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 PublisherId = 5
             },
             new Game
@@ -316,6 +346,7 @@ public static class PatchSellerDbSeeder
                 ReleaseDate = new DateTime(2017, 7, 25),
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 PublisherId = 6
             }
         );
@@ -497,6 +528,7 @@ public static class PatchSellerDbSeeder
                 Description = "Tối ưu cấu hình, giảm stutter, preset đồ họa theo GPU. Có hướng dẫn chi tiết bằng tiếng Việt.",
                 UpdateBy = "admin",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Patch
@@ -508,6 +540,7 @@ public static class PatchSellerDbSeeder
                 Description = "Việt hóa menu/thiết lập/thông báo cơ bản. Không can thiệp gameplay.",
                 UpdateBy = "editor",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Patch
@@ -519,6 +552,7 @@ public static class PatchSellerDbSeeder
                 Description = "Profile EQ + preset ingame giúp nghe hướng bước chân rõ hơn (tùy tai nghe).",
                 UpdateBy = "admin",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Patch
@@ -530,6 +564,7 @@ public static class PatchSellerDbSeeder
                 Description = "Preset ưu tiên nhìn rõ + FPS ổn định: anti-aliasing, sharpening, render scale.",
                 UpdateBy = "editor",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Patch
@@ -541,6 +576,7 @@ public static class PatchSellerDbSeeder
                 Description = "Bộ bài tập aim + routine 20 phút/ngày (file + checklist).",
                 UpdateBy = "editor",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Patch
@@ -552,6 +588,7 @@ public static class PatchSellerDbSeeder
                 Description = "Hướng dẫn tối ưu DNS, MTU, cấu hình router cơ bản + checklist kiểm tra mạng.",
                 UpdateBy = "admin",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Patch
@@ -563,6 +600,7 @@ public static class PatchSellerDbSeeder
                 Description = "Tài liệu callout theo map phổ biến, kèm mini-map đánh dấu vị trí.",
                 UpdateBy = "editor",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Patch
@@ -574,6 +612,7 @@ public static class PatchSellerDbSeeder
                 Description = "Autoexec, launch options, tối ưu chuột/Hz, giảm input lag (khuyến nghị theo cấu hình).",
                 UpdateBy = "admin",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             },
             new Patch
@@ -585,6 +624,7 @@ public static class PatchSellerDbSeeder
                 Description = "Tối ưu hiệu năng, setting competitive, hướng dẫn bật chế độ Performance Mode.",
                 UpdateBy = "editor",
                 Status = 1,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Delete = false
             }
         );
@@ -945,6 +985,7 @@ public static class PatchSellerDbSeeder
                 RewardPoint = 120,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 1
             },
             new User
@@ -958,6 +999,7 @@ public static class PatchSellerDbSeeder
                 RewardPoint = 980,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 2
             },
             new User
@@ -971,6 +1013,7 @@ public static class PatchSellerDbSeeder
                 RewardPoint = 2450,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 3
             },
             new User
@@ -984,6 +1027,7 @@ public static class PatchSellerDbSeeder
                 RewardPoint = 420,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 2
             },
             new User
@@ -997,6 +1041,7 @@ public static class PatchSellerDbSeeder
                 RewardPoint = 75,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 1
             },
             new User
@@ -1010,6 +1055,7 @@ public static class PatchSellerDbSeeder
                 RewardPoint = 1500,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 3
             }
         );
@@ -1045,6 +1091,7 @@ public static class PatchSellerDbSeeder
                 UsedCount = 0,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 1
             },
             new Discount
@@ -1060,6 +1107,7 @@ public static class PatchSellerDbSeeder
                 UsedCount = 0,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 2
             },
             new Discount
@@ -1075,6 +1123,7 @@ public static class PatchSellerDbSeeder
                 UsedCount = 0,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 3
             },
             new Discount
@@ -1090,6 +1139,7 @@ public static class PatchSellerDbSeeder
                 UsedCount = 0,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 1
             },
             new Discount
@@ -1105,6 +1155,7 @@ public static class PatchSellerDbSeeder
                 UsedCount = 0,
                 Status = 1,
                 Delete = false,
+                CreatedAt = new DateTime(2020, 1, 1),
                 RankId = 2
             }
         );
@@ -1182,6 +1233,7 @@ public static class PatchSellerDbSeeder
                 Title = "Config CS2 hợp lý",
                 Content = "Autoexec gọn, không có lệnh linh tinh. Input lag giảm thấy rõ, recommend.",
                 Overall = 5.0,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Status = 1
             },
             new Review
@@ -1193,6 +1245,7 @@ public static class PatchSellerDbSeeder
                 Title = "Việt hóa dễ cài",
                 Content = "Copy là chạy, có file restore nên yên tâm. Thuật ngữ dịch ổn.",
                 Overall = 4.2,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Status = 1
             },
             new Review
@@ -1204,6 +1257,7 @@ public static class PatchSellerDbSeeder
                 Title = "Bài tập aim ok",
                 Content = "Routine 20 phút hợp lý, kiên trì 1 tuần thấy aim ổn hơn trong DM.",
                 Overall = 4.0,
+                CreatedAt = new DateTime(2020, 1, 1),
                 Status = 1
             }
         );

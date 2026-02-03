@@ -75,6 +75,7 @@
 
             <MudButton Variant="Variant.Filled"
                        OnClick="@(async () => await OnSubmit())"
+                       Disabled="@_isSubmitting"
                        Class="w-full !rounded-full !bg-purple-500 py-2 !font-bold !text-white transition-all hover:!bg-purple-600">
                 Đăng Ký
             </MudButton>
@@ -91,6 +92,7 @@
     RegisterModel _model = new RegisterModel();
     AccessSchema.Register _registerSchema = new AccessSchema.Register();
 
+    private bool _isSubmitting = false;
     private bool _passwordVisibility = false;
     private bool _passwordConfirmVisibility = false;
 
@@ -104,6 +106,11 @@
 
     private async Task OnSubmit()
     {
+        if (_isSubmitting) return;
+
+        try
+        {
+            _isSubmitting = true;
         await _form.Validate();
 
         if (!_form.IsValid) return;
@@ -119,6 +126,15 @@
         else
         {
             _snackbar.Add(response.ErrorMessage != null ? response.ErrorMessage : "Đăng ký không thành công!", MudBlazor.Severity.Warning);
+        }
+        }
+        catch (Exception)
+        {
+            _isSubmitting = false;
+        }
+        finally
+        {
+            _isSubmitting = false;
         }
     }
 }

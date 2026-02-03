@@ -88,6 +88,7 @@ namespace PatchSeller.DAL.Repository
             try
             {
                 user.Delete = false;
+                user.CreatedAt = DateTime.Now;
                 var addedUser = _context.Users.Add(user).Entity;
                 await _context.SaveChangesAsync();
                 return addedUser;

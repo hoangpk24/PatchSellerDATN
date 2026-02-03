@@ -19,6 +19,20 @@
             public const string CategoryCreate = "/admin/category/create";
             public const string CategoryUpdate = "/admin/category/update";
             public const string CategoryDelete = "/admin/category/delete/:id";
+
+            // Platform
+            public const string PlatformGetAll = "/admin/platform/get-all-platforms";
+            public const string PlatformGetById = "/admin/platform/get-platform-by-id/:id";
+            public const string PlatformCreate = "/admin/platform/create";
+            public const string PlatformUpdate = "/admin/platform/update";
+            public const string PlatformDelete = "/admin/platform/delete/:id";
+
+            // Publisher
+            public const string PublisherGetAll = "/admin/publisher/get-all-publishers";
+            public const string PublisherGetById = "/admin/publisher/get-publisher-by-id/:id";
+            public const string PublisherCreate = "/admin/publisher/create";
+            public const string PublisherUpdate = "/admin/publisher/update";
+            public const string PublisherDelete = "/admin/publisher/delete/:id";
         }
     }
 }

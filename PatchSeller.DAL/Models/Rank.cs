@@ -11,6 +11,7 @@ public class Rank
     public string Description { get; set; }
     public int Status { get; set; }
     public bool Delete { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public ICollection<User> Users { get; set; }
     public ICollection<Discount> Discounts { get; set; }
