@@ -28,6 +28,8 @@ builder.Services.AddMudServices(config =>
 builder.Services.AddScoped<AccessService>();
 builder.Services.AddScoped<DrawerService>();
 builder.Services.AddScoped<AdminCategoryService>();
+builder.Services.AddScoped<AdminPlatformService>();
+builder.Services.AddScoped<AdminPublisherService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {
