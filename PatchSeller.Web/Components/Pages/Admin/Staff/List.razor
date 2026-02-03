@@ -1,28 +1,26 @@
-﻿@page "/admin/customer"
+﻿@page "/admin/staff"
 @layout AdminLayout
 
-<PageTitle>@Constant.PageTitleAdmin Customer</PageTitle>
+<PageTitle>@Constant.PageTitleAdmin Staff</PageTitle>
 
 <section class="p-6">
-    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
-
     <div class="flex items-center justify-between">
-        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách khách hàng</h1>
-        <a href="@RouterConfig.Admin.CreateCustomer" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
+        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách quản trị</h1>
+        <a href="@RouterConfig.Admin.CreateStaff" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
     </div>
 
     <div class="mt-8 rounded bg-white p-6 shadow-md">
         <div class="grid w-full grid-cols-3 items-start gap-x-6 gap-y-4">
             <div>
                 <MudTextField T="string" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Value="@_searchValue"
-                              AdornmentIcon="@Icons.Material.Filled.Search" Variant="Variant.Outlined" IconSize="Size.Medium" Class="mt-0" Margin="Margin.Dense" ValueChanged="onChangeSearch" Immediate=true></MudTextField>
+                                AdornmentIcon="@Icons.Material.Filled.Search" Variant="Variant.Outlined" IconSize="Size.Medium" Class="mt-0" Margin="Margin.Dense" ValueChanged="onChangeSearch" Immediate=true></MudTextField>
             </div>
             <div>
-                <MudSelect T="int" Label="Cấp bậc" class="mt-0" Margin="Margin.Dense" Variant="Variant.Outlined" @bind-Value="@_searchRank">
-                    <MudSelectItem Value="0">Tất cả</MudSelectItem>
-                    <MudSelectItem Value="1">Đồng</MudSelectItem>
-                    <MudSelectItem Value="2">Bạc</MudSelectItem>
-                    <MudSelectItem Value="3">Vàng</MudSelectItem>
+                <MudSelect class="mt-0" Margin="Margin.Dense" Variant="Variant.Outlined" @bind-Value="@_searchRole">
+                    <MudSelectItem Value="@("")">Tất cả</MudSelectItem>
+                    <MudSelectItem Value="@("admin")">Admin</MudSelectItem>
+                    <MudSelectItem Value="@("editor")">Editor</MudSelectItem>
+                    <MudSelectItem Value="@("staff")">Staff</MudSelectItem>
                 </MudSelect>
             </div>
             <div class="flex items-center gap-2">
@@ -33,25 +31,25 @@
     </div>
 
     <div class="mt-8 rounded bg-white shadow-md">
-        <MudTable Items="@_lstUser" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100lvh - 357px)">
+        <MudTable Items="@_lstStaff" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100lvh - 357px)">
             <HeaderContent>
                 <MudTh hidden><MudTableSortLabel SortLabel="Id" T="string" hidden>STT</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Tên" T="string">Tên</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Email" T="string">Email</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Tên đăng nhập" T="string">Tên đăng nhập</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Cấp bậc" T="string">Chức vụ</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Chức vụ" T="string">Chức vụ</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Id" hidden>@context.UserId</MudTd>
+                <MudTd DataLabel="Id" hidden>@context.StaffId</MudTd>
                 <MudTd DataLabel="Tên">@context.FullName</MudTd>
                 <MudTd DataLabel="Email">@context.Email</MudTd>
                 <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
                 <MudTd DataLabel="Tên đăng nhập">@context.UserName</MudTd>
-                <MudTd DataLabel="Cấp bậc">@context.RankId</MudTd>
+                <MudTd DataLabel="Số điện thoại">@context.Role</MudTd>
                 <MudTd DataLabel="Thao tác">
-                    <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditCustomer.Replace(":id", context.UserId.ToString())))"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditStaff.Replace(":id", context.StaffId.ToString())))"></MudIconButton>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
@@ -82,17 +80,11 @@
 </section>
 
 @code {
-    List<DAL.Models.User> _lstUser = [];
+    List<DAL.Models.Staff> _lstStaff = [];
 
     private string _searchValue = string.Empty;
-    private int _searchRank = 0;
+    private string _searchRole = string.Empty;
     private bool _isLoading = true;
-
-    private List<BreadcrumbItem> _itemBreadcrumbs =
-    [
-        new("Trang Chủ", href: RouterConfig.Admin.Home),
-        new("Khách Hàng", href: "#", disabled: true),
-    ];
 
     protected override async Task OnInitializedAsync()
     {
@@ -112,11 +104,11 @@
 
     async Task LoadData()
     {
-        var res = await _adminUserService.GetAll(_searchValue, _searchRank);
+        var res = await _adminStaffService.GetAll(_searchValue, _searchRole);
         var data = res.Data;
         if (res.IsSuccess && data != null)
         {
-            _lstUser = data;
+            _lstStaff = data;
         }
         else if (res.IsSuccess == false && res.StatusCode == "NotFound")
         {
@@ -144,7 +136,7 @@
     private async Task OnReset()
     {
         _searchValue = string.Empty;
-        _searchRank = 0;
+        _searchRole = string.Empty;
         await LoadData();
     }
 }

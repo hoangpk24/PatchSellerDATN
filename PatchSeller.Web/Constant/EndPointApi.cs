@@ -33,6 +33,20 @@
             public const string PublisherCreate = "/admin/publisher/create";
             public const string PublisherUpdate = "/admin/publisher/update";
             public const string PublisherDelete = "/admin/publisher/delete/:id";
+
+            // Staff
+            public const string StaffGetAll = "/admin/staff/get-all-staffs";
+            public const string StaffGetById = "/admin/staff/get-staff-by-id/:id";
+            public const string StaffCreate = "/admin/staff/create";
+            public const string StaffUpdate = "/admin/staff/update";
+            public const string StaffDelete = "/admin/staff/delete/:id";
+
+            // User
+            public const string UserGetAll = "/admin/user/get-all-users";
+            public const string UserGetById = "/admin/user/get-user-by-id/:id";
+            public const string UserCreate = "/admin/user/create";
+            public const string UserUpdate = "/admin/user/update";
+            public const string UserDelete = "/admin/user/delete/:id";
         }
     }
 }

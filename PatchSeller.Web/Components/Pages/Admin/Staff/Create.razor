@@ -1,10 +1,10 @@
-﻿@page "/admin/customer/create"
+﻿@page "/admin/staff/create"
 @layout AdminLayout
 
-<PageTitle>@Constant.PageTitleAdmin Customer Create</PageTitle>
+<PageTitle>@Constant.PageTitleAdmin Staff Create</PageTitle>
 
 <section class="mx-auto max-w-[1032px] p-6">
-    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo khách hàng mới</h1>
+    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo quản trị mới</h1>
 
     <div class="rounded bg-white p-10 shadow-md">
         <MudForm @ref="_form" Model="_model" Validation="_staffSchema.ValidateValue" Class="mx-auto max-w-[600px]">
@@ -40,6 +40,15 @@
             </div>
 
             <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Quyền</label>
+                <MudSelect Margin="Margin.Dense" Variant="Variant.Outlined" T="string" @bind-Value="_model.Role" For="@(() => _model.Role)">
+                    <MudSelectItem Value="@("admin")">Admin</MudSelectItem>
+                    <MudSelectItem Value="@("editor")">Editor</MudSelectItem>
+                    <MudSelectItem Value="@("staff")">Staff</MudSelectItem>
+                </MudSelect>
+            </div>
+
+            <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tên đăng nhập</label> <span class="ml-1 text-red-500">*</span>
                 <MudTextField T="string"
                               @bind-Value="_model.UserName"
@@ -70,7 +79,7 @@
             <div class="flex items-center justify-end gap-3">
                 <MudButton Variant="Variant.Text"
                            Class="px-6 py-2 text-slate-500 hover:bg-slate-200"
-                           OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Customer)">
+                           OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Staff)">
                     Quay lại
                 </MudButton>
                 <MudButton Variant="Variant.Filled"
@@ -88,20 +97,18 @@
 
 @code {
     MudForm _form = new MudForm();
-    DAL.Models.User _model = new DAL.Models.User();
-    UserSchema.CreateUpdate _staffSchema = new UserSchema.CreateUpdate();
+    DAL.Models.Staff _model = new DAL.Models.Staff();
+    StaffSchema.CreateUpdate _staffSchema = new StaffSchema.CreateUpdate();
 
     private bool _isLoading = false;
     private bool _passwordVisibility = false;
 
     private void TogglePasswordVisibility() => _passwordVisibility = !_passwordVisibility;
 
-    private List<BreadcrumbItem> _itemBreadcrumbs =
-    [
-        new("Trang Chủ", href: RouterConfig.Admin.Home),
-        new("Khách Hàng", href: RouterConfig.Admin.Customer),
-        new("Tạo Khách Hàng", href: "#", disabled: true),
-    ];
+    protected override void OnInitialized()
+    {
+        _model.Role = "admin";
+    }
 
     async Task OnSubmit()
     {
@@ -119,16 +126,13 @@
             _model.Email = _model.Email.Trim();
             _model.PasswordHash = _model.PasswordHash.Trim();
             _model.PhoneNumber = _model.PhoneNumber.Trim();
-            _model.Status = 1;
-            _model.RankId = 1;
-            _model.RewardPoint = 0;
 
-            var response = await _adminUserService.CreateStaff(_model);
+            var response = await _adminStaffService.CreateStaff(_model);
 
             if (response.IsSuccess)
             {
                 _snackbar.Add("Tạo thành công!", MudBlazor.Severity.Success);
-                navigation.NavigateTo(RouterConfig.Admin.Customer);
+                navigation.NavigateTo(RouterConfig.Admin.Staff);
             }
             else
             {
