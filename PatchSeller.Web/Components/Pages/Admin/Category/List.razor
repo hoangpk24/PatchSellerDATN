@@ -4,8 +4,6 @@
 <PageTitle>@Constant.PageTitleAdmin Category</PageTitle>
 
 <section class="p-6">
-    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
-
     <div class="flex items-center justify-between">
         <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách thể loại</h1>
         <a href="@RouterConfig.Admin.CreateCategory" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
@@ -25,7 +23,7 @@
     </div>
 
     <div class="mt-8 rounded bg-white shadow-md">
-        <MudTable Items="@_lstCategory" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true">
+        <MudTable Items="@_lstCategory" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100lvh - 357px)">
             <HeaderContent>
                 <MudTh hidden><MudTableSortLabel SortLabel="Id" T="string" hidden>STT</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Tên" T="string">Tên</MudTableSortLabel></MudTh>
@@ -60,7 +58,7 @@
                     @{
                         for (var i = 0; i < 5; i++)
                         {
-                            <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center justify-between gap-2 px-2">
                                 <MudSkeleton Width="100%" Height="5rem" />
                                 <MudSkeleton Width="100%" Height="5rem" />
                                 <MudSkeleton Width="100%" Height="5rem" />
@@ -84,11 +82,6 @@
     private bool _isLoading = true;
 
     private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
-    private List<BreadcrumbItem> _itemBreadcrumbs =
-    [
-        new("Trang Chủ", href: RouterConfig.Admin.Home),
-        new("Thể Loại", href: "#", disabled: true),
-    ];
 
     protected override async Task OnInitializedAsync()
     {

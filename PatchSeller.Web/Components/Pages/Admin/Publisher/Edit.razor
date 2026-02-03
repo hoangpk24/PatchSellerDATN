@@ -4,8 +4,6 @@
 <PageTitle>@Constant.PageTitleAdmin publisher Edit</PageTitle>
 
 <section class="mx-auto max-w-[1032px] p-6">
-    <MudBreadcrumbs Class="!mb-2 !p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
-
     <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa nhà phát hành</h1>
 
     <div class="rounded bg-white p-10 shadow-md">
@@ -75,13 +73,6 @@
     PublisherSchema.CreateUpdate _categorySchema = new PublisherSchema.CreateUpdate();
 
     private bool _isLoading = false;
-
-    private List<BreadcrumbItem> _itemBreadcrumbs =
-    [
-        new("Trang Chủ", href: RouterConfig.Admin.Home),
-        new("Nhà Phát Hành", href: RouterConfig.Admin.Publisher),
-        new("Sửa Nhà Phát Hành", href: "#", disabled: true),
-    ];
 
     protected override async Task OnInitializedAsync()
     {
