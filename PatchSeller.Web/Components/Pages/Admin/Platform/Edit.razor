@@ -4,8 +4,6 @@
 <PageTitle>@Constant.PageTitleAdmin Platform Edit</PageTitle>
 
 <section class="mx-auto max-w-[1032px] p-6">
-    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
-
     <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa nền tảng</h1>
 
     <div class="rounded bg-white p-10 shadow-md">
@@ -76,13 +74,6 @@
     PlatformSchema.CreateUpdate _categorySchema = new PlatformSchema.CreateUpdate();
 
     private bool _isLoading = false;
-
-    private List<BreadcrumbItem> _itemBreadcrumbs =
-    [
-        new("Trang Chủ", href: RouterConfig.Admin.Home),
-        new("Nền Tảng", href: RouterConfig.Admin.Platform),
-        new("Sửa Nền Tảng", href: "#", disabled: true),
-    ];
 
     protected override async Task OnInitializedAsync()
     {

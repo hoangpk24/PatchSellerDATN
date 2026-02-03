@@ -20,6 +20,10 @@
                 <Nav OnLoggedOut="HandleLogout" />
 
                 <section class="max-w-[calc(100lvw-18.75rem)] h-screen w-full overflow-auto bg-slate-50">
+                    <div class="border-b border-solid border-slate-200 bg-white px-6 py-4">
+                        <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator="/"></MudBreadcrumbs>
+                    </div>
+
                     @Body
                 </section>
             </main>
@@ -36,14 +40,21 @@
         },
     };
 
+    private List<BreadcrumbItem> _itemBreadcrumbs =
+    [
+        new("Trang Chủ", href: RouterConfig.Admin.Home)
+    ];
+
     private MineResponse _mine = null;
     private bool _isLoading = true;
     private string _token = string.Empty;
 
-        protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         navigation.LocationChanged += HandleLocationChanged;
+        UpdateBreadcrumbs(navigation.Uri);
     }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -55,10 +66,14 @@
 
     private async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
     {
+        UpdateBreadcrumbs(e.Location);
+
         if (_mine == null && !_isLoading)
         {
             await InitializeAuth();
         }
+
+        StateHasChanged();
     }
 
     private async Task InitializeAuth()
@@ -157,4 +172,216 @@
     {
         navigation.LocationChanged -= HandleLocationChanged;
     }
+
+    private void UpdateBreadcrumbs(string url)
+    {
+        var uri = new Uri(url);
+        var currentPath = uri.AbsolutePath.ToLower().TrimEnd('/');
+
+        var match = _breadcrumbConfig.FirstOrDefault(x =>
+        {
+            var configPath = x.Key.ToLower().TrimEnd('/');
+
+            var currentSegments = currentPath.Split('/');
+            var configSegments = configPath.Split('/');
+
+            if (currentSegments.Length != configSegments.Length) return false;
+
+            for (int i = 0; i < configSegments.Length; i++)
+            {
+                if (configSegments[i] == ":id") continue;
+
+                if (configSegments[i] != currentSegments[i]) return false;
+            }
+            return true;
+        });
+
+        if (match.Value != null)
+        {
+            _itemBreadcrumbs = match.Value;
+        }
+        else
+        {
+            _itemBreadcrumbs = new List<BreadcrumbItem>
+        {
+            new("Trang Chủ", href: RouterConfig.Admin.Home)
+        };
+        }
+    }
+
+    private readonly Dictionary<string, List<BreadcrumbItem>> _breadcrumbConfig = new()
+    {
+        // --- HOME ---
+        { RouterConfig.Admin.Home, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home)
+        }},
+
+        // --- GAME ---
+        { RouterConfig.Admin.Game, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Game", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreateGame, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Game", href: RouterConfig.Admin.Game),
+            new("Thêm Game Mới", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditGame, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Game", href: RouterConfig.Admin.Game),
+            new("Chỉnh Sửa Game", href: null, disabled: true)
+        }},
+
+        // --- PUBLISHER ---
+        { RouterConfig.Admin.Publisher, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Nhà Phát Hành", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreatePublisher, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Nhà Phát Hành", href: RouterConfig.Admin.Publisher),
+            new("Thêm Nhà Phát Hành", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditPublisher, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Nhà Phát Hành", href: RouterConfig.Admin.Publisher),
+            new("Cập Nhật Nhà Phát Hành", href: null, disabled: true)
+        }},
+
+        // --- CATEGORY ---
+        { RouterConfig.Admin.Category, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Thể Loại", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreateCategory, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Thể Loại", href: RouterConfig.Admin.Category),
+            new("Thêm Thể Loại", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditCategory, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Thể Loại", href: RouterConfig.Admin.Category),
+            new("Cập Nhật Thể Loại", href: null, disabled: true)
+        }},
+
+        // --- PLATFORM ---
+        { RouterConfig.Admin.Platform, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Nền Tảng", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreatePlatform, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Nền Tảng", href: RouterConfig.Admin.Platform),
+            new("Thêm Nền Tảng", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditPlatform, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Nền Tảng", href: RouterConfig.Admin.Platform),
+            new("Cập Nhật Nền Tảng", href: null, disabled: true)
+        }},
+
+        // --- PATCH ---
+        { RouterConfig.Admin.Patch, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Gói Việt Hóa", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreatePatch, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Gói Việt Hóa", href: RouterConfig.Admin.Patch),
+            new("Tạo Gói Việt Hóa Mới", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditPatch, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Gói Việt Hóa", href: RouterConfig.Admin.Patch),
+            new("Cập Nhật Gói Việt Hóa", href: null, disabled: true)
+        }},
+
+        // --- PATCH VERSION ---
+        { RouterConfig.Admin.Version, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Phiên Bản Gói Việt Hóa", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreateVersion, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Phiên Bản Gói Việt Hóa", href: RouterConfig.Admin.Version),
+            new("Tạo Phiên Bản Gói Việt Hóa Mới", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditVersion, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Phiên Bản Gói Việt Hóa", href: RouterConfig.Admin.Version),
+            new("Cập Nhật Phiên Bản Gói Việt Hóa", href: null, disabled: true)
+        }},
+
+        // --- VOUCHER ---
+        { RouterConfig.Admin.Voucher, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Mã Giảm Giá", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreateVoucher, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Mã Giảm Giá", href: RouterConfig.Admin.Voucher),
+            new("Tạo Mã Giảm Giá", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditVoucher, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Mã Giảm Giá", href: RouterConfig.Admin.Voucher),
+            new("Cập Nhật Mã Giảm Giá", href: null, disabled: true)
+        }},
+
+        // --- STAFF ---
+        { RouterConfig.Admin.Staff, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Nhân Viên", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreateStaff, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Nhân Viên", href: RouterConfig.Admin.Staff),
+            new("Thêm Nhân Viên", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditStaff, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Nhân Viên", href: RouterConfig.Admin.Staff),
+            new("Cập Nhật Nhân Viên", href: null, disabled: true)
+        }},
+
+        // --- CUSTOMER ---
+        { RouterConfig.Admin.Customer, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Khách Hàng", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreateCustomer, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Khách Hàng", href: RouterConfig.Admin.Customer),
+            new("Thêm Khách Hàng", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditCustomer, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Khách Hàng", href: RouterConfig.Admin.Customer),
+            new("Cập Nhật Khách Hàng", href: null, disabled: true)
+        }},
+
+        // --- ORDER ---
+        { RouterConfig.Admin.Order, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Đơn Hàng", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.OrderDetail, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Đơn Hàng", href: RouterConfig.Admin.Order),
+            new("Chi Tiết Đơn Hàng", href: null, disabled: true)
+        }},
+
+        // --- STATISTICAL ---
+        { RouterConfig.Admin.Statistical, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Thống Kê", href: null, disabled: true)
+        }}
+    };
 }
+
+<style>
+    .mud-breadcrumbs > .mud-disabled > a {
+        color: #000000 !important;
+        font-weight: 700 !important;
+    }
+</style>

@@ -4,8 +4,6 @@
 <PageTitle>@Constant.PageTitleAdmin Patch</PageTitle>
 
 <section class="p-6">
-    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
-
     <div class="flex items-center justify-between">
         <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách gói việt hóa</h1>
         <a href="@RouterConfig.Admin.CreatePatch" class="leading-[1.5rem] h-10 rounded-lg bg-material-default px-6 py-2 text-white">Tạo mới</a>
@@ -13,9 +11,4 @@
 </section>
 
 @code {
-    private List<BreadcrumbItem> _itemBreadcrumbs =
-    [
-        new("Trang Chủ", href: RouterConfig.Admin.Home),
-        new("Gói Việt Hóa", href: "#", disabled: true),
-    ];
 }
