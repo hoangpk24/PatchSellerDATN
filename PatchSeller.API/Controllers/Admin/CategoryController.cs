@@ -30,6 +30,10 @@ namespace PatchSeller.API.Controllers.Admin
                     return NoContent();
                 }
 
+                if(result.Any())
+                {
+                    result = result.OrderByDescending(c => c.CreatedAt).ToList();
+                }    
                 return Ok(result);
             }
             catch (Exception ex)

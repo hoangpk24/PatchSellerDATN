@@ -14,7 +14,7 @@ namespace PatchSeller.Web.Schema
                     .Length(2, 255).WithMessage("Tên có độ dài từ 2 đến 255 ký tự");
 
                 RuleFor(x => x.Description)
-                    .Length(0, 255).WithMessage("Mô tả có độ dài tối đa 500 ký tự");
+                    .Length(0, 1000).WithMessage("Mô tả có độ dài tối đa 500 ký tự");
             }
 
             public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>

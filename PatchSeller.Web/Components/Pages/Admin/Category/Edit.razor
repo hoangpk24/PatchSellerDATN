@@ -3,13 +3,12 @@
 
 <PageTitle>@Constant.PageTitleAdmin Category Edit</PageTitle>
 
-<section class="min-h-screen bg-[#f8fafc] p-8">
-    <div class="mx-auto max-w-[1000px]">
-        <MudBreadcrumbs Class="mb-2 !p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+<section class="mx-auto max-w-[1032px] p-6">
+    <MudBreadcrumbs Class="!mb-2 !p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
 
-        <h1 class="mb-8 text-3xl font-extrabold text-material-default">Sửa thể loại</h1>
+    <h1 class="mb-8 text-3xl font-extrabold text-material-default">Sửa thể loại</h1>
 
-        <div class="rounded bg-white p-10 shadow-md">
+    <div class="rounded bg-white p-10 shadow-md">
             <MudForm @ref="_form" Model="_model" Validation="_categorySchema.ValidateValue" Class="mx-auto max-w-[600px]">
 
                 <div class="mb-6">
@@ -59,13 +58,13 @@
                                Color="Color.Primary"
                                StartIcon="@Icons.Material.Filled.Edit"
                                OnClick="@(async () => await OnSubmit())"
+                               Disabled="@_isLoading"
                                Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
                         Sửa
                     </MudButton>
                 </div>
             </MudForm>
         </div>
-    </div>
 </section>
 
 @code {
@@ -76,6 +75,8 @@
     DAL.Models.Category _model = new DAL.Models.Category();
     CategorySchema.CreateUpdate _categorySchema = new CategorySchema.CreateUpdate();
 
+    private bool _isLoading = false;
+
     private List<BreadcrumbItem> _itemBreadcrumbs =
     [
         new("Trang Chủ", href: RouterConfig.Admin.Home),
@@ -85,7 +86,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+        } catch (Exception)
+        {
+            _isLoading = false;
+        } finally
+        {
+            _isLoading = false;
+        }
     }
 
     async Task LoadData()
@@ -110,27 +121,39 @@
 
     async Task OnSubmit()
     {
-        await _form.Validate();
+        if (_isLoading) return;
 
-        if (!_form.IsValid) return;
-
-        _model.CategoryName = _model.CategoryName.Trim();
-        if (!string.IsNullOrEmpty(_model.Description))
+        try
         {
-            _model.Description = _model.Description.Trim();
-        }
+            _isLoading = true;
+            await _form.Validate();
 
-        var response = await _adminCategoryService.UpdateCategory(_model);
+            if (!_form.IsValid) return;
 
-        if (response.IsSuccess)
+            _model.CategoryName = _model.CategoryName.Trim();
+            if (!string.IsNullOrEmpty(_model.Description))
+            {
+                _model.Description = _model.Description.Trim();
+            }
+
+            var response = await _adminCategoryService.UpdateCategory(_model);
+
+            if (response.IsSuccess)
+            {
+                _snackbar.Add("Sửa thể loại thành công!", MudBlazor.Severity.Success);
+                navigation.NavigateTo(RouterConfig.Admin.Category);
+            }
+            else
+            {
+                var mess = string.IsNullOrEmpty(response.ErrorMessage) ? "Sửa thể loại thất bại" : response.ErrorMessage;
+                _snackbar.Add(mess, MudBlazor.Severity.Error);
+            }
+        } catch (Exception)
         {
-            _snackbar.Add("Sửa thể loại thành công!", MudBlazor.Severity.Success);
-            navigation.NavigateTo(RouterConfig.Admin.Category);
-        }
-        else
+            _isLoading = false;
+        } finally
         {
-            var mess = string.IsNullOrEmpty(response.ErrorMessage) ? "Sửa thể loại thất bại" : response.ErrorMessage;
-            _snackbar.Add(mess, MudBlazor.Severity.Error);
+            _isLoading = false;
         }
     }
 }

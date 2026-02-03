@@ -10,6 +10,7 @@ public class Category
     public string Description { get; set; } = string.Empty;
     public int Status { get; set; }
     public bool Delete { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     public ICollection<GameCategory>? GameCategories { get; set; }
 }

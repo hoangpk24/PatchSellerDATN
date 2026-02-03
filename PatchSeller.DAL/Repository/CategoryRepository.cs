@@ -62,7 +62,7 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
-                var duplicateName = await _context.Categories.AnyAsync(c => c.CategoryName == category.CategoryName && c.Delete != true);
+                var duplicateName = await _context.Categories.AnyAsync(c => c.CategoryName.ToLower() == category.CategoryName.ToLower() && c.Delete != true);
 
                 if(duplicateName)
                 {
@@ -70,6 +70,7 @@ namespace PatchSeller.DAL.Repository
                 }
 
                 category.Delete = false;
+                category.CreatedAt = DateTime.Now;
                 var added = _context.Categories.Add(category).Entity;
                 await _context.SaveChangesAsync();
                 return added;
