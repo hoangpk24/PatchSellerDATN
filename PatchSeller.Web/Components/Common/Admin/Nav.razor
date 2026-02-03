@@ -88,7 +88,7 @@
     {
         var contentUrl = "/" + navigation.ToBaseRelativePath(navigation.Uri);
 
-        if (contentUrl.Equals(path)) return "active-menu";
+        if (contentUrl.Contains(path)) return "active-menu";
 
         return "item-menu";
     }

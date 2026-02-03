@@ -7,24 +7,24 @@ using System.Security.Claims;
 
 namespace PatchSeller.API.Controllers.Admin
 {
-    [Route("admin/category")]
+    [Route("admin/publisher")]
     [ApiController]
 
-    public class CategoryController : ControllerBase
+    public class PublisherController : ControllerBase
     {
-        CategoryRepository _categoryRepository;
+        PublisherRepository _publisherRepository;
 
-        public CategoryController()
+        public PublisherController()
         {
-            _categoryRepository = new CategoryRepository();
+            _publisherRepository = new PublisherRepository();
         }
 
-        [HttpGet("get-all-categories")]
-        public async Task<ActionResult<List<Category>>> GetAllCategories(string? keyword)
+        [HttpGet("get-all-publishers")]
+        public async Task<ActionResult<List<Publisher>>> GetAllPublishers(string? keyword)
         {
             try
             {
-                List<Category> result = await _categoryRepository.GetAll(keyword);
+                List<Publisher> result = await _publisherRepository.GetAll(keyword);
                 if (result == null)
                 {
                     return NoContent();
@@ -33,7 +33,8 @@ namespace PatchSeller.API.Controllers.Admin
                 if(result.Any())
                 {
                     result = result.OrderByDescending(c => c.CreatedAt).ToList();
-                }    
+                }
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -42,12 +43,12 @@ namespace PatchSeller.API.Controllers.Admin
             }
         }
 
-        [HttpGet("get-category-by-id/{id}")]
-        public async Task<ActionResult<Category>> GetCategoryById(int id)
+        [HttpGet("get-publisher-by-id/{id}")]
+        public async Task<ActionResult<Publisher>> GetCategoryById(int id)
         {
             try
             {
-                var result = await _categoryRepository.GetById(id);
+                var result = await _publisherRepository.GetById(id);
                 if (result == null)
                 {
                     return NotFound(Constant.ErrorCode.NotFound);
@@ -61,7 +62,7 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<Category>> CreateCategory([FromBody] Category category)
+        public async Task<ActionResult<Publisher>> CreatePublisher([FromBody] Publisher category)
         {
             try
             {
@@ -72,7 +73,7 @@ namespace PatchSeller.API.Controllers.Admin
 
                 category.Status = 1;
                 category.Delete = false;
-                var result = await _categoryRepository.Create(category);
+                var result = await _publisherRepository.Create(category);
 
                 if (result == null)
                 {
@@ -92,25 +93,25 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult<Category>> UpdateCategory([FromBody] Category category)
+        public async Task<ActionResult<Publisher>> UpdatePublisher([FromBody] Publisher publisher)
         {
             try
             {
-                if (category == null)
+                if (publisher == null)
                 {
                     return BadRequest(Constant.ErrorCode.DataRequired);
                 }
 
-                var newCategory = new Category
+                var newPublisher = new Publisher
                 {
-                    CategoryId = category.CategoryId,
-                    CategoryName = category.CategoryName,
-                    Description = category.Description,
-                    Status = category.Status,
-                    Delete = category.Delete
+                    PublisherId = publisher.PublisherId,
+                    Name = publisher.Name,
+                    Description = publisher.Description,
+                    Status = publisher.Status,
+                    Delete = publisher.Delete
                 };
 
-                var result = await _categoryRepository.Update(category);
+                var result = await _publisherRepository.Update(publisher);
 
                 if (result == null)
                 {
@@ -134,11 +135,11 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpDelete("delete/{id}")]
-        public async Task<ActionResult<bool>> DeleteCategory(int id)
+        public async Task<ActionResult<bool>> DeletePublisher(int id)
         {
             try
             {
-                var result = await _categoryRepository.Delete(id);
+                var result = await _publisherRepository.Delete(id);
 
                 if (!result)
                 {

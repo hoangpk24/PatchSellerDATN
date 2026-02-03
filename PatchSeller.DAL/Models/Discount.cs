@@ -15,8 +15,11 @@ public class Discount
     public int UsageLimit { get; set; }
     public int LimitPerUser { get; set; }
     public int UsedCount { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
     public int Status { get; set; }
     public bool Delete { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     [ForeignKey("RankId")]
     public int? RankId { get; set; }

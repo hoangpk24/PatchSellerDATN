@@ -44,8 +44,9 @@ else
                 </div>
 
                 <MudButton Variant="Variant.Filled"
-                OnClick="@(async () => await OnSubmit())"
-                Class="w-full !rounded-full !bg-material-default py-3 !font-bold !text-white transition-all hover:opacity-80">
+                           OnClick="@(async () => await OnSubmit())"
+                           Disabled="@_isSubmitting"
+                           Class="w-full !rounded-full !bg-material-default py-3 !font-bold !text-white transition-all hover:opacity-80">
                     Đăng Nhập
                 </MudButton>
             </MudForm>
@@ -59,6 +60,7 @@ else
     AccessSchema.AdminLogin _adminLoginSchema = new AccessSchema.AdminLogin();
 
     private bool _isLoading = true;
+    private bool _isSubmitting = false;
     private bool _passwordVisibility = false;
 
     private void TogglePasswordVisibility() => _passwordVisibility = !_passwordVisibility;
@@ -153,28 +155,43 @@ else
 
     private async Task OnSubmit()
     {
-        await _form.Validate();
 
-        if (!_form.IsValid) return;
+        if (_isSubmitting) return;
 
-        _model.UserName = _model.UserName.Trim();
-        _model.PasswordHash = _model.PasswordHash.Trim();
-
-        var result = await _accessService.LoginStaff(_model);
-
-        if (result.LoginSuccess == true)
+        try
         {
-            await _localStorage.SetItemAsync(Constant.TokenNameLocalStorage, result.Token);
-            await _localStorage.SetItemAsync(Constant.TokenExpiredLocalStorage, result.Expiration);
-            await _localStorage.SetItemAsync(Constant.UserFirstLoginLocalStorage, false);
+            _isSubmitting = true;
+            await _form.Validate();
 
-            _snackbar.Add("Đăng nhập thành công!", MudBlazor.Severity.Success);
-            navigation.NavigateTo(RouterConfig.Admin.Home);
+            if (!_form.IsValid) return;
 
+            _model.UserName = _model.UserName.Trim();
+            _model.PasswordHash = _model.PasswordHash.Trim();
+
+            var result = await _accessService.LoginStaff(_model);
+
+            if (result.LoginSuccess == true)
+            {
+                await _localStorage.SetItemAsync(Constant.TokenNameLocalStorage, result.Token);
+                await _localStorage.SetItemAsync(Constant.TokenExpiredLocalStorage, result.Expiration);
+                await _localStorage.SetItemAsync(Constant.UserFirstLoginLocalStorage, false);
+
+                _snackbar.Add("Đăng nhập thành công!", MudBlazor.Severity.Success);
+                navigation.NavigateTo(RouterConfig.Admin.Home);
+
+            }
+            else
+            {
+                _snackbar.Add("Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu", MudBlazor.Severity.Warning);
+            }
         }
-        else
+        catch (Exception)
         {
-            _snackbar.Add("Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu", MudBlazor.Severity.Warning);
+            _isSubmitting = false;
+        }
+        finally
+        {
+            _isSubmitting = false;
         }
     }
 }

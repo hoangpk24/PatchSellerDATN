@@ -8,14 +8,156 @@
 
     <div class="flex items-center justify-between">
         <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách nhà phát hành</h1>
-        <a href="@RouterConfig.Admin.CreatePublisher" class="leading-[1.5rem] h-10 rounded-lg bg-material-default px-6 py-2 text-white">Tạo mới</a>
+        <a href="@RouterConfig.Admin.CreatePublisher" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
+    </div>
+
+    <div class="mt-8 rounded bg-white p-6 shadow-md">
+        <div class="grid w-full grid-cols-3 gap-x-6 gap-y-4">
+            <div>
+                <MudTextField T="string" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Value="@_searchValue"
+                              AdornmentIcon="@Icons.Material.Filled.Search" Variant="Variant.Outlined" IconSize="Size.Medium" Class="mt-0" Style="height: 44px" ValueChanged="onChangeSearch" Immediate=true></MudTextField>
+            </div>
+            <div class="flex items-center gap-2">
+                <MudButton Variant="Variant.Outlined" OnClick="OnSearch" Class="h-11 w-full"><MudIcon Icon="@Icons.Material.Filled.Search" Class="mr-2" /> Tìm kiếm</MudButton>
+                <MudButton Variant="Variant.Outlined" OnClick="OnReset" Class="h-11 w-full"><MudIcon Icon="@Icons.Material.Filled.Filter" Class="mr-2" /> Đặt lại</MudButton>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 rounded bg-white shadow-md">
+        <MudTable Items="@_lstPublisher" Loading="@_isLoading" Elevation="0" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true">
+            <HeaderContent>
+                <MudTh hidden><MudTableSortLabel SortLabel="Id" T="string" hidden>STT</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Tên" T="string">Tên</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Mô tả" T="string">Mô tả</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id" hidden>@context.PublisherId</MudTd>
+                <MudTd DataLabel="Tên">@context.Name</MudTd>
+                <MudTd DataLabel="Mô tả">@context.Description</MudTd>
+                <MudTd DataLabel="Trạng thái">
+                    @if (context.Status == Constant.StatusDefault.Active)
+                    {
+                        <span class="font-medium uppercase text-material-default">Hoạt động</span>
+                    }
+                    else
+                    {
+
+                        <span class="font-medium uppercase text-red-500">Tạm ngưng</span>
+                    }
+                </MudTd>
+                <MudTd DataLabel="Thao tác">
+                    <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditPublisher.Replace(":id", context.PublisherId.ToString())))"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogDelete(context.PublisherId))"></MudIconButton>
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText Class="my-4">Không có dữ liệu.</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <div class="flex w-full flex-col gap-3">
+                    @{
+                        for (var i = 0; i < 5; i++)
+                        {
+                            <div class="flex items-center justify-between gap-2">
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                            </div>
+                        }
+                    }
+                </div>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
     </div>
 </section>
 
 @code {
+    List<DAL.Models.Publisher> _lstPublisher = [];
+
+    private string _searchValue = string.Empty;
+    private bool _isLoading = true;
+
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
     private List<BreadcrumbItem> _itemBreadcrumbs =
     [
         new("Trang Chủ", href: RouterConfig.Admin.Home),
         new("Nhà Phát Hành", href: "#", disabled: true),
     ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadData();
+        }
+        catch (Exception)
+        {
+            _isLoading = false;    
+        } finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var res = await _adminPublisherService.GetAll(_searchValue);
+        var data = res.Data;
+        if (res.IsSuccess && data != null)
+        {
+            _lstPublisher = data;
+        }
+        else if (res.IsSuccess == false && res.StatusCode == "NotFound")
+        {
+            _snackbar.Add("Không tìm thấy trang này.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.NotFound);
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho quản trị viên.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.Admin.Category);
+        }
+        StateHasChanged();
+    }
+
+    private void onChangeSearch(string value)
+    {
+        _searchValue = value.Trim();
+    }
+
+    private async Task OnSearch()
+    {
+        await LoadData();
+    }
+
+    private async Task OnReset()
+    {
+        _searchValue = string.Empty;
+        await LoadData();
+    }
+
+    async Task OpenDialogDelete(int id)
+    {
+        var deleteParaeters = new DialogParameters<Admin.Publisher.ConfirmDeleteDialog>
+        {
+            {x => x.id, id}
+        };
+
+        var dialog = await _dialogService.ShowAsync<Admin.Publisher.ConfirmDeleteDialog>("Options Dialog", deleteParaeters, _dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+            StateHasChanged();
+        }
+    }
 }

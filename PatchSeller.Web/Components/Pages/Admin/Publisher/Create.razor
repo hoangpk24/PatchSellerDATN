@@ -3,17 +3,125 @@
 
 <PageTitle>@Constant.PageTitleAdmin Publisher Create</PageTitle>
 
-<section class="p-6">
-    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
+<section class="mx-auto max-w-[1032px] p-6">
+    <MudBreadcrumbs Class="!mb-2 !p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
 
-    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo nhà phát hành</h1>
+    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo nhà phát hành mới</h1>
+
+    <div class="rounded bg-white p-10 shadow-md">
+        <MudForm @ref="_form" Model="_model" Validation="_categorySchema.ValidateValue" Class="mx-auto max-w-[600px]">
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tên thể loại</label> <span class="ml-1 text-red-500">*</span>
+                <MudTextField T="string"
+                              @bind-Value="_model.Name"
+                              For="@(() => _model.Name)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Ví dụ: VNG, Tencent..."
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Mô tả chi tiết</label>
+                <MudTextField T="string"
+                              @bind-Value="_model.Description"
+                              For="@(() => _model.Description)"
+                              Placeholder="Nhập mô tả ngắn gọn về nhà phát hành này..."
+                              Variant="Variant.Outlined"
+                              Lines="4"
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div>
+                <label class="mb-2 block text-sm font-bold uppercase tracking-wider text-slate-700">Trạng thái hiển thị</label>
+                <MudRadioGroup T="int" @bind-Value="_model.Status" For="@(() => _model.Status)">
+                    <div class="flex gap-6">
+                        <MudRadio Value="1" Color="Color.Primary" Class="!ml-0">
+                            <span class="text-sm font-medium text-slate-600">Hoạt động</span>
+                        </MudRadio>
+                        <MudRadio Value="0" Color="Color.Error">
+                            <span class="text-sm font-medium text-slate-600">Tạm ngưng</span>
+                        </MudRadio>
+                    </div>
+                </MudRadioGroup>
+            </div>
+
+            <MudDivider Class="mb-8 mt-4 !border-slate-200" />
+
+            <div class="flex items-center justify-end gap-3">
+                <MudButton Variant="Variant.Text"
+                           Class="px-6 py-2 text-slate-500 hover:bg-slate-200"
+                           OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Publisher)">
+                    Quay lại
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="@(async () => await OnSubmit())"
+                           Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
+                    Tạo mới
+                </MudButton>
+            </div>
+        </MudForm>
+    </div>
 </section>
 
 @code {
+    MudForm _form = new MudForm();
+    DAL.Models.Publisher _model = new DAL.Models.Publisher();
+    PublisherSchema.CreateUpdate _categorySchema = new PublisherSchema.CreateUpdate();
+
+    private bool _isLoading = false;
+
     private List<BreadcrumbItem> _itemBreadcrumbs =
     [
         new("Trang Chủ", href: RouterConfig.Admin.Home),
         new("Nhà Phát Hành", href: RouterConfig.Admin.Publisher),
         new("Tạo Nhà Phát Hành", href: "#", disabled: true),
     ];
+
+    protected override void OnInitialized()
+    {
+        _model.Status = 1;
+    }
+
+    async Task OnSubmit()
+    {
+        if (_isLoading) return;
+
+        try
+        {
+            _isLoading = true;
+            await _form.Validate();
+
+            if (!_form.IsValid) return;
+
+            _model.Name = _model.Name.Trim();
+            if (!string.IsNullOrEmpty(_model.Description))
+            {
+                _model.Description = _model.Description.Trim();
+            }
+
+            var response = await _adminPublisherService.CreatePublisher(_model);
+
+            if (response.IsSuccess)
+            {
+                _snackbar.Add("Tạo nhà phát hành thành công!", MudBlazor.Severity.Success);
+                navigation.NavigateTo(RouterConfig.Admin.Publisher);
+            }
+            else
+            {
+                var mess = string.IsNullOrEmpty(response.ErrorMessage) ? "Tạo nhà phát hành thất bại" : response.ErrorMessage;
+                _snackbar.Add(mess, MudBlazor.Severity.Error);
+            }
+        }
+        catch (Exception)
+        {
+            _isLoading = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 }

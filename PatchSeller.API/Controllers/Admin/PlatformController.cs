@@ -7,24 +7,24 @@ using System.Security.Claims;
 
 namespace PatchSeller.API.Controllers.Admin
 {
-    [Route("admin/category")]
+    [Route("admin/platform")]
     [ApiController]
 
-    public class CategoryController : ControllerBase
+    public class PlatformController : ControllerBase
     {
-        CategoryRepository _categoryRepository;
+        PlatformRepository _platformRepository;
 
-        public CategoryController()
+        public PlatformController()
         {
-            _categoryRepository = new CategoryRepository();
+            _platformRepository = new PlatformRepository();
         }
 
-        [HttpGet("get-all-categories")]
-        public async Task<ActionResult<List<Category>>> GetAllCategories(string? keyword)
+        [HttpGet("get-all-platforms")]
+        public async Task<ActionResult<List<Platform>>> GetAllPlatform(string? keyword)
         {
             try
             {
-                List<Category> result = await _categoryRepository.GetAll(keyword);
+                List<Platform> result = await _platformRepository.GetAll(keyword);
                 if (result == null)
                 {
                     return NoContent();
@@ -33,7 +33,8 @@ namespace PatchSeller.API.Controllers.Admin
                 if(result.Any())
                 {
                     result = result.OrderByDescending(c => c.CreatedAt).ToList();
-                }    
+                }
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -42,12 +43,12 @@ namespace PatchSeller.API.Controllers.Admin
             }
         }
 
-        [HttpGet("get-category-by-id/{id}")]
-        public async Task<ActionResult<Category>> GetCategoryById(int id)
+        [HttpGet("get-platform-by-id/{id}")]
+        public async Task<ActionResult<Platform>> GetCategoryById(int id)
         {
             try
             {
-                var result = await _categoryRepository.GetById(id);
+                var result = await _platformRepository.GetById(id);
                 if (result == null)
                 {
                     return NotFound(Constant.ErrorCode.NotFound);
@@ -61,18 +62,18 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<Category>> CreateCategory([FromBody] Category category)
+        public async Task<ActionResult<Platform>> CreatePlatform([FromBody] Platform platform)
         {
             try
             {
-                if (category == null)
+                if (platform == null)
                 {
                     return BadRequest(Constant.ErrorCode.DataRequired);
                 }
 
-                category.Status = 1;
-                category.Delete = false;
-                var result = await _categoryRepository.Create(category);
+                platform.Status = 1;
+                platform.Delete = false;
+                var result = await _platformRepository.Create(platform);
 
                 if (result == null)
                 {
@@ -92,25 +93,25 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult<Category>> UpdateCategory([FromBody] Category category)
+        public async Task<ActionResult<Platform>> UpdatePlatform([FromBody] Platform platform)
         {
             try
             {
-                if (category == null)
+                if (platform == null)
                 {
                     return BadRequest(Constant.ErrorCode.DataRequired);
                 }
 
-                var newCategory = new Category
+                var newPlatform = new Platform
                 {
-                    CategoryId = category.CategoryId,
-                    CategoryName = category.CategoryName,
-                    Description = category.Description,
-                    Status = category.Status,
-                    Delete = category.Delete
+                    PlatformId = platform.PlatformId,
+                    Name = platform.Name,
+                    Description = platform.Description,
+                    Status = platform.Status,
+                    Delete = platform.Delete
                 };
 
-                var result = await _categoryRepository.Update(category);
+                var result = await _platformRepository.Update(platform);
 
                 if (result == null)
                 {
@@ -134,11 +135,11 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpDelete("delete/{id}")]
-        public async Task<ActionResult<bool>> DeleteCategory(int id)
+        public async Task<ActionResult<bool>> DeletePlatform(int id)
         {
             try
             {
-                var result = await _categoryRepository.Delete(id);
+                var result = await _platformRepository.Delete(id);
 
                 if (!result)
                 {

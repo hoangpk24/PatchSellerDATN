@@ -15,6 +15,7 @@ public class Game
     public DateTime ReleaseDate { get; set; }
     public int Status { get; set; }
     public bool Delete { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     [ForeignKey("PublisherId")]
     public int PublisherId { get; set; }

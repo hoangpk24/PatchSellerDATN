@@ -13,6 +13,7 @@ public class Review
     public string Content { get; set; }
     public double Overall { get; set; }
     public int Status { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
     [ForeignKey("UserId")]
     public int UserId { get; set; }

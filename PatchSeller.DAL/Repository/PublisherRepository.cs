@@ -17,10 +17,17 @@ namespace PatchSeller.DAL.Repository
             _context = new PatchSellerDbContext();
         }
 
-        public async Task<List<Publisher>> GetAll()
+        public async Task<List<Publisher>> GetAll(string? keyword)
         {
             try
             {
+                if(keyword != null)
+                {
+                    return await _context.Publishers
+                        .Where(x => x.Delete != true && x.Name.ToLower().Contains(keyword.ToLower()))
+                        .ToListAsync();
+                }
+
                 return await _context.Publishers
                     .Where(x => x.Delete != true)
                     .ToListAsync();
@@ -50,10 +57,22 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
+                var duplicateName = await _context.Publishers.AnyAsync(c => c.Name.ToLower() == entity.Name.ToLower() && c.Delete != true);
+
+                if (duplicateName)
+                {
+                    throw new InvalidOperationException("DUPLICATE_NAME");
+                }
+
                 entity.Delete = false;
+                entity.CreatedAt = DateTime.Now;
                 var added = _context.Publishers.Add(entity).Entity;
                 await _context.SaveChangesAsync();
                 return added;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {
@@ -65,9 +84,32 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
-                _context.Publishers.Update(entity);
+                var existingPublisher = await _context.Publishers.FindAsync(entity.PublisherId);
+
+                if (existingPublisher == null || (existingPublisher != null && existingPublisher.Delete == true))
+                {
+                    throw new InvalidOperationException("NOT_FOUND");
+                }
+
+                var duplicateName = await _context.Publishers.AnyAsync(c => c.PublisherId != entity.PublisherId && c.Name.ToLower() == entity.Name.ToLower() && c.Delete != true);
+
+                if (duplicateName)
+                {
+                    throw new InvalidOperationException("DUPLICATE_NAME");
+                }
+
+                existingPublisher.Name = entity.Name;
+                existingPublisher.Description = entity.Description;
+                existingPublisher.Status = entity.Status;
+                existingPublisher.Delete = entity.Delete;
+
+                _context.Publishers.Update(existingPublisher);
                 await _context.SaveChangesAsync();
                 return entity;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {
@@ -80,8 +122,11 @@ namespace PatchSeller.DAL.Repository
             try
             {
                 var entity = await _context.Publishers.FindAsync(id);
-                if (entity == null)
-                    return false;
+
+                if (entity == null || (entity != null && entity.Delete == true))
+                {
+                    throw new InvalidOperationException("NOT_FOUND");
+                }
 
                 entity.Delete = true;
                 await _context.SaveChangesAsync();
