@@ -17,6 +17,6 @@ public class Staff
     public string Role { get; set; } = string.Empty;
     public DateTime? CreatedAt { get; set; }
 
-    public ICollection<PatchVersion> PatchVersions { get; set; }
-    public ICollection<ActionLog> ActionLogs { get; set; }
+    public ICollection<PatchVersion>? PatchVersions { get; set; }
+    public ICollection<ActionLog>? ActionLogs { get; set; }
 }

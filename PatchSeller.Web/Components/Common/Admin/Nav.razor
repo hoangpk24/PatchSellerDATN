@@ -15,13 +15,15 @@
     }
 </style>
 
-<nav class="relative h-full w-[18.75rem] bg-white pb-4 pt-6 shadow-lg">
+<nav class="relative h-full w-[18.75rem] border-r border-solid border-slate-200 bg-white pb-4">
     <MudNavMenu Class="mud-width-full" Color="Color.Primary" Bordered="true">
-        <a href="@RouterConfig.Admin.Home" class="flex items-center justify-center">
-            <img src="/assets/icons/logo-admin.svg" alt="logo admin" width="180" />
-        </a>
+        <div class="flex items-center justify-center px-3 py-1.5">
+            <a class="inline-block" href="@RouterConfig.Admin.Home">
+                <img src="/assets/icons/logo-admin-1.svg" alt="logo admin" width="101" height="40" />
+            </a>
+        </div>
 
-        <MudDivider Class="my-5 !border-slate-200" />
+        <MudDivider Class="mb-5 !border-slate-200" />
 
         <div class="max-h-[calc(100lvh-280px)] flex flex-col gap-2 overflow-y-auto px-3">
             <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Home))" Class="@ActiveMenuClass(RouterConfig.Admin.Home)" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
@@ -36,7 +38,7 @@
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Version))" Class="@ActiveMenuClass(RouterConfig.Admin.Version)" Icon="@Icons.Material.Filled.Difference">Phiên bản</MudNavLink>
             </MudNavGroup>
             <MudNavGroup Title="Quản lý tài khoản">
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Member))" Class="@ActiveMenuClass(RouterConfig.Admin.Member)" Icon="@Icons.Material.Filled.SupervisedUserCircle">Quản trị</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Staff))" Class="@ActiveMenuClass(RouterConfig.Admin.Staff)" Icon="@Icons.Material.Filled.SupervisedUserCircle">Quản trị</MudNavLink>
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Customer))" Class="@ActiveMenuClass(RouterConfig.Admin.Customer)" Icon="@Icons.Material.Filled.Group">Khách hàng</MudNavLink>
             </MudNavGroup>
             <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Voucher))" Class="@ActiveMenuClass(RouterConfig.Admin.Voucher)" Icon="@Icons.Material.Filled.PanoramaHorizontalSelect">Mã giảm giá</MudNavLink>

@@ -16,6 +16,7 @@
             public const string TokenExpired = "token_expired";
             public const string InvalidToken = "invalid_token";
             public const string NameAlreadyExit = "name_already_exit";
+            public const string UserNameOrEmailAlreadyExit = "username_email_already_exit";
 
             public const string NotFound = "not_found";
             public const string DataNotFound = "data_not_found";

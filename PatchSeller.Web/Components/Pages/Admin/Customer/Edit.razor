@@ -4,14 +4,81 @@
 <PageTitle>@Constant.PageTitleAdmin Customer Edit</PageTitle>
 
 <section class="p-6">
-    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
-
     <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa khách hàng</h1>
+
+    <div class="rounded bg-white p-10 shadow-md">
+        <MudForm @ref="_form" Model="_model" Validation="_staffSchema.ValidateValue" Class="mx-auto max-w-[600px]">
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Họ và tên</label> <span class="ml-1 text-red-500">*</span>
+                <MudTextField T="string"
+                              @bind-Value="_model.FullName"
+                              For="@(() => _model.FullName)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Ví dụ: Nguyễn văn a"
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Email</label> <span class="ml-1 text-red-500">*</span>
+                <MudTextField T="string"
+                              @bind-Value="_model.Email"
+                              For="@(() => _model.Email)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Ví dụ: nva@gmail.com"
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Số điện thoại</label>
+                <MudTextField T="string"
+                              @bind-Value="_model.PhoneNumber"
+                              For="@(() => _model.PhoneNumber)"
+                              Variant="Variant.Outlined"
+                              Placeholder="0912345678"
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tên đăng nhập</label>
+                <MudTextField T="string"
+                              @bind-Value="_model.UserName"
+                              For="@(() => _model.UserName)"
+                              Placeholder="Ví dụ: anguyen..."
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+            </div>
+
+            <MudDivider Class="mb-8 mt-4 !border-slate-200" />
+
+            <div class="flex items-center justify-end gap-3">
+                <MudButton Variant="Variant.Text"
+                           Class="px-6 py-2 text-slate-500 hover:bg-slate-200"
+                           OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Customer)">
+                    Quay lại
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Edit"
+                           OnClick="@(async () => await OnSubmit())"
+                           Disabled="@_isLoading"
+                           Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
+                    Sửa
+                </MudButton>
+            </div>
+        </MudForm>
+    </div>
 </section>
 
 @code {
     [Parameter]
     public int id { get; set; }
+
+    MudForm _form = new MudForm();
+    DAL.Models.User _model = new DAL.Models.User();
+    UserSchema.CreateUpdate _staffSchema = new UserSchema.CreateUpdate();
+
+    private bool _isLoading = false;
 
     private List<BreadcrumbItem> _itemBreadcrumbs =
     [
@@ -19,4 +86,81 @@
         new("Khách Hàng", href: RouterConfig.Admin.Customer),
         new("Tạo Khách Hàng", href: "#", disabled: true),
     ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+        }
+        catch (Exception)
+        {
+            _isLoading = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var response = await _adminUserService.GetById(id);
+
+        if (response.IsSuccess && response.Data != null)
+        {
+            _model = response.Data;
+        }
+        else if (response.IsSuccess == false && response.StatusCode == "NotFound")
+        {
+            _snackbar.Add("Không tìm thấy khách hàng này.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.NotFound);
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho khách hàng.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.Admin.Staff);
+        }
+    }
+
+    async Task OnSubmit()
+    {
+        if (_isLoading) return;
+
+        try
+        {
+            _isLoading = true;
+            await _form.Validate();
+
+            if (!_form.IsValid) return;
+
+            _model.FullName = _model.FullName.Trim();
+            _model.UserName = _model.UserName.Trim();
+            _model.Email = _model.Email.Trim();
+            _model.PasswordHash = _model.PasswordHash.Trim();
+            _model.PhoneNumber = _model.PhoneNumber.Trim();
+
+            var response = await _adminUserService.UpdateStaff(_model);
+
+            if (response.IsSuccess)
+            {
+                _snackbar.Add("Sửa thành công!", MudBlazor.Severity.Success);
+                navigation.NavigateTo(RouterConfig.Admin.Customer);
+            }
+            else
+            {
+                var mess = string.IsNullOrEmpty(response.ErrorMessage) ? "Sửa thất bại" : response.ErrorMessage;
+                _snackbar.Add(mess, MudBlazor.Severity.Error);
+            }
+        }
+        catch (Exception)
+        {
+            _isLoading = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 }

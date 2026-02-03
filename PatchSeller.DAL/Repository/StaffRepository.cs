@@ -22,10 +22,16 @@ namespace PatchSeller.DAL.Repository
             return u;
         }
 
-        public async Task<List<Staff>> GetAll()
+        public async Task<List<Staff>> GetAll(string? keyword)
         {
             try
             {
+                if(keyword != null)
+                {
+                    return await _context.Staffs
+                        .Where(s => s.FullName.Contains(keyword) || s.Email.Contains(keyword) || s.PhoneNumber.Contains(keyword))
+                        .ToListAsync();
+                }
                 return await _context.Staffs.ToListAsync();
             }
             catch (Exception)
@@ -50,9 +56,22 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
+                var exitingStaff = await _context.Staffs
+                    .AnyAsync(s => s.UserName.ToLower() == staff.UserName.ToLower() || s.Email.ToLower() == staff.Email.ToLower());
+
+                if (exitingStaff)
+                {
+                    throw new InvalidOperationException("DUPLICATE_NAME_OR_EMAIL");
+                }
+
+                staff.CreatedAt = DateTime.Now;
                 var added = _context.Staffs.Add(staff).Entity;
                 await _context.SaveChangesAsync();
                 return added;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {
@@ -64,9 +83,35 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
-                _context.Staffs.Update(staff);
+                var exitingStaff = await _context.Staffs.FindAsync(staff.StaffId);
+
+                if (exitingStaff == null)
+                {
+                    throw new InvalidOperationException("NOT_FOUND");
+                }
+
+                var duplicateStaff = await _context.Staffs
+                    .AnyAsync(s => (s.UserName.ToLower() == staff.UserName.ToLower() || s.Email.ToLower() == staff.Email.ToLower()) && s.StaffId != staff.StaffId);
+
+                if (duplicateStaff)
+                {
+                    throw new InvalidOperationException("DUPLICATE_NAME_OR_EMAIL");
+                }
+
+                exitingStaff.FullName = staff.FullName;
+                exitingStaff.UserName = staff.UserName;
+                exitingStaff.PasswordHash = staff.PasswordHash;
+                exitingStaff.Email = staff.Email;
+                exitingStaff.PhoneNumber = staff.PhoneNumber;
+                exitingStaff.Role = staff.Role;
+
+                _context.Staffs.Update(exitingStaff);
                 await _context.SaveChangesAsync();
                 return staff;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {
@@ -79,12 +124,17 @@ namespace PatchSeller.DAL.Repository
             try
             {
                 var staff = await _context.Staffs.FindAsync(id);
+
                 if (staff == null)
-                    return false;
+                    throw new InvalidOperationException("NOT_FOUND");
 
                 _context.Staffs.Remove(staff);
                 await _context.SaveChangesAsync();
                 return true;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {

@@ -88,10 +88,10 @@
             public const string CreateVoucher = "/admin/voucher/create";
             public const string EditVoucher = "/admin/voucher/:id/edit";
 
-            // Member
-            public const string Member = "/admin/member";
-            public const string CreateMember = "/admin/member/create";
-            public const string EditMember = "/admin/member/:id/edit";
+            // Staff
+            public const string Staff = "/admin/staff";
+            public const string CreateStaff = "/admin/staff/create";
+            public const string EditStaff = "/admin/staff/:id/edit";
 
             // Customer
             public const string Customer = "/admin/customer";

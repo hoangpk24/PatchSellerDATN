@@ -22,9 +22,9 @@ public class User
     [ForeignKey("RankId")]
     public int? RankId { get; set; }
     public Rank? Rank { get; set; }
-    public ICollection<Cart> Carts { get; set; }
-    public ICollection<DownloadLog> DownloadLogs { get; set; }
-    public ICollection<UserPurchase> UserPurchases { get; set; }
-    public ICollection<Order> Orders { get; set; }
-    public ICollection<Review> Reviews { get; set; }
+    public ICollection<Cart>? Carts { get; set; }
+    public ICollection<DownloadLog>? DownloadLogs { get; set; }
+    public ICollection<UserPurchase>? UserPurchases { get; set; }
+    public ICollection<Order>? Orders { get; set; }
+    public ICollection<Review>? Reviews { get; set; }
 }
