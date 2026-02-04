@@ -28,6 +28,8 @@
 @using Spillgebees.Blazor.RichTextEditor.Components.Toolbar.Controls
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @inject IJSRuntime JS
+@using System.Globalization;
+@using Microsoft.AspNetCore.WebUtilities;
 @inject Blazored.LocalStorage.ILocalStorageService _localStorage
 @inject NavigationManager navigation
 @inject ISnackbar _snackbar
@@ -39,3 +41,4 @@
 @inject AdminPublisherService _adminPublisherService
 @inject AdminStaffService _adminStaffService
 @inject AdminUserService _adminUserService
+@inject AdminDiscountService _adminDiscountService

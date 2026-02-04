@@ -3,9 +3,292 @@
 
 <PageTitle>@Constant.PageTitleAdmin Voucher Create</PageTitle>
 
-<section class="p-6">
-    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo mã giảm giá</h1>
+<section class="mx-auto max-w-[1032px] p-6">
+    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo mã giảm giá mới</h1>
+
+    <div class="rounded bg-white p-10 shadow-md">
+        <MudForm Model="_model" @ref="_form" Validation="_discountSchema.ValidateValue">
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Mã</label> <span class="ml-1 text-red-500">*</span>
+                <MudTextField T="string" 
+                              @bind-Value="_model.Code"
+                              For="@(() => _model.Code)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Ví dụ: MUAXUAN2026..."
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Loại</label> <span class="ml-1 text-red-500">*</span>
+                <MudRadioGroup T="string" Value="@_model.DiscountType" ValueChanged="@((string value) => OnDiscoutTypeChange(value))">
+                    <MudRadio T="string" Value="@(Constant.DiscountTypePercent)" Color="Color.Primary">Phần Trăm</MudRadio>
+                    <MudRadio T="string" Value="@(Constant.DiscountTypeFixed)" Color="Color.Primary">Giá Cố Định</MudRadio>
+                </MudRadioGroup>
+            </div>
+            
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Giá</label> <span class="ml-1 text-red-500">*</span>
+                <MudNumericField @bind-Value="_model.Value"
+                                 For="@(() => _model.Value)"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Adornment="Adornment.End"
+                                 Format="F0" Step="@(_model.DiscountType == Constant.DiscountTypePercent ? 10 : 1000)"
+                                 AdornmentText="@(_model.DiscountType == Constant.DiscountTypePercent ? "%" : "đ")"
+                                 HideSpinButtons="true" 
+                                 Placeholder="@(_model.DiscountType == Constant.DiscountTypePercent ? "10" : "179000")" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Giá áp dụng tối thiểu</label>
+                <MudNumericField @bind-Value="_model.MinOrderValue"
+                                 For="@(() => _model.MinOrderValue)"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Adornment="Adornment.End"
+                                 Format="F0"
+                                 AdornmentText="đ"
+                                 HideSpinButtons="true"
+                                 Placeholder="Ví dụ: 179000" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Giá giảm tối đa</label>
+                <MudNumericField @bind-Value="_model.MaxDiscount"
+                                 For="@(() => _model.MaxDiscount)"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Adornment="Adornment.End"
+                                 Format="F0"
+                                 AdornmentText="đ"
+                                 Disabled="@_isDisableMaxValue"
+                                 HideSpinButtons="true"
+                                 Placeholder="Ví dụ: 179000" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Số mã phát hành</label> <span class="ml-1 text-red-500">*</span>
+                <MudNumericField @bind-Value="_model.UsageLimit"
+                                 For="@(() => _model.UsageLimit)"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 HideSpinButtons="true"
+                                 Placeholder="Ví dụ: 10" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Giới hạn sử dụng</label> <span class="ml-1 text-red-500">*</span>
+                <MudNumericField @bind-Value="_model.LimitPerUser"
+                                 For="@(() => _model.LimitPerUser)"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 HideSpinButtons="true"
+                                 Placeholder="Ví dụ: 1" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Cấp bậc được áp dụng</label> <span class="ml-1 text-red-500">*</span>
+                <MudSelect class="mt-0" Margin="Margin.Dense" Variant="Variant.Outlined" @bind-Value="@_model.RankId">
+                    <MudSelectItem Value="0">Tất cả</MudSelectItem>
+                    <MudSelectItem Value="1">Đồng</MudSelectItem>
+                    <MudSelectItem Value="2">Bạc</MudSelectItem>
+                    <MudSelectItem Value="3">Vàng</MudSelectItem>
+                </MudSelect>
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Ngày và Giờ bắt đầu</label>
+                <MudStack Row="true">
+                    <MudDatePicker Date="@_startDateOnly"
+                                   DateChanged="OnStartDateChanged"
+                                   For="@(() => _model.StartDate)"
+                                   Label="Ngày Bắt Đầu"
+                                   DateFormat="dd/MM/yyyy"
+                                   Margin="Margin.Dense"
+                                   Variant="Variant.Outlined" />
+
+                    <MudTimePicker Time="@_startTime"
+                                   TimeChanged="OnStartTimeChanged"
+                                   Label="Giờ Bắt Đầu"
+                                   Margin="Margin.Dense"
+                                   Variant="Variant.Outlined" />
+                </MudStack>
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Ngày và Giờ kết thúc</label>
+                <MudStack Row="true">
+                    <MudDatePicker Date="@_endDateOnly"
+                                   DateChanged="OnEndDateChanged"
+                                   For="@(() => _model.EndDate)"
+                                   Label="Ngày Kết Thúc"
+                                   DateFormat="dd/MM/yyyy"
+                                   Margin="Margin.Dense"
+                                   Variant="Variant.Outlined" />
+
+                    <MudTimePicker Time="@_endTime"
+                                   TimeChanged="OnEndTimeChanged"
+                                   Label="Giờ Kết thúc"
+                                   Margin="Margin.Dense"
+                                   Variant="Variant.Outlined" />
+                </MudStack>
+            </div>
+
+            <MudDivider Class="mb-8 mt-4 !border-slate-200" />
+
+            <div class="flex items-center justify-end gap-3">
+                <MudButton Variant="Variant.Text"
+                           Class="px-6 py-2 text-slate-500 hover:bg-slate-200"
+                           OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Voucher)">
+                    Quay lại
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="@(async () => await OnSubmit())"
+                           Disabled="@_isLoading"
+                           Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
+                    Tạo mới
+                </MudButton>
+            </div>
+        </MudForm>
+    </div>
 </section>
 
 @code {
+    MudForm _form = new MudForm();
+    DiscountModel _model = new DiscountModel();
+    DiscountSchema.CreateUpdate _discountSchema = new DiscountSchema.CreateUpdate();
+
+    private bool _isLoading = false;
+    private DateTime? _startDateOnly;
+    private DateTime? _endDateOnly;
+    private TimeSpan? _startTime;
+    private TimeSpan? _endTime;
+
+    protected override void OnInitialized()
+    {
+        var now = DateTime.Now;
+        var startDate = now.AddDays(1);
+        var endDate = now.AddDays(15);
+
+        _startDateOnly = startDate.Date;
+        _endDateOnly = endDate.Date;
+        _startTime = new TimeSpan(0, 0, 0);
+        _endTime = new TimeSpan(23, 59, 59);
+
+        _model.StartDate = _startDateOnly.Value.Date.Add(_startTime ?? TimeSpan.Zero);
+        _model.EndDate = _endDateOnly.Value.Date.Add(_endTime ?? TimeSpan.Zero);
+
+        _model.DiscountType = Constant.DiscountTypePercent;
+        _model.Value = 20;
+        _model.UsageLimit = 10;
+        _model.LimitPerUser = 1;
+        _model.RankId = 0;
+    }
+
+    async Task OnDiscoutTypeChange(string type)
+    {
+        _model.DiscountType = type;
+        if (_model.DiscountType == Constant.DiscountTypeFixed)
+        {
+            _model.Value = 100000;
+            _model.MaxDiscount = null;
+        }
+        else
+        {
+            _model.Value = 20;
+        }
+
+        await _form.Validate();
+    }
+
+    private async Task OnStartDateChanged(DateTime? date)
+    {
+        _startDateOnly = date?.Date;
+        await UpdateStartDateTime();
+    }
+
+    private async Task OnStartTimeChanged(TimeSpan? time)
+    {
+        _startTime = time;
+        await UpdateStartDateTime();
+    }
+
+    private async Task OnEndDateChanged(DateTime? date)
+    {
+        _endDateOnly = date?.Date;
+        await UpdateEndDateTime();
+    }
+
+    private async Task OnEndTimeChanged(TimeSpan? time)
+    {
+        _endTime = time;
+        await UpdateEndDateTime();
+    }
+
+    private async Task UpdateStartDateTime()
+    {
+        if (_startDateOnly.HasValue && _startTime.HasValue)
+        {
+            _model.StartDate = _startDateOnly.Value.Date.Add(_startTime.Value);
+        }
+        else if (_startDateOnly.HasValue)
+        {
+            _model.StartDate = _startDateOnly.Value.Date;
+        }
+
+        await _form.Validate();
+    }
+
+    private async Task UpdateEndDateTime()
+    {
+        if (_endDateOnly.HasValue && _endTime.HasValue)
+        {
+            _model.EndDate = _endDateOnly.Value.Date.Add(_endTime.Value);
+        }
+        else if (_endDateOnly.HasValue)
+        {
+            _model.EndDate = _endDateOnly.Value.Date;
+        }
+
+        await _form.Validate();
+    }
+
+    private bool _isDisableMaxValue => _model.DiscountType == Constant.DiscountTypeFixed;
+
+    async Task OnSubmit()
+    {
+        if (_isLoading) return;
+
+        try
+        {
+            _isLoading = true;
+
+            await _form.Validate();
+
+            if (!_form.IsValid) return;
+
+            _model.Code = _model.Code.Trim();
+
+            var response = await _adminDiscountService.CreateDiscount(_model);
+
+            if(response.IsSuccess)
+            {
+                _snackbar.Add("Tạo thành công!", MudBlazor.Severity.Success);
+                navigation.NavigateTo(RouterConfig.Admin.Voucher);
+            }
+            else
+            {
+                var mess = string.IsNullOrEmpty(response.ErrorMessage) ? "Tạo thất bại" : response.ErrorMessage;
+                _snackbar.Add(mess, MudBlazor.Severity.Error);
+            }
+        } catch(Exception)
+        {
+            _isLoading = false;
+        } finally
+        {
+            _isLoading = false;
+        }
+    }
 }

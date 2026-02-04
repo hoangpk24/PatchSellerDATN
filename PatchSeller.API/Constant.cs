@@ -14,6 +14,7 @@
             public const string EmailOrUsernameAlreadyExit = "email_username_already_exit";
             public const string UserNameOrEmailAlreadyExit = "username_email_already_exit";
             public const string NameAlreadyExit = "name_already_exit";
+            public const string CodeAlreadyExit = "code_already_exit";
 
             // Authentication & Authorization
             public const string Unauthorized = "unauthorized";
@@ -38,9 +39,6 @@
             // Other Errors
             public const string OtherError = "other_error";
             public const string DatabaseError = "database_error";
-
-            public const string OutOfStock = "out_of_stock";
-            public const string ProductInActiveOrder = "product_in_active_order";
         }
     }
 }
