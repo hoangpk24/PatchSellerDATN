@@ -123,7 +123,7 @@
             _model.RankId = 1;
             _model.RewardPoint = 0;
 
-            var response = await _adminUserService.CreateStaff(_model);
+            var response = await _adminUserService.CreateUser(_model);
 
             if (response.IsSuccess)
             {

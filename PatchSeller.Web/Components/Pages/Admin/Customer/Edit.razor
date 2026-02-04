@@ -141,7 +141,7 @@
             _model.PasswordHash = _model.PasswordHash.Trim();
             _model.PhoneNumber = _model.PhoneNumber.Trim();
 
-            var response = await _adminUserService.UpdateStaff(_model);
+            var response = await _adminUserService.UpdateUser(_model);
 
             if (response.IsSuccess)
             {
