@@ -15,6 +15,10 @@
         // Image default
         public const string DefaultImages = "/Assets/Images/default-image.png";
 
+        // Discount type
+        public const string DiscountTypePercent = "Percent";
+        public const string DiscountTypeFixed = "Amount";
+
         // Regex
         public static class Regex
         {
@@ -44,6 +48,7 @@
             public const string EmailOrUsernameAlreadyExit = "email_username_already_exit";
             public const string UserNameOrEmailAlreadyExit = "username_email_already_exit";
             public const string NameAlreadyExit = "name_already_exit";
+            public const string CodeAlreadyExit = "code_already_exit";
 
             // Authentication & Authorization
             public const string Unauthorized = "unauthorized";
@@ -68,33 +73,26 @@
             // Other Errors
             public const string OtherError = "other_error";
             public const string DatabaseError = "database_error";
-
-            public const string OutOfStock = "out_of_stock";
-            public const string ProductInActiveOrder = "product_in_active_order";
         }
 
         public static readonly Dictionary<string, string> Errors = new Dictionary<string, string>
         {
-            // --- Lỗi liên quan đến Tài khoản & Tồn tại ---
             { ErrorCode.EmailOrUsernameAlreadyExit, "Email hoặc tên tài khoản này đã được sử dụng." },
             { ErrorCode.UserNameOrEmailAlreadyExit, "Tên tài khoản hoặc email này đã tồn tại." },
             { ErrorCode.NameAlreadyExit, "Tên này đã được sử dụng, vui lòng chọn tên khác." },
-
-            // --- Lỗi liên quan đến Yêu cầu dữ liệu ---
+            { ErrorCode.CodeAlreadyExit, "Mã này đã được sử dụng, vui lòng chọn mã khác." },
+            
             { ErrorCode.EmailOrPhoneRequired, "Vui lòng nhập email hoặc số điện thoại của bạn." },
             { ErrorCode.EmailOrUsernameRequired, "Vui lòng nhập email hoặc tên đăng nhập." },
             { ErrorCode.DataRequired, "Thông tin bắt buộc còn thiếu, vui lòng kiểm tra lại." },
 
-            // --- Lỗi Mật khẩu ---
             { ErrorCode.CurrentPasswordFailed, "Mật khẩu hiện tại không chính xác." },
             { ErrorCode.PasswordIsTheSame, "Mật khẩu mới không được trùng với mật khẩu hiện tại." },
 
-            // --- Lỗi Xác thực & Quyền hạn ---
             { ErrorCode.Unauthorized, "Bạn không có quyền truy cập vào chức năng này." },
             { ErrorCode.InvalidToken, "Phiên làm việc không hợp lệ." },
             { ErrorCode.TokenExpired, "Phiên làm việc đã hết hạn, vui lòng đăng nhập lại." },
 
-            // --- Lỗi Không tìm thấy (NotFound) ---
             { ErrorCode.EmailOrPhoneNotFound, "Email hoặc số điện thoại không tồn tại trên hệ thống." },
             { ErrorCode.EmailOrUsernameNotFound, "Email hoặc tên đăng nhập không tồn tại." },
             { ErrorCode.CustomerNotFound, "Không tìm thấy thông tin khách hàng." },
@@ -103,12 +101,8 @@
             { ErrorCode.NotFound, "Yêu cầu không tìm thấy." },
             { ErrorCode.DataNotFound, "Dữ liệu không tồn tại trên hệ thống." },
 
-            // --- Lỗi Dữ liệu & Nghiệp vụ ---
             { ErrorCode.InvalidData, "Dữ liệu cung cấp không hợp lệ." },
-            { ErrorCode.OutOfStock, "Sản phẩm hiện đã hết hàng hoặc đạt số lượng mua tối đa." },
-            { ErrorCode.ProductInActiveOrder, "Sản phẩm đang nằm trong một đơn hàng đang xử lý, không thể thao tác." },
 
-            // --- Lỗi Hệ thống ---
             { ErrorCode.DatabaseError, "Lỗi kết nối cơ sở dữ liệu. Vui lòng thử lại sau." },
             { ErrorCode.OtherError, "Đã có lỗi không xác định xảy ra." },
             { "", "Đã có lỗi xảy ra. Vui lòng liên hệ quản trị viên." },

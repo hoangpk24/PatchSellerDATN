@@ -807,6 +807,10 @@ video {
   display: inline-block;
 }
 
+.\!flex {
+  display: flex !important;
+}
+
 .flex {
   display: flex;
 }
@@ -910,6 +914,10 @@ video {
 
 .h-screen {
   height: 100vh;
+}
+
+.h-\[4\.375rem\] {
+  height: 4.375rem;
 }
 
 .max-h-\[350px\] {
@@ -1081,6 +1089,10 @@ video {
   max-width: 28rem;
 }
 
+.max-w-\[1280px\] {
+  max-width: 1280px;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -1116,6 +1128,10 @@ video {
 
 .flex-wrap {
   flex-wrap: wrap;
+}
+
+.\!flex-nowrap {
+  flex-wrap: nowrap !important;
 }
 
 .flex-nowrap {
@@ -1227,6 +1243,10 @@ video {
 
 .overflow-y-auto {
   overflow-y: auto;
+}
+
+.\!whitespace-nowrap {
+  white-space: nowrap !important;
 }
 
 .whitespace-nowrap {
@@ -1793,6 +1813,10 @@ video {
   line-height: 1.25;
 }
 
+.leading-\[4\.375rem\] {
+  line-height: 4.375rem;
+}
+
 .tracking-wider {
   letter-spacing: 0.05em;
 }
@@ -1956,6 +1980,11 @@ video {
 
 .text-white\/80 {
   color: rgb(255 255 255 / 0.8);
+}
+
+.text-gray-800 {
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
 }
 
 .underline {
@@ -2288,6 +2317,10 @@ video {
 
   .sm\:grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  .sm\:flex-row {
+    flex-direction: row;
   }
 
   .sm\:flex-col {

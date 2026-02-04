@@ -48,6 +48,13 @@
             public const string UserCreate = "/admin/user/create";
             public const string UserUpdate = "/admin/user/update";
             public const string UserDelete = "/admin/user/delete/:id";
+
+            // Voucher
+            public const string VoucherGetAll = "/admin/discount/get-all-discounts";
+            public const string VoucherGetById = "/admin/discount/get-discount-by-id/:id";
+            public const string VoucherCreate = "/admin/discount/create";
+            public const string VoucherUpdate = "/admin/discount/update";
+            public const string VoucherDelete = "/admin/discount/delete/:id";
         }
     }
 }
