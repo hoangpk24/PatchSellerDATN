@@ -2,10 +2,26 @@
 @layout AdminLayout
 
 <PageTitle>@Constant.PageTitleAdmin Home</PageTitle>
+
 <section class="p-6">
-    home
+    <div class="flex items-center justify-between">
+        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Trang Chủ</h1>
+    </div>
+
+    <div class="mt-6 rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+        <div class="text-center">
+            <h2 class="mb-4 text-2xl font-medium text-gray-800">Chào mừng đến với trang quản trị của ITEAM@(_mine != null && _mine.Username != null ? ", " + _mine.Username + "!" : "")</h2>
+
+            <p class="mb-6 text-lg text-gray-600">
+                Đây là màn hình quản lý hệ thống quản lý cửa hàng bán gói game việt hóa. Có nhiều chức năng quản lý khác nhau.
+            </p>
+
+            <p class="text-sm text-gray-500">Bạn có thể truy cập nhiều chức năng quản lý khác nhau từ menu bên trái.</p>
+        </div>
+    </div>
 </section>
 
 @code {
-
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public MineResponse _mine { get; set; }
 }
