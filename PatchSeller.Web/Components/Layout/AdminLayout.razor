@@ -11,13 +11,13 @@
 
 @if(_isLoading)
 {
-    <LoadingAdmin />
+    <LoadingGlobal />
 } else 
 {
     <CascadingValue Value="_mine" Name="@Constant.CascadingNameParams.Mine">
         <CascadingValue Value="_token" Name="@Constant.CascadingNameParams.Token">
             <main class="hidden h-screen w-screen overflow-hidden lg:flex">
-                <Nav OnLoggedOut="HandleLogout" />
+                <Nav OnLoggedOut="HandleLogout" OnChangePassword="HandleChangePassword" />
 
                 <section class="max-w-[calc(100lvw-18.75rem)] h-screen w-full overflow-auto bg-slate-50">
                     <div class="border-b border-solid border-slate-200 bg-white px-6 py-4">
@@ -48,6 +48,8 @@
     private MineResponse _mine = null;
     private bool _isLoading = true;
     private string _token = string.Empty;
+
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
     protected override void OnInitialized()
     {
@@ -94,7 +96,7 @@
     {
         try
         {
-            var _token = await _localStorage.GetItemAsStringAsync(Constant.TokenNameLocalStorage);
+            _token = await _localStorage.GetItemAsStringAsync(Constant.TokenNameLocalStorage);
             var expired = await _localStorage.GetItemAsStringAsync(Constant.TokenExpiredLocalStorage);
 
             if (string.IsNullOrEmpty(_token))
@@ -150,6 +152,16 @@
             }
         }
         catch (Exception e) {}
+    }
+
+    private async Task HandleChangePassword()
+    {
+        var paraeters = new DialogParameters<Components.Common.Admin.ChangePasswordDialog>
+        {
+            {x => x._token, _token}
+        };
+
+        var dialog = await _dialogService.ShowAsync<Components.Common.Admin.ChangePasswordDialog>("Options Dialog", paraeters, _dialogOptions);
     }
 
     private async Task HandleLogout()

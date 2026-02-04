@@ -70,7 +70,7 @@ namespace PatchSeller.Web.Services.Admin
             }
         }
 
-        public async Task<ServiceResult<User>> CreateStaff(User user)
+        public async Task<ServiceResult<User>> CreateUser(User user)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, Constant.EndPointApi.Admin.UserCreate);
             request.Content = JsonContent.Create(user);
@@ -91,7 +91,7 @@ namespace PatchSeller.Web.Services.Admin
             }
         }
 
-        public async Task<ServiceResult<User>> UpdateStaff(User user)
+        public async Task<ServiceResult<User>> UpdateUser(User user)
         {
             var request = new HttpRequestMessage(HttpMethod.Put, Constant.EndPointApi.Admin.UserUpdate);
             request.Content = JsonContent.Create(user);

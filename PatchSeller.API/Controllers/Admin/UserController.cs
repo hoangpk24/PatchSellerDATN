@@ -76,6 +76,7 @@ namespace PatchSeller.API.Controllers.Admin
                     return BadRequest(Constant.ErrorCode.DataRequired);
                 }
 
+                user.CreatedAt = DateTime.Now;
                 var result = await _userRepository.Create(user);
 
                 if (result == null)
