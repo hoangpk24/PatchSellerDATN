@@ -269,6 +269,11 @@ namespace PatchSeller.API.Controllers
         [HttpPost("change-password")]
         public async Task<ActionResult<bool>> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
         {
+            if(changePasswordDTO.CurrentPassword == changePasswordDTO.NewHashPassword)
+            {
+                return BadRequest(Constant.ErrorCode.PasswordIsTheSame);
+            }
+
             string userName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             string email = User.FindFirst(ClaimTypes.Email)?.Value;
             if (userName == null && email == null)
@@ -301,6 +306,36 @@ namespace PatchSeller.API.Controllers
                     return StatusCode(500, Constant.ErrorCode.OtherError);
                 }
 
+                return Ok(true);
+            }
+        }
+
+        [HttpPost("staff-change-password")]
+        public async Task<ActionResult<bool>> StaffChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
+        {
+            if (changePasswordDTO.CurrentPassword == changePasswordDTO.NewHashPassword)
+            {
+                return BadRequest(Constant.ErrorCode.PasswordIsTheSame);
+            }
+
+            string userName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userName == null)
+            {
+                return BadRequest(Constant.ErrorCode.StaffNotFound);
+            }
+            else
+            {
+                var staff = await _staffRepository.GetByKeyAndPassword(userName, changePasswordDTO.CurrentPassword);
+                if (staff == null)
+                {
+                    return NotFound(Constant.ErrorCode.CurrentPasswordFailed);
+                }
+                staff.PasswordHash = changePasswordDTO.NewHashPassword;
+                var updatedStaff = await _staffRepository.Update(staff);
+                if (updatedStaff == null)
+                {
+                    return StatusCode(500, Constant.ErrorCode.OtherError);
+                }
                 return Ok(true);
             }
         }

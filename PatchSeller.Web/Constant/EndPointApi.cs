@@ -9,6 +9,7 @@
         public const string AccessCheck = "/Access/Check";
         public const string AccessResetPassword = "/Access/reset-password";
         public const string AccessChangePassword = "/Access/change-password";
+        public const string StaffChangePassword = "/Access/staff-change-password";
 
         // Admin
         public static class Admin

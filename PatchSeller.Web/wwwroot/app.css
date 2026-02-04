@@ -685,10 +685,6 @@ video {
   margin-bottom: 2rem;
 }
 
-.\!mb-2 {
-  margin-bottom: 0.5rem !important;
-}
-
 .\!mb-5 {
   margin-bottom: 1.25rem !important;
 }
@@ -1051,10 +1047,6 @@ video {
 
 .max-w-40 {
   max-width: 10rem;
-}
-
-.max-w-\[1000px\] {
-  max-width: 1000px;
 }
 
 .max-w-\[1032px\] {

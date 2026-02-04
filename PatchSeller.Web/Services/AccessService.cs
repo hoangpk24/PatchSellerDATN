@@ -202,5 +202,43 @@ namespace PatchSeller.Web.Services
                 return ServiceResult<bool>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
+
+        public async Task<ServiceResult<bool>> StaffChangePassword(StaffChangePasswordModel request, string token)
+        {
+
+            var payload = new ChangePasswordModel()
+            {
+                CurrentPassword = HashPassword(request.CurrentPassword.Trim()),
+                NewHashPassword = HashPassword(request.NewHashPassword.Trim())
+            };
+
+            var r = new HttpRequestMessage(HttpMethod.Post, EndPointApi.StaffChangePassword);
+
+            r.Content = JsonContent.Create(payload);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                var formatToken = token.Trim('"');
+                r.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", formatToken);
+            }
+
+            var response = await _httpClient.SendAsync(r);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ServiceResult<bool>.Success(true);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                    ? Constant.Constant.Errors[errorCode ?? ""]
+                                    : errorCode;
+                return ServiceResult<bool>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
     }
 }

@@ -64,12 +64,15 @@
                 </ActivatorContent>
                 <ChildContent>
                     <MudMenuItem Disabled>
+                        <div class="flex items-center gap-2">
                             <MudAvatar Size="@Size.Small" Class="!bg-material-default !text-white">@GetInitials(_mine.FullName)</MudAvatar>
-                    </MudMenuItem>
-                    <MudMenuItem Disabled>
-                        <p class="whitespace-nowrap text-sm font-medium text-gray-900">@_mine.FullName</p>
+                            <p class="whitespace-nowrap text-sm font-medium text-gray-900">@_mine.FullName</p>
+                        </div>
                     </MudMenuItem>
                     <MudDivider Class="!border-material-default"/>
+                    <MudMenuItem>
+                        <button @onclick="ChangePassword" class="flex w-full justify-start whitespace-nowrap px-1.5 py-1 text-sm font-medium text-[#666666] hover:bg-gray-100 hover:text-black">Đổi mật khẩu</button>
+                    </MudMenuItem>
                     <MudMenuItem>
                         <button @onclick="Logout" class="flex w-full justify-start whitespace-nowrap px-1.5 py-1 text-sm font-medium text-[#666666] hover:bg-gray-100 hover:text-black">Đăng Xuất</button>
                     </MudMenuItem>
@@ -85,6 +88,9 @@
 
     [Parameter]
     public EventCallback OnLoggedOut { get; set; }
+
+    [Parameter]
+    public EventCallback OnChangePassword { get; set; }
 
     private string ActiveMenuClass(string path)
     {
@@ -112,5 +118,10 @@
     async Task Logout()
     {
         await OnLoggedOut.InvokeAsync();
+    }
+
+    async Task ChangePassword()
+    {
+        await OnChangePassword.InvokeAsync();
     }
 }
