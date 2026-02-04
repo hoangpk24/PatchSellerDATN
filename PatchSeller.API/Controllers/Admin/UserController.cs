@@ -157,7 +157,7 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpDelete("delete/{id}")]
-        public async Task<ActionResult<bool>> DeleteCategory(int id)
+        public async Task<ActionResult<bool>> DeleteUser(int id)
         {
             try
             {
