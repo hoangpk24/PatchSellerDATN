@@ -4,8 +4,6 @@
 <PageTitle>@Constant.PageTitleAdmin Customer</PageTitle>
 
 <section class="p-6">
-    <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator=">"></MudBreadcrumbs>
-
     <div class="flex items-center justify-between">
         <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách khách hàng</h1>
         <a href="@RouterConfig.Admin.CreateCustomer" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
@@ -40,7 +38,7 @@
                 <MudTh><MudTableSortLabel SortLabel="Email" T="string">Email</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Tên đăng nhập" T="string">Tên đăng nhập</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Cấp bậc" T="string">Chức vụ</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Cấp bậc" T="string">Cấp bậc</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
@@ -49,7 +47,16 @@
                 <MudTd DataLabel="Email">@context.Email</MudTd>
                 <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
                 <MudTd DataLabel="Tên đăng nhập">@context.UserName</MudTd>
-                <MudTd DataLabel="Cấp bậc">@context.RankId</MudTd>
+                <MudTd DataLabel="Cấp bậc">
+                    @{
+                        if(_lstRank != null && _lstRank.Any())
+                        {
+                            var obj = _lstRank.FirstOrDefault(x => x.RankId == context.RankId);
+
+                            <span>@(obj != null ? obj.RankName : "")</span>
+                        }
+                    }
+                </MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditCustomer.Replace(":id", context.UserId.ToString())))"></MudIconButton>
                 </MudTd>
@@ -83,6 +90,7 @@
 
 @code {
     List<DAL.Models.User> _lstUser = [];
+    List<DAL.Models.Rank> _lstRank = [];
 
     private string _searchValue = string.Empty;
     private int _searchRank = 0;
@@ -127,6 +135,12 @@
         {
             _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho quản trị viên.", MudBlazor.Severity.Error);
             navigation.NavigateTo(RouterConfig.Admin.Category);
+        }
+
+        var resRank = await _adminRankService.GetAll();
+        if (resRank.IsSuccess)
+        {
+            _lstRank = resRank.Data;
         }
         StateHasChanged();
     }

@@ -55,6 +55,13 @@
             public const string VoucherCreate = "/admin/discount/create";
             public const string VoucherUpdate = "/admin/discount/update";
             public const string VoucherDelete = "/admin/discount/delete/:id";
+
+            // Rank
+            public const string RankGetAll = "/admin/rank/get-all-ranks";
+            public const string RankGetById = "/admin/rank/get-rank-by-id/:id";
+            public const string RankCreate = "/admin/rank/create";
+            public const string RankUpdate = "/admin/rank/update";
+            public const string RankDelete = "/admin/rank/delete/:id";
         }
     }
 }

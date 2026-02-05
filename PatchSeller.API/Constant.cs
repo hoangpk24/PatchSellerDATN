@@ -14,6 +14,7 @@
             public const string EmailOrUsernameAlreadyExit = "email_username_already_exit";
             public const string UserNameOrEmailAlreadyExit = "username_email_already_exit";
             public const string NameAlreadyExit = "name_already_exit";
+            public const string PointAlreadyExit = "point_already_exit";
             public const string CodeAlreadyExit = "code_already_exit";
 
             // Authentication & Authorization

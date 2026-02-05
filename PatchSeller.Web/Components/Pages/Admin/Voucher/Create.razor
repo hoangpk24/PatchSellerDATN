@@ -90,9 +90,22 @@
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Cấp bậc được áp dụng</label> <span class="ml-1 text-red-500">*</span>
                 <MudSelect class="mt-0" Margin="Margin.Dense" Variant="Variant.Outlined" @bind-Value="@_model.RankId">
                     <MudSelectItem Value="0">Tất cả</MudSelectItem>
-                    <MudSelectItem Value="1">Đồng</MudSelectItem>
-                    <MudSelectItem Value="2">Bạc</MudSelectItem>
-                    <MudSelectItem Value="3">Vàng</MudSelectItem>
+                    @if (_lstRank.Any())
+                    {
+                        @foreach (var rank in _lstRank)
+                        {
+                            <MudSelectItem Value="@rank.RankId">
+                                <div class="flex items-center justify-between">
+                                    <span>
+                                        @rank.RankName
+                                    </span> 
+                                    <span>
+                                        @rank.MiniumSpend.ToString("C0", vietnameseCulture)
+                                    </span>
+                                </div>
+                            </MudSelectItem>
+                        }
+                    }
                 </MudSelect>
             </div>
 
@@ -157,6 +170,7 @@
 
 @code {
     MudForm _form = new MudForm();
+    List<DAL.Models.Rank> _lstRank = [];
     DiscountModel _model = new DiscountModel();
     DiscountSchema.CreateUpdate _discountSchema = new DiscountSchema.CreateUpdate();
 
@@ -166,8 +180,12 @@
     private TimeSpan? _startTime;
     private TimeSpan? _endTime;
 
-    protected override void OnInitialized()
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+
+    protected override async Task OnInitializedAsync()
     {
+        await LoadData();
+
         var now = DateTime.Now;
         var startDate = now.AddDays(1);
         var endDate = now.AddDays(15);
@@ -185,6 +203,15 @@
         _model.UsageLimit = 10;
         _model.LimitPerUser = 1;
         _model.RankId = 0;
+    }
+
+    async Task LoadData()
+    {
+        var response = await _adminRankService.GetAll();
+        if (response.IsSuccess)
+        {
+            _lstRank = response.Data;
+        }
     }
 
     async Task OnDiscoutTypeChange(string type)

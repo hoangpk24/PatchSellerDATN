@@ -64,7 +64,22 @@
                 <MudTd DataLabel="Id" hidden>@context.DiscountId</MudTd>
                 <MudTd DataLabel="Mã">@context.Code</MudTd>
                 <MudTd Class="!whitespace-nowrap" DataLabel="Loại">@(context.DiscountType == Constant.DiscountTypePercent ? "Phần trăm (%)" : "Giá cố định (đ)")</MudTd>
-                <MudTd Class="!whitespace-nowrap" DataLabel="Cấp bậc được áp dụng">@context.RankId</MudTd>
+                <MudTd Class="!whitespace-nowrap" DataLabel="Cấp bậc được áp dụng">
+                    @{
+                        if(context.RankId == null)
+                        {
+                            <span>Tất cả</span>
+                        } else
+                        {
+                            if(_lstRank != null && _lstRank.Any())
+                            {   
+                                var obj = _lstRank.FirstOrDefault(x => x.RankId == context.RankId);
+
+                                <span>@(obj != null ? obj.RankName : "")</span>
+                            }
+                        }
+                    }
+                </MudTd>
                 <MudTd DataLabel="Số điện thoại">@(FormatDiscountValue(context))</MudTd>
                 <MudTd DataLabel="Tên đăng nhập">@(context.MinOrderValue?.ToString("C0", vietnameseCulture) ?? "Không có")</MudTd>
                 <MudTd DataLabel="Số điện thoại">@(context.MaxDiscount?.ToString("C0", vietnameseCulture) ?? "Không có")</MudTd>
@@ -124,6 +139,7 @@
 
 @code {
     List<DAL.Models.Discount> _lstDiscount = [];
+    List<DAL.Models.Rank> _lstRank = [];
 
     private string _searchValue = string.Empty;
     private string _searchDiscountType = string.Empty;
@@ -175,6 +191,12 @@
         {
             _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho quản trị viên.", MudBlazor.Severity.Error);
             navigation.NavigateTo(RouterConfig.Admin.Category);
+        }
+
+        var resRank = await _adminRankService.GetAll();
+        if (resRank.IsSuccess)
+        {
+            _lstRank = resRank.Data;
         }
         StateHasChanged();
     }
