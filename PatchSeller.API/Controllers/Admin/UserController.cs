@@ -14,10 +14,12 @@ namespace PatchSeller.API.Controllers.Admin
     {
         UserRepository _userRepository;
         CartRepository _cartRepository;
+        RankRepository _rankRepository;
         public UserController()
         {
             _userRepository = new UserRepository();
             _cartRepository = new CartRepository();
+            _rankRepository = new RankRepository();
         }
 
         [HttpGet("get-all-users")]
@@ -76,7 +78,17 @@ namespace PatchSeller.API.Controllers.Admin
                     return BadRequest(Constant.ErrorCode.DataRequired);
                 }
 
-                user.CreatedAt = DateTime.Now;
+                var lstRank = await _rankRepository.GetAll(null);
+
+                if(lstRank != null && lstRank.Any())
+                {
+                    user.RankId = lstRank.FirstOrDefault()?.RankId ?? null;
+                } else
+                {
+                    user.RankId = null;
+                }
+
+                    user.CreatedAt = DateTime.Now;
                 var result = await _userRepository.Create(user);
 
                 if (result == null)

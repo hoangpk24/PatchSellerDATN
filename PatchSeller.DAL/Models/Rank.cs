@@ -13,6 +13,6 @@ public class Rank
     public bool Delete { get; set; }
     public DateTime? CreatedAt { get; set; }
 
-    public ICollection<User> Users { get; set; }
-    public ICollection<Discount> Discounts { get; set; }
+    public ICollection<User>? Users { get; set; }
+    public ICollection<Discount>? Discounts { get; set; }
 }

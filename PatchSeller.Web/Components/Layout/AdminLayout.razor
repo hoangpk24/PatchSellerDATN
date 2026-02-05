@@ -383,6 +383,22 @@
             new("Chi Tiết Đơn Hàng", href: null, disabled: true)
         }},
 
+        // --- Rank ---
+        { RouterConfig.Admin.Rank, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Cấp Bậc", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreateRank, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Cấp Bậc", href: RouterConfig.Admin.Rank),
+            new("Tạo Cấp Bậc", href: null, disabled: true)
+        }},
+            { RouterConfig.Admin.EditRank, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Cấp Bậc", href: RouterConfig.Admin.Rank),
+            new("Sửa Cấp Bậc", href: null, disabled: true)
+        }},
+
         // --- STATISTICAL ---
         { RouterConfig.Admin.Statistical, new List<BreadcrumbItem> {
             new("Trang Chủ", href: RouterConfig.Admin.Home),

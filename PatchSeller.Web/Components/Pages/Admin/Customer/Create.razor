@@ -120,7 +120,7 @@
             _model.PasswordHash = _model.PasswordHash.Trim();
             _model.PhoneNumber = _model.PhoneNumber.Trim();
             _model.Status = 1;
-            _model.RankId = 1;
+            _model.RankId = null;
             _model.RewardPoint = 0;
 
             var response = await _adminUserService.CreateUser(_model);

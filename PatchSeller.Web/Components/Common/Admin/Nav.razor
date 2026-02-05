@@ -40,6 +40,7 @@
             <MudNavGroup Title="Quản lý tài khoản">
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Staff))" Class="@ActiveMenuClass(RouterConfig.Admin.Staff)" Icon="@Icons.Material.Filled.SupervisedUserCircle">Quản trị</MudNavLink>
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Customer))" Class="@ActiveMenuClass(RouterConfig.Admin.Customer)" Icon="@Icons.Material.Filled.Group">Khách hàng</MudNavLink>
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Rank))" Class="@ActiveMenuClass(RouterConfig.Admin.Rank)" Icon="@Icons.Material.Filled.KeyboardDoubleArrowUp">Cấp bậc</MudNavLink>
             </MudNavGroup>
             <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Voucher))" Class="@ActiveMenuClass(RouterConfig.Admin.Voucher)" Icon="@Icons.Material.Filled.PanoramaHorizontalSelect">Mã giảm giá</MudNavLink>
             <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Order))" Class="@ActiveMenuClass(RouterConfig.Admin.Order)" Icon="@Icons.Material.Filled.Payments">Hóa đơn</MudNavLink>

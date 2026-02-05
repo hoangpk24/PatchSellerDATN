@@ -108,6 +108,11 @@
             // Payment Done
             public const string PaymentSuccess = "/admin/order/payment-success";
             public const string PaymentCancelled = "/admin/order/payment-cancelled";
+
+            // Rank
+            public const string Rank = "/admin/rank";
+            public const string CreateRank = "/admin/rank/create";
+            public const string EditRank = "/admin/rank/:id/edit";
         }
     }
 }

@@ -1,0 +1,131 @@
+﻿@page "/admin/rank/create"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Rank Create</PageTitle>
+
+<section class="mx-auto max-w-[1280px] p-6">
+    <h1 class="mb-4 text-3xl font-extrabold text-material-default">Tạo cấp bậc mới</h1>
+
+    <div class="rounded bg-white p-10 shadow-md">
+        <MudForm @ref="_form" Model="_model" Validation="_rankSchema.ValidateValue">
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tên thể loại</label> <span class="ml-1 text-red-500">*</span>
+                <MudTextField T="string"
+                                @bind-Value="_model.RankName"
+                                For="@(() => _model.RankName)"
+                                Variant="Variant.Outlined"
+                                Placeholder="Ví dụ: Đồng, bạc, vàng..."
+                                Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Mốc áp dụng</label> <span class="ml-1 text-red-500">*</span>
+                <MudNumericField @bind-Value="_model.MiniumSpend"
+                              For="@(() => _model.MiniumSpend)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Ví dụ: 10000000đ..."
+                              Margin="Margin.Dense"
+                              AdornmentIcon="đ"
+                              Adornment="Adornment.End"
+                              Format="F0" Step="1000"
+                              HideSpinButtons="true" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Mô tả chi tiết</label> <span class="ml-1 text-red-500">*</span>
+                <MudTextField T="string"
+                                @bind-Value="_model.Description"
+                                For="@(() => _model.Description)"
+                                Placeholder="Nhập mô tả ngắn gọn về cấp bậc này..."
+                                Variant="Variant.Outlined"
+                                Lines="4"
+                                Margin="Margin.Dense" />
+            </div>
+
+            <div>
+                <label class="mb-2 block text-sm font-bold uppercase tracking-wider text-slate-700">Trạng thái hiển thị</label>
+                <MudRadioGroup T="int" @bind-Value="_model.Status" For="@(() => _model.Status)">
+                    <div class="flex gap-6">
+                        <MudRadio Value="1" Color="Color.Primary" Class="!ml-0">
+                            <span class="text-sm font-medium text-slate-600">Hoạt động</span>
+                        </MudRadio>
+                        <MudRadio Value="0" Color="Color.Error">
+                            <span class="text-sm font-medium text-slate-600">Tạm ngưng</span>
+                        </MudRadio>
+                    </div>
+                </MudRadioGroup>
+            </div>
+
+            <MudDivider Class="mb-8 mt-4 !border-slate-200" />
+
+            <div class="flex items-center justify-end gap-3">
+                <MudButton Variant="Variant.Text"
+                            Class="px-6 py-2 text-slate-500 hover:bg-slate-200"
+                            OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Rank)">
+                    Quay lại
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            StartIcon="@Icons.Material.Filled.Add"
+                            OnClick="@(async () => await OnSubmit())"
+                            Disabled="@_isLoading"
+                            Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
+                    Tạo mới
+                </MudButton>
+            </div>
+        </MudForm>
+    </div>
+</section>
+
+@code {
+    MudForm _form = new MudForm();
+    DAL.Models.Rank _model = new DAL.Models.Rank();
+    RankSchema.CreateUpdate _rankSchema = new RankSchema.CreateUpdate();
+
+    private bool _isLoading = false;
+
+    protected override void OnInitialized()
+    {
+        _model.Status = 1;
+    }
+
+    async Task OnSubmit()
+    {
+        if (_isLoading) return;
+
+        try
+        {
+            _isLoading = true;
+            await _form.Validate();
+
+            if (!_form.IsValid) return;
+
+            _model.RankName = _model.RankName.Trim();
+            if(!string.IsNullOrEmpty(_model.Description))
+            {
+                _model.Description = _model.Description.Trim();
+            }
+
+            var response = await _adminRankService.CreateRank(_model);
+
+            if(response.IsSuccess)
+            {
+                _snackbar.Add("Tạo cấp bậc thành công!", MudBlazor.Severity.Success);
+                navigation.NavigateTo(RouterConfig.Admin.Rank);
+            } else
+            {
+                var mess = string.IsNullOrEmpty(response.ErrorMessage) ? "Tạo cấp bậc thất bại" : response.ErrorMessage;
+                _snackbar.Add(mess, MudBlazor.Severity.Error);
+            }
+        } 
+        catch (Exception)
+        {
+            _isLoading = false;
+        } 
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}
