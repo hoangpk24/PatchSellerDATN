@@ -17,13 +17,49 @@ namespace PatchSeller.DAL.Repository
             _context = new PatchSellerDbContext();
         }
 
-        public async Task<List<Game>> GetAll()
+        public async Task<List<Game>> GetAll(string? keyword)
         {
             try
             {
-                return await _context.Games
+                if(keyword == null)
+                {
+                    return await _context.Games
+                 .Where(x => x.Delete != true)
+                 .ToListAsync();
+                }
+                else
+                {
+                 var lstGame = await _context.Games
+                .Where(x => x.Delete != true)
+                .ToListAsync();
+                    return lstGame.Where(x=>x.Title.Contains(keyword) || x.Description.Contains(keyword)).ToList();
+                }
+             
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<Game>> GetAllDetail(string? keyword)
+        {
+            try
+            {
+                var query = _context.Games
                     .Where(x => x.Delete != true)
-                    .ToListAsync();
+                    .Include(g => g.Publisher)
+                    .Include(g => g.GamePlatforms).ThenInclude(gp => gp.Platform)
+                    .Include(g => g.GameCategories).ThenInclude(gc => gc.Category)
+                    .Include(g => g.Patches)
+                    .Include(g => g.GameImages).ToList();
+
+                if (keyword != null)
+                {
+                    query = query.Where(x => x.Title.Contains(keyword) || (x.Description != null && x.Description.Contains(keyword))).ToList();
+                }
+
+                return  query;
             }
             catch (Exception)
             {
@@ -38,6 +74,26 @@ namespace PatchSeller.DAL.Repository
                 var game = await _context.Games.FindAsync(id);
                 if (game != null && game.Delete == true)
                     return null;
+                return game;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Game> GetByIdDetail(int id)
+        {
+            try
+            {
+                var game = await _context.Games
+                    .Where(x => x.GameId == id && x.Delete != true)
+                    .Include(g => g.Publisher)
+                    .Include(g => g.GamePlatforms).ThenInclude(gp => gp.Platform)
+                    .Include(g => g.GameCategories).ThenInclude(gc => gc.Category)
+                    .Include(g => g.Patches)
+                    .Include(g => g.GameImages)
+                    .FirstOrDefaultAsync();
                 return game;
             }
             catch (Exception)

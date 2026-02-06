@@ -19,9 +19,9 @@ public class Game
 
     [ForeignKey("PublisherId")]
     public int PublisherId { get; set; }
-    public Publisher Publisher { get; set; }
-    public ICollection<GameCategory> GameCategories { get; set; }
-    public ICollection<GameImage> GameImages { get; set; }
-    public ICollection<GamePlatform> GamePlatforms { get; set; }
-    public ICollection<Patch> Patches { get; set; }
+    public Publisher? Publisher { get; set; }
+    public ICollection<GameCategory>? GameCategories { get; set; }
+    public ICollection<GameImage>? GameImages { get; set; }
+    public ICollection<GamePlatform>? GamePlatforms { get; set; }
+    public ICollection<Patch>? Patches { get; set; }
 }

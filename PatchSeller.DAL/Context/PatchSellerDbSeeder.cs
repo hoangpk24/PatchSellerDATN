@@ -12,6 +12,15 @@ public static class PatchSellerDbSeeder
         // - Non-nullable reference properties (Nullable enabled) must be populated.
 
         modelBuilder.Entity<Publisher>().HasData(
+             new Publisher
+             {
+                 PublisherId = -1,
+                 Name = "Unknow",
+                 Description = "Không rõ",
+                 Status = 1,
+                 CreatedAt = new DateTime(2020, 1, 1),
+                 Delete = false
+             },
             new Publisher
             {
                 PublisherId = 1,
