@@ -27,6 +27,17 @@ namespace PatchSeller.DAL.Repository
                 return null;
             }
         }
+        public async Task<List<OrderDetail>> GetByOrderId(int orderId)
+        {
+            try
+            {
+                return await _context.OrderDetails.Where(x => x.OrderId == orderId).ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
 
         public async Task<OrderDetail> GetById(int id)
         {
