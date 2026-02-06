@@ -46,6 +46,26 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<GameCategory>> GetByGameId(int gameId, bool isDelete = true)
+        {
+            try
+            {
+                if(isDelete)
+                {
+                    return await _context.GameCategories
+                        .Where(x => x.Delete != true && x.GameId == gameId)
+                        .ToListAsync();
+                }
+                return await _context.GameCategories
+                    .Where(x => x.GameId == gameId)
+                    .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<GameCategory> Create(GameCategory entity)
         {
             try

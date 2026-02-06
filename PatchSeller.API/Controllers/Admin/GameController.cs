@@ -168,7 +168,7 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<GameDetailDTO>> CreateGame([FromBody] GameCreateDTO dto)
+        public async Task<ActionResult<GameDetailDTO>> CreateGame([FromBody] GameCreateEditDTO dto)
         {
             try
             {
@@ -238,14 +238,27 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult<Game>> UpdateGame([FromBody] Game game)
+        public async Task<ActionResult<Game>> UpdateGame([FromBody] GameCreateEditDTO dto)
         {
             try
             {
-                if (game == null)
+                if (dto == null)
                 {
                     return BadRequest(Constant.ErrorCode.DataRequired);
                 }
+
+                var game = new Game
+                {
+                    GameId = dto.GameId,
+                    Title = dto.Title,
+                    Developer = dto.Developer,
+                    Description = dto.Description,
+                    Thumbnail = dto.Thumbnail,
+                    ReleaseDate = dto.ReleaseDate,
+                    Status = dto.Status > 0 ? dto.Status : 1,
+                    Delete = dto.Delete,
+                    PublisherId = dto.PublisherId >= 0 ? dto.PublisherId : -1
+                };
 
                 var result = await _gameRepository.Update(game);
 
@@ -254,7 +267,84 @@ namespace PatchSeller.API.Controllers.Admin
                     return StatusCode(500, Constant.ErrorCode.DatabaseError);
                 }
 
+                var allExistingCategories = await _gameCategoryRepository.GetByGameId(result.GameId, false);
+
+                var incomingCategoryIds = dto.CategoryIds ?? new List<int>();
+
+                var toDelete = allExistingCategories
+                    .Where(db => db.Delete != true && !incomingCategoryIds.Contains(db.CategoryId))
+                    .ToList();
+
+                foreach (var item in toDelete)
+                {
+                    item.Delete = true;
+                    await _gameCategoryRepository.Update(item);
+                }
+
+                foreach (var catId in incomingCategoryIds)
+                {
+                    var existingRecord = allExistingCategories.FirstOrDefault(x => x.CategoryId == catId);
+
+                    if (existingRecord == null)
+                    {
+                        await _gameCategoryRepository.Create(new GameCategory
+                        {
+                            GameId = result.GameId,
+                            CategoryId = catId,
+                            Delete = false
+                        });
+                    }
+                    else if (existingRecord.Delete == true)
+                    {
+                        existingRecord.Delete = false;
+                        await _gameCategoryRepository.Update(existingRecord);
+                    }
+                }
+
+                var allExistingPlatforms = await _gamePlatformRepository.GetByGameId(result.GameId);
+                var incomingPlatformIds = dto.Platforms?.Select(p => p.PlatformId).ToList() ?? new List<int>();
+
+                var platformsToHide = allExistingPlatforms
+                    .Where(db => db.Delete != true && !incomingPlatformIds.Contains(db.PlatformId))
+                    .ToList();
+
+                foreach (var item in platformsToHide)
+                {
+                    item.Delete = true;
+                    await _gamePlatformRepository.Update(item);
+                }
+
+                if (dto.Platforms != null)
+                {
+                    foreach (var platDto in dto.Platforms)
+                    {
+                        var existingRecord = allExistingPlatforms.FirstOrDefault(x => x.PlatformId == platDto.PlatformId);
+
+                        if (existingRecord == null)
+                        {
+                            await _gamePlatformRepository.Create(new GamePlatform
+                            {
+                                GameId = result.GameId,
+                                PlatformId = platDto.PlatformId,
+                                Description = platDto.Description ?? string.Empty,
+                                Status = 1,
+                                Delete = false
+                            });
+                        }
+                        else
+                        {
+                            existingRecord.Description = platDto.Description ?? string.Empty;
+                            existingRecord.Delete = false;
+                            await _gamePlatformRepository.Update(existingRecord);
+                        }
+                    }
+                }
+
                 return Ok(result);
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "DUPLICATE_NAME")
+            {
+                return BadRequest(Constant.ErrorCode.NameAlreadyExit);
             }
             catch (InvalidOperationException ex) when (ex.Message == "NOT_FOUND")
             {
@@ -277,6 +367,27 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return StatusCode(500, Constant.ErrorCode.DatabaseError);
                 }
+
+                var categories = await _gameCategoryRepository.GetByGameId(id);
+                if (categories != null && categories.Any())
+                {
+                    foreach (var cat in categories.Where(c => c.Delete != true))
+                    {
+                        cat.Delete = true;
+                        await _gameCategoryRepository.Update(cat);
+                    }
+                }
+
+                var platforms = await _gamePlatformRepository.GetByGameId(id);
+                if (platforms != null && platforms.Any())
+                {
+                    foreach (var plat in platforms.Where(p => p.Delete != true))
+                    {
+                        plat.Delete = true;
+                        await _gamePlatformRepository.Update(plat);
+                    }
+                }
+
                 return Ok(true);
             }
             catch (InvalidOperationException ex) when (ex.Message == "NOT_FOUND")

@@ -34,6 +34,7 @@ builder.Services.AddScoped<AdminStaffService>();
 builder.Services.AddScoped<AdminUserService>();
 builder.Services.AddScoped<AdminDiscountService>();
 builder.Services.AddScoped<AdminRankService>();
+builder.Services.AddScoped<AdminGameService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {

@@ -6,9 +6,198 @@
 <section class="p-6">
     <div class="flex items-center justify-between">
         <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách game</h1>
-        <a href="@RouterConfig.Admin.CreateGame" class="leading-[1.5rem] h-10 rounded-lg bg-material-default px-6 py-2 text-white">Tạo mới</a>
+        <a href="@RouterConfig.Admin.CreateGame" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
+    </div>
+
+    <div class="mt-8 rounded bg-white p-6 shadow-md">
+        <div class="grid w-full grid-cols-3 items-start gap-x-6 gap-y-4">
+            <div>
+                <MudTextField T="string" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Value="@_searchValue"
+                              AdornmentIcon="@Icons.Material.Filled.Search" Variant="Variant.Outlined" IconSize="Size.Medium" Class="mt-0" Margin="Margin.Dense" ValueChanged="onChangeSearch" Immediate=true></MudTextField>
+            </div>
+            <div class="flex items-center gap-2">
+                <MudButton Variant="Variant.Outlined" OnClick="OnSearch" Class="h-10 w-full"><MudIcon Icon="@Icons.Material.Filled.Search" Class="mr-2" /> Tìm kiếm</MudButton>
+                <MudButton Variant="Variant.Outlined" OnClick="OnReset" Class="h-10 w-full"><MudIcon Icon="@Icons.Material.Filled.Filter" Class="mr-2" /> Đặt lại</MudButton>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 rounded bg-white shadow-md">
+        <MudTable Items="@_lstGame" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100lvh - 357px)">
+            <HeaderContent>
+                <MudTh Class="whitespace-nowrap" hidden><MudTableSortLabel SortLabel="Id" T="string" hidden>STT</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Ảnh</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Tiêu đề</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Email" T="string">Nhà phát triển</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Số điện thoại" T="string">Thời gian phát hành</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Số điện thoại" T="string">Thể loại</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Số điện thoại" T="string">Nền tảng</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Số điện thoại" T="string">Nhà phát hành</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id" hidden>@context.GameId</MudTd>
+                <MudTd DataLabel="Tên">
+                    <div class="w-[100px]">
+                        <MudImage Src="@context.Thumbnail" Class="aspect-[1/1.7] object-cover" />
+                    </div>
+                </MudTd>
+                <MudTd DataLabel="Tên">@context.Title</MudTd>
+                <MudTd DataLabel="Email">@context.Developer</MudTd>
+                <MudTd DataLabel="Số điện thoại">@context.ReleaseDate.ToString("dd/MM/yyyy")</MudTd>
+                <MudTd DataLabel="Số điện thoại">
+                    <div class="flex max-w-[250px] flex-wrap items-center gap-1">
+                        @if(context.Categories != null && context.Categories.Any())
+                        {
+                            foreach(var category in context.Categories)
+                            {
+                                <MudChip T="string" Class="!m-0" Variant="Variant.Outlined">@category.CategoryName</MudChip>
+                            }
+                        }
+                    </div>
+                </MudTd>
+                <MudTd DataLabel="Số điện thoại">
+                    <div class="flex max-w-[250px] flex-wrap items-center gap-2">
+                        @if (context.Platforms != null && context.Platforms.Any())
+                        {
+                            foreach (var platform in context.Platforms)
+                            {
+                                <MudChip T="string" Class="!m-0" Variant="Variant.Outlined">@platform.Name</MudChip>
+                            }
+                        }
+                    </div>
+                </MudTd>
+                <MudTd DataLabel="Số điện thoại">@context.Publisher.Name</MudTd>
+                <MudTd DataLabel="Thao tác">
+                    <div class="flex flex-nowrap items-center gap-2">
+                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditGame.Replace(":id", context.GameId.ToString())))"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogDelete(context.GameId))"></MudIconButton>
+                    </div>
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText Class="my-4">Không có dữ liệu.</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <div class="flex w-full flex-col gap-3">
+                    @{
+                        for (var i = 0; i < 5; i++)
+                        {
+                            <div class="flex items-center justify-between gap-2 px-2">
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                            </div>
+                        }
+                    }
+                </div>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
     </div>
 </section>
 
 @code {
+    List<GameDetailResponse> _lstGame = [];
+    List<DAL.Models.Category> _lstCategory = [];
+    List<DAL.Models.Platform> _lstPlatform = [];
+    List<DAL.Models.Publisher> _lstPublisher = [];
+
+    private string _searchValue = string.Empty;
+    private int _searchRank = 0;
+    private bool _isLoading = true;
+
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadData();
+        }
+        catch (Exception)
+        {
+            _isLoading = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var res = await _adminGameService.GetAllWithDetail(_searchValue);
+        var data = res.Data;
+        if (res.IsSuccess && data != null)
+        {
+            _lstGame = data;
+        }
+        else if (res.IsSuccess == false && res.StatusCode == "NotFound")
+        {
+            _snackbar.Add("Không tìm thấy trang này.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.NotFound);
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho quản trị viên.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.Admin.Category);
+        }
+
+        var resCategory = await _adminCategoryService.GetAll();
+        if (resCategory.IsSuccess)
+        {
+            _lstCategory = resCategory.Data;
+        }
+        var resPlatform = await _adminPlatformService.GetAll();
+        if (resPlatform.IsSuccess)
+        {
+            _lstPlatform = resPlatform.Data;
+        }
+        var resPublisher = await _adminPublisherService.GetAll();
+        if (resPublisher.IsSuccess)
+        {
+            _lstPublisher = resPublisher.Data;
+        }
+        StateHasChanged();
+    }
+
+    private void onChangeSearch(string value)
+    {
+        _searchValue = value.Trim();
+    }
+
+    private async Task OnSearch()
+    {
+        await LoadData();
+    }
+
+    private async Task OnReset()
+    {
+        _searchValue = string.Empty;
+        _searchRank = 0;
+        await LoadData();
+    }
+
+    async Task OpenDialogDelete(int id)
+    {
+        var deleteParaeters = new DialogParameters<Admin.Game.ConfirmDeleteDialog>
+        {
+            {x => x.id, id}
+        };
+
+        var dialog = await _dialogService.ShowAsync<Admin.Game.ConfirmDeleteDialog>("Options Dialog", deleteParaeters, _dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+            StateHasChanged();
+        }
+    }
 }
