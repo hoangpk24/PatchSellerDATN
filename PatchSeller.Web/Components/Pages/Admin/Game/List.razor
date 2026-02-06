@@ -33,13 +33,14 @@
                 <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Số điện thoại" T="string">Thể loại</MudTableSortLabel></MudTh>
                 <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Số điện thoại" T="string">Nền tảng</MudTableSortLabel></MudTh>
                 <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Số điện thoại" T="string">Nhà phát hành</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Số điện thoại" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Id" hidden>@context.GameId</MudTd>
                 <MudTd DataLabel="Tên">
                     <div class="w-[100px]">
-                        <MudImage Src="@context.Thumbnail" Class="aspect-[1/1.7] object-cover" />
+                        <MudImage Src="@context.Thumbnail" Class="aspect-[1/1.6] object-cover" />
                     </div>
                 </MudTd>
                 <MudTd DataLabel="Tên">@context.Title</MudTd>
@@ -68,6 +69,17 @@
                     </div>
                 </MudTd>
                 <MudTd DataLabel="Số điện thoại">@context.Publisher.Name</MudTd>
+                <MudTd DataLabel="Số điện thoại">
+                    @if (context.Status == Constant.StatusDefault.Active)
+                    {
+                        <span class="font-medium uppercase text-material-default">Hoạt động</span>
+                    }
+                    else
+                    {
+
+                        <span class="font-medium uppercase text-red-500">Tạm ngưng</span>
+                    }
+                </MudTd>
                 <MudTd DataLabel="Thao tác">
                     <div class="flex flex-nowrap items-center gap-2">
                         <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditGame.Replace(":id", context.GameId.ToString())))"></MudIconButton>
