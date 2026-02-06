@@ -10,8 +10,8 @@ public class CartItem
     public bool Delete { get; set; }
     [ForeignKey("CartId")]
     public int CartId { get; set; }
-    public Cart Cart { get; set; }    
+    public Cart? Cart { get; set; }    
     [ForeignKey("PatchId")]
     public int PatchId { get; set; }
-    public Patch Patch { get; set; }
+    public Patch? Patch { get; set; }
 }
