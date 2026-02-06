@@ -244,119 +244,67 @@ public static class PatchSellerDbSeeder
             new Game
             {
                 GameId = 1,
-                Title = "Battlefield 2042",
-                Developer = "DICE",
-                Description = "FPS quy mô lớn với chế độ All-Out Warfare. Tập trung chiến trường rộng, phương tiện và teamplay.",
-                Thumbnail = "/seed/games/bf2042-thumb.jpg",
-                ReleaseDate = new DateTime(2021, 11, 19),
+                Title = "Mafia: The Old Country Deluxe Edition",
+                Developer = "Hangar 13",
+                Description = "<h2>COMPARE EDITIONS</h2><p> </p><p><img src=\"https://avigames.net/wp-content/uploads/2025/08/042dc0ab3b41c3563d24e41b8b132c07.\"></p><p> </p><p> </p><h2>Mafia: The Old Country Deluxe Edition</h2><p> </p><p><img src=\"https://avigames.net/wp-content/uploads/2025/08/caf7a2a3d335e66ac20dc4de6e247b7c.\"></p><p> </p><p>Mafia: The Old Country Deluxe Edition lets you descend into Sicily's criminal underworld in true mafioso style with a variety of bonus items for your collection.</p><h2>Deluxe Edition includes:</h2><p><strong>• Full base game</strong></p><p><strong>• Padrino Pack</strong></p><p>     – “Lupara Speciale” Shotgun</p><p>     – “Vendetti Speciale” Pistol</p><p>     – “Immortale” Charm</p><p>     – “Padrino” Outfit</p><p>     – “Stiletto Speciale” Knife</p><p>     – “Eckhart Speciale” Limousine</p><p>     – “Cosimo” Horse and Accessories</p><p><strong>• Gatto Nero Pack</strong></p><p>     – “Bodeo Nero” Pistol</p><p>     – “Velocità” Charm</p><p>     – “Gatto Nero” Outfit</p><p>     – “Carozella Nero” Race Car</p><p><strong>• Bonus materials</strong></p><p>     – Digital Art Book</p><p>     – Original Score</p><p> </p><h2>Ưu đãi mua trước</h2><p> </p><p><img src=\"https://avigames.net/wp-content/uploads/2025/08/5d48af94fb53c36d8da4723721bb8ee3.\"></p><p> </p><p>Pre-Purchase Mafia: The Old Country Standard Edition or Deluxe Edition to receive the Soldato Pack featuring distinctive cosmetics and a helpful Charm.*</p><p>*Pre-Purchase offer available for Mafia: The Old Country Standard Edition and Deluxe Edition until launch. Internet connection required to redeem bonus content. Items will be automatically entitled in-game at launch. Terms apply.</p><p><br></p><h4>Thông tin cơ bản</h4><p>Uncover the origins of organized crime in Mafia: The Old Country, a gritty mob story set in the brutal underworld of 1900s Sicily. Fight to survive as Enzo Favara and prove your worth to the Family in this immersive third-person action-adventure.</p><p><br></p><p><br></p><p><strong>Tối thiểu:</strong></p><ol><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>HĐH:</strong> Windows 10 / 11</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Bộ xử lý:</strong> AMD Ryzen 7 2700X / Intel Core i7-9700K</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Bộ nhớ:</strong> 16 GB RAM</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Đồ họa:</strong> AMD Radeon RX 5700 XT / NVIDIA RTX 2070</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>DirectX:</strong> Phiên bản 12</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Lưu trữ:</strong> 55 GB chỗ trống khả dụng</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Ghi chú thêm:</strong> Requires a 64-bit processor and operating system. Requires SSD ; Graphic Preset: Medium ; Resolution: 1080p</li></ol><p><strong>Khuyến nghị:</strong></p><ol><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>HĐH:</strong> Windows 10 / 11</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Bộ xử lý:</strong> AMD Ryzen 7 5800X / Intel Core i7-12700K</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Bộ nhớ:</strong> 32 GB RAM</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Đồ họa:</strong> AMD Radeon RX 6950 XT / NVIDIA RTX 3080 Ti</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>DirectX:</strong> Phiên bản 12</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Lưu trữ:</strong> 55 GB chỗ trống khả dụng</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Ghi chú thêm:</strong> Requires a 64-bit processor and operating system. Requires SSD ; Graphic Preset: High ; Resolution: 1440p</li></ol><p><br></p><p><br></p>",
+                Thumbnail = "/uploads/images/games/1c5ae9eb/MAF4-STD-DIGITAL_BANNERS_AND_CHANNEL_SETUP-D2C-STATIC-ENUS-NO_RATING-AGN-600x850-R1.jpg",
+                ReleaseDate = new DateTime(2025, 08, 08),
                 Status = 1,
                 Delete = false,
-                CreatedAt = new DateTime(2020, 1, 1),
+                CreatedAt = new DateTime(2026, 01, 01),
                 PublisherId = 1
             },
             new Game
             {
                 GameId = 2,
-                Title = "Battlefield V",
-                Developer = "DICE",
-                Description = "FPS bối cảnh Thế chiến II, nhịp độ nhanh, gunplay tốt và yêu cầu phối hợp tổ đội.",
-                Thumbnail = "/seed/games/bfv-thumb.jpg",
-                ReleaseDate = new DateTime(2018, 11, 20),
+                Title = "Clair Obscur: Expedition 33 Deluxe Edition",
+                Developer = "Sandfall Interactive",
+                Description = "<p>■ “eFootball™” – An Evolution from “PES”</p><p>It's an all-new era of digital football: “PES” has now evolved into “eFootball™”! And now you can experience the next generation of football gaming with “eFootball™”!</p><p>■ Welcoming Newcomers</p><p>After downloading, you can learn the basic controls of the game via a step-by-step tutorial that includes practical demonstrations! Complete them all and receive Lionel Messi!</p><p>[Ways of Playing]</p><p>■ Build Your Very Own Dream Team</p><p>You have a plethora of teams that can be chosen as your Base Team, including European powerhouses like FC Barcelona, Manchester United, FC Bayern München, AC Milan and Internazionale Milano. On top of that, you can also choose clubs from South America, J.League and even your favourite national team!</p><p>■ Sign Players</p><p>After creating your team, it's time to get some signings in! From current superstars to footballing legends; sign players and take your team to new heights!</p><p>・ Special Player List</p><p>Here you can sign special players such as standouts from actual fixtures, players from featured leagues and legends of the game!</p><p>・ Standard Player List</p><p>Here you can handpick and sign your favourite players. You can also use the Sort and Filter functions to narrow your search.</p><p>・ Manager List</p><p>Here you can sign managers who are adept at all sorts of tactical approaches with different Coaching Affinities.</p><p>■ Playing Matches</p><p>Once you have built a team with your favourite players, it’s time to take them to the pitch.</p><p>From testing your skills against the AI, to competing for ranking in Online Matches; enjoy eFootball™ the way you like!</p><p>・ Sharpen your skills in VS AI Matches</p><p>There are a variety of Events which coincide with the real-world football calendar, including a “Starter” Event for those just starting out, as well as Events where you can play against teams from high-profile leagues. Build a Dream Team that fits the Events’ themes and take part!</p><p>・ Put your strength to the test in User Matches</p><p>Enjoy real-time competition with the Division-based “eFootball™ League” and a wide variety of weekly Events. Can you take your Dream Team to the pinnacle of Division 1?</p><p>・ Max 3 vs 3 matches with friends</p><p>Use the Friend Match feature to play against your friends. Show them the true colours of your well-developed team!</p><p>Cooperative matches up to 3 vs 3 are also available. Get together with your friends and enjoy some heated footballing actions!</p><p>■ Player Development</p><p>Depending on Player Types, signed players can be further developed.</p><p>Level up your players by having them play in matches and by using “Level Training Programs”, then utilize the acquired Progression Points to develop them to match your playing style! Level Training Programs can be received by participating in Events.</p><p>The players' Progression Points will be automatically allocated into categories such as [Shooting], [Dribbling] and [Defending] in a way that will optimise their Player Stats and maximise their Overall Rating.</p><p>In case you prefer to customise a player to fit your personal likings, you have the option to allocate the Progression Points manually.</p><p>When in doubt about how to develop the player, you can use the [Recommended] function to automatically allocate his Points.</p><p>Develop your players to your exact liking!</p><p>[For More Fun]</p><p>■ Weekly Live Updates</p><p>Data from real matches being played around the world is collated on a weekly basis and implemented in-game through the Live Update feature to create a more authentic experience. These updates affect various aspects of the game, including player Condition Ratings and team rosters.</p><p>*Users that reside in Belgium will not have access to loot boxes that require eFootball™ Coins as payment.</p><p>*eFootball™ Coins can be purchased in-game and can be used in various ways, such as signing randomly selected players or unlocking Match Passes.</p><p>*The description above may be changed in future updates.</p><h2><br></h2>",
+                Thumbnail = "/uploads/images/games/5a5fb655/here-are-all-my-custom-covers-i-really-hope-football-life-v0-hr02epdm6ysd1.jpg",
+                ReleaseDate = new DateTime(2025, 04, 24),
                 Status = 1,
                 Delete = false,
-                CreatedAt = new DateTime(2020, 1, 1),
+                CreatedAt = new DateTime(2025, 12, 31),
                 PublisherId = 1
             },
             new Game
             {
                 GameId = 3,
-                Title = "Call of Duty: Modern Warfare II",
-                Developer = "Infinity Ward",
-                Description = "FPS hiện đại, campaign + multiplayer. TTK nhanh, nhiều chế độ cạnh tranh.",
-                Thumbnail = "/seed/games/cod-mw2-thumb.jpg",
-                ReleaseDate = new DateTime(2022, 10, 28),
+                Title = "The Elder Scrolls IV: Oblivion Remastered – Deluxe Edition",
+                Developer = "Virtuos",
+                Description = "<h2>Digital Deluxe Edition</h2><p> </p><p><img src=\"https://avigames.net/wp-content/uploads/2025/04/Jaws_Deluxe_Steam_SpecialAnnounce_616x943-EN-01.jpg\"></p><p>The Elder Scrolls IV: Oblivion Remastered Deluxe Edition includes:</p><p>– Digital base game</p><p>– New quests for unique digital Akatosh and Mehrunes Dagon Armors, Weapons, and Horse Armor Sets</p><p>– Digital Artbook and Soundtrack App</p><p>– Shivering Isles and Knights of the Nine story expansions</p><p>– Additional downloadable content: Fighter’s Stronghold, Spell Tomes, Vile Lair, Mehrune’s Razor, The Thieves Den, Wizard’s Tower, The Orrery, and Horse Armor Pack</p><p> </p><h2>About This Game</h2><p>The Elder Scrolls IV: Oblivion™ Remastered modernizes the 2006 Game of the Year with all new stunning visuals and refined gameplay. Explore the vast landscape of Cyrodiil like never before and stop the forces of Oblivion from overtaking the land in one of the greatest RPGs ever from the award-winning Bethesda Game Studios.</p><p><img src=\"https://avigames.net/wp-content/uploads/2025/04/JAWS_Rediscover_for_Steam.gif\"></p><p><strong>Rediscover Cyrodiil</strong></p><p>Journey through the rich world of Tamriel and battle across the planes of Oblivion where handcrafted details have been meticulously recreated to ensure each moment of exploration is awe-inspiring.</p><p><img src=\"https://avigames.net/wp-content/uploads/2025/04/JAWS_Your_Story_for_Steam.gif\"></p><p><strong>Navigate Your Own Story</strong></p><p>From the noble warrior to the sinister assassin, wizened sorcerer, or scrappy blacksmith, forge your path and play the way you want.</p><p><img src=\"https://avigames.net/wp-content/uploads/2025/04/JAWS_Adventure_for_Steam.gif\"></p><p><strong>Experience an Epic Adventure</strong></p><p>Step inside a universe bursting with captivating stories and encounter an unforgettable cast of characters. Master swordcraft and wield powerful magic as you fight to save Tamriel from the Daedric invasion.</p><p><img src=\"https://avigames.net/wp-content/uploads/2025/04/JAWS_Complete_Story_for_Steam.gif\"></p><p><strong>The Complete Story</strong></p><p>Experience everything Oblivion has to offer with previously released story expansions Shivering Isles, Knights of the Nine, and additional downloadable content included in The Elder Scrolls IV: Oblivion Remastered.</p><h4>Thông tin cơ bản</h4><p>Explore Cyrodiil like never before with stunning new visuals and refined gameplay in The Elder Scrolls IV: Oblivion™ Remastered.</p><p><br></p><p><br></p><h2>System Requirements</h2><p><strong>Minimum:</strong></p><p><br></p><ol><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Requires a 64-bit processor and operating system</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>OS:</strong> Windows 10 64-bit</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Processor:</strong> AMD Ryzen 5 2600X, Intel Core i7-6800K</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Memory:</strong> 16 GB RAM</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Graphics:</strong> AMD Radeon RX 5700, NVIDIA GeForce 1070 Ti</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>DirectX:</strong> Version 12</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Storage:</strong> 125 GB available space</li></ol><p><strong>Recommended:</strong></p><p><br></p><ol><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Requires a 64-bit processor and operating system</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>OS:</strong> Windows 10 64-bit</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Processor:</strong> AMD Ryzen 5 3600X, Intel Core i5-10600K</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Memory:</strong> 32 GB RAM</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Graphics:</strong> AMD Radeon RX 6800XT or NVIDIA RTX 2080</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>DirectX:</strong> Version 12</li><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><strong>Storage:</strong> 125 GB available space</li></ol><p><br></p>",
+                Thumbnail = "/uploads/images/games/f0a968e5/avigameskyrim4.jpg",
+                ReleaseDate = new DateTime(2024, 04, 01),
                 Status = 1,
                 Delete = false,
-                CreatedAt = new DateTime(2020, 1, 1),
+                CreatedAt = new DateTime(2026, 01, 02),
                 PublisherId = 3
             },
             new Game
             {
                 GameId = 4,
-                Title = "Call of Duty: Warzone",
-                Developer = "Raven Software",
-                Description = "Battle Royale nhịp nhanh, gunplay COD, meta thay đổi theo mùa.",
-                Thumbnail = "/seed/games/warzone-thumb.jpg",
-                ReleaseDate = new DateTime(2020, 3, 10),
+                Title = "SILENT HILL f – Digital Deluxe",
+                Developer = "NeoBards Entertainment (nổi tiếng với các dự án như Resident Evil: Resistance, Re:Verse, Devil May Cry HD Collection)",
+                Description = "<h2>DELUXE EDITION &amp; PRE-PURCHASE BONUS</h2><p><img src=\"https://avigames.net/wp-content/uploads/2025/09/671332089955de2c84090411ae83ddbf.\" height=\"450\" width=\"800\"></p><h2>Deluxe Edition Contents</h2><p>– Full Game</p><p>– Digital Artbook *1</p><p>– Digital Soundtrack *1</p><p>– Pink Rabbit Costume *2</p><p>*1</p><p>The Digital Artbook and Digital Soundtrack are included in a bonus application.</p><p>The Digital Soundtrack can be downloaded in MP3 or WAV format from the Steam launcher.</p><p>*2</p><p>This costume changes Hinako's appearance.</p><p>To apply this costume, access a Hokora in the game and select Change Costume from the menu.</p><p>Note:</p><p>-The contents of the SILENT HILL f – Deluxe Upgrade are included in this item. Please be careful to avoid redundant purchases.</p><p>-Digital Soundtrack includes music with lyrics in Japanese.</p><p><img src=\"https://avigames.net/wp-content/uploads/2025/09/73f517192bdffbc5bbb6756dc3093f94.\" height=\"450\" width=\"800\"></p><h2>Pre-purchase Bonuses</h2><p>– White Sailor School Uniform *1</p><p>– Omamori: Peony *2</p><p>– Item Pack *3</p><p>*1</p><p>This costume changes Hinako's appearance.</p><p>To apply this costume, access a Hokora in the game and select Change Costume from the menu.</p><p>*2</p><p>An equipable item.</p><p>To receive this item, access a Hokora in the game and select Bonuses from the menu.</p><p>The Bonuses option will unlock based on game progression.</p><p>*3</p><p>An item pack with three consumable items. This pack can only be claimed once.</p><p>To receive this item, access a Hokora in the game and select Bonuses from the menu.</p><p>The Bonuses option will unlock based on game progression.</p><p>Item Pack contains:</p><p>– 1 Shriveled Abura-age</p><p>– 1 Divine Water</p><p>– 1 First Aid Kit</p><p>Note: The bonuses above do not come included in the SILENT HILL f – Deluxe Upgrade.</p><p><img src=\"https://avigames.net/wp-content/uploads/2025/09/4e5350d38c7e52846c6d5f5d6a1aa77f.\" height=\"450\" width=\"800\"></p><h2>Deluxe Edition Pre-purchase Bonuses</h2><p>– 48-hour Early Access</p><p><img src=\"https://avigames.net/wp-content/uploads/2025/09/18f9fc149caf0f87bd40791e61b26b49.\" height=\"450\" width=\"800\"></p><p><br></p><h2>About This Game</h2><p>In 1960s Japan, Shimizu Hinako's secluded town of Ebisugaoka is consumed by a sudden fog, transforming her home into a haunting nightmare.</p><p>As the town falls silent and the fog thickens, Hinako must navigate the twisted paths of Ebisugaoka, solving complex puzzles and confronting grotesque monsters to survive.</p><p>Immerse yourself into Hinako's world imagined by renowned author Ryukishi07, with entrancing music, including pieces by Akira Yamaoka, and beautiful visuals in a gripping tale of doubt, regret, and inescapable choices. Will Hinako embrace the beauty hidden within terror, or succumb to the madness that lies ahead?</p><p>Discover a new chapter in the SILENT HILL series, blending psychological horror with a haunting Japanese setting.</p><ol><li data-list=\"bullet\" class=\"ql-indent-1\"><span class=\"ql-ui\" contenteditable=\"false\"></span><br></li></ol>",
+                Thumbnail = "/uploads/images/games/798ffb77/silent-hill-f-1q1eg.jpg",
+                ReleaseDate = new DateTime(2025, 01, 01),
                 Status = 1,
                 Delete = false,
-                CreatedAt = new DateTime(2020, 1, 1),
+                CreatedAt = new DateTime(2026, 02, 02),
                 PublisherId = 3
             },
             new Game
             {
                 GameId = 5,
-                Title = "VALORANT",
-                Developer = "Riot Games",
-                Description = "Tactical shooter 5v5, agent có kỹ năng, ưu tiên crosshair placement và chiến thuật.",
-                Thumbnail = "/seed/games/valorant-thumb.jpg",
-                ReleaseDate = new DateTime(2020, 6, 2),
+                Title = "Borderlands 4 Super Deluxe Edition",
+                Developer = "Gearbox Software",
+                Description = "<h2>DELUXE AND SUPER DELUXE EDITIONS</h2><p> </p><p><img src=\"https://avigames.net/wp-content/uploads/2025/09/7ca62306233938f33d1d363cc16cbb8a.\" height=\"3740\" width=\"1080\"></p><p> </p><h2>Roadmap</h2><p> </p><p><img src=\"https://avigames.net/wp-content/uploads/2025/09/1c99aae6151f75bc1d524230bcf9d690.\" height=\"878\" width=\"1560\"></p><h2>About This Game</h2><p><em>Borderlands 4</em> brings intense action, badass Vault Hunters, and billions of wild and deadly weapons to an all-new planet ruled by a ruthless tyrant.</p><p>Crash into Kairos as one of four new Vault Hunters seeking wealth and glory. Wield powerful Action Skills, customize your build with deep skill trees, and dominate enemies with dynamic movement abilities.</p><p>Break free from the oppressive Timekeeper, a ruthless dictator who dominates the masses from on high. Now a world-altering catastrophe threatens his perfect Order, unleashing Mayhem across the planet.</p><p>Become an unstoppable force of battle, blasting through enemies with an all-new arsenal of outrageous weaponry. Move across the Borderlands like never before—double jumping, gliding, dodging, grappling, and more—dealing death from every direction. Explode each encounter with devastating Action Skills that unleash your Vault Hunter's unique abilities. Craft your perfect build with branching skill trees and a deep, rewarding loot chase full of wild weapons and powerful gear.</p><p>Wreaking havoc across Kairos is awesome alone and even better with friends in 4-player online co-op.* <em>Borderlands 4</em> is designed for co-op from the ground up; whether you're hunting for loot, tackling missions, or wandering freely, level scaling and individual difficulty keeps the party together and having fun.</p><p>Freely explore a vast and dangerous world rife with warring factions. Hop on your hover bike and ride through lush fields, towering peaks, and deadly deserts full of fearsome enemies, dynamic events, and engaging quests with unforgettable characters. Unite the people of Kairos and ignite a revolution, tackling this adventure however you see fit in a seamless <em>Borderlands</em> experience.</p><p><em>*Online play requires Internet connection, and cross-play requires SHiFT Account. Terms apply.</em></p><p><br></p>",
+                Thumbnail = "/uploads/images/games/da4ca4f4/borderlands-4-fnnpo.jpg",
+                ReleaseDate = new DateTime(2025, 09, 01),
                 Status = 1,
                 Delete = false,
-                CreatedAt = new DateTime(2020, 1, 1),
+                CreatedAt = new DateTime(2025, 11, 11),
                 PublisherId = 2
-            },
-            new Game
-            {
-                GameId = 6,
-                Title = "League of Legends",
-                Developer = "Riot Games",
-                Description = "MOBA 5v5 kinh điển, hệ thống rank đa dạng, meta xoay theo patch.",
-                Thumbnail = "/seed/games/lol-thumb.jpg",
-                ReleaseDate = new DateTime(2009, 10, 27),
-                Status = 1,
-                Delete = false,
-                CreatedAt = new DateTime(2020, 1, 1),
-                PublisherId = 2
-            },
-            new Game
-            {
-                GameId = 7,
-                Title = "Tom Clancy's Rainbow Six Siege",
-                Developer = "Ubisoft Montreal",
-                Description = "Bắn súng chiến thuật theo round, phá hủy môi trường, cần phối hợp team và map knowledge.",
-                Thumbnail = "/seed/games/r6s-thumb.jpg",
-                ReleaseDate = new DateTime(2015, 12, 1),
-                Status = 1,
-                Delete = false,
-                CreatedAt = new DateTime(2020, 1, 1),
-                PublisherId = 4
-            },
-            new Game
-            {
-                GameId = 8,
-                Title = "Counter-Strike 2",
-                Developer = "Valve",
-                Description = "FPS eSports 5v5, đặt/giải bom. Tối ưu aim, utility và teamwork.",
-                Thumbnail = "/seed/games/cs2-thumb.jpg",
-                ReleaseDate = new DateTime(2023, 9, 27),
-                Status = 1,
-                Delete = false,
-                CreatedAt = new DateTime(2020, 1, 1),
-                PublisherId = 5
-            },
-            new Game
-            {
-                GameId = 9,
-                Title = "Fortnite",
-                Developer = "Epic Games",
-                Description = "Battle Royale với cơ chế xây dựng/không xây dựng, sự kiện theo mùa và collab liên tục.",
-                Thumbnail = "/seed/games/fortnite-thumb.jpg",
-                ReleaseDate = new DateTime(2017, 7, 25),
-                Status = 1,
-                Delete = false,
-                CreatedAt = new DateTime(2020, 1, 1),
-                PublisherId = 6
             }
         );
 
@@ -376,20 +324,20 @@ public static class PatchSellerDbSeeder
             // Riot
             new GameCategory { GameCategoryId = 9, GameId = 5, CategoryId = 4, Delete = false },
             new GameCategory { GameCategoryId = 10, GameId = 5, CategoryId = 6, Delete = false },
-            new GameCategory { GameCategoryId = 11, GameId = 6, CategoryId = 3, Delete = false },
-            new GameCategory { GameCategoryId = 12, GameId = 6, CategoryId = 6, Delete = false },
+            new GameCategory { GameCategoryId = 11, GameId = 4, CategoryId = 3, Delete = false },
+            new GameCategory { GameCategoryId = 12, GameId = 4, CategoryId = 6, Delete = false },
 
             // Ubisoft
-            new GameCategory { GameCategoryId = 13, GameId = 7, CategoryId = 4, Delete = false },
-            new GameCategory { GameCategoryId = 14, GameId = 7, CategoryId = 6, Delete = false },
+            new GameCategory { GameCategoryId = 13, GameId = 3, CategoryId = 4, Delete = false },
+            new GameCategory { GameCategoryId = 14, GameId = 3, CategoryId = 6, Delete = false },
 
             // Valve
-            new GameCategory { GameCategoryId = 15, GameId = 8, CategoryId = 1, Delete = false },
-            new GameCategory { GameCategoryId = 16, GameId = 8, CategoryId = 6, Delete = false },
+            new GameCategory { GameCategoryId = 15, GameId = 2, CategoryId = 1, Delete = false },
+            new GameCategory { GameCategoryId = 16, GameId = 2, CategoryId = 6, Delete = false },
 
             // Epic
-            new GameCategory { GameCategoryId = 17, GameId = 9, CategoryId = 2, Delete = false },
-            new GameCategory { GameCategoryId = 18, GameId = 9, CategoryId = 6, Delete = false }
+            new GameCategory { GameCategoryId = 17, GameId = 1, CategoryId = 2, Delete = false },
+            new GameCategory { GameCategoryId = 18, GameId = 1, CategoryId = 6, Delete = false }
         );
 
         modelBuilder.Entity<GamePlatform>().HasData(
@@ -421,17 +369,17 @@ public static class PatchSellerDbSeeder
 
             // Riot
             new GamePlatform { GamePlatformId = 13, GameId = 5, PlatformId = 1, Description = "PC - anti-cheat Vanguard, nên tắt overlay lạ.", Status = 1, Delete = false },
-            new GamePlatform { GamePlatformId = 14, GameId = 6, PlatformId = 1, Description = "PC - cập nhật patch hàng tuần.", Status = 1, Delete = false },
+            new GamePlatform { GamePlatformId = 14, GameId = 5, PlatformId = 1, Description = "PC - cập nhật patch hàng tuần.", Status = 1, Delete = false },
 
             // Ubisoft
-            new GamePlatform { GamePlatformId = 15, GameId = 7, PlatformId = 1, Description = "PC (Ubisoft Connect/Steam).", Status = 1, Delete = false },
-            new GamePlatform { GamePlatformId = 16, GameId = 7, PlatformId = 2, Description = "PS5/PS4.", Status = 1, Delete = false },
-            new GamePlatform { GamePlatformId = 17, GameId = 7, PlatformId = 3, Description = "Xbox Series X|S/Xbox One.", Status = 1, Delete = false },
+            new GamePlatform { GamePlatformId = 15, GameId = 4, PlatformId = 1, Description = "PC (Ubisoft Connect/Steam).", Status = 1, Delete = false },
+            new GamePlatform { GamePlatformId = 16, GameId = 3, PlatformId = 2, Description = "PS5/PS4.", Status = 1, Delete = false },
+            new GamePlatform { GamePlatformId = 17, GameId = 2, PlatformId = 3, Description = "Xbox Series X|S/Xbox One.", Status = 1, Delete = false },
 
             // Valve / Epic
-            new GamePlatform { GamePlatformId = 18, GameId = 8, PlatformId = 1, Description = "PC (Steam) - ưu tiên 128-tick server/community.", Status = 1, Delete = false },
-            new GamePlatform { GamePlatformId = 19, GameId = 9, PlatformId = 1, Description = "PC (Epic) - nhiều chế độ chơi.", Status = 1, Delete = false },
-            new GamePlatform { GamePlatformId = 20, GameId = 9, PlatformId = 4, Description = "Nintendo Switch - ưu tiên chế độ hiệu năng.", Status = 1, Delete = false }
+            new GamePlatform { GamePlatformId = 18, GameId = 1, PlatformId = 1, Description = "PC (Steam) - ưu tiên 128-tick server/community.", Status = 1, Delete = false },
+            new GamePlatform { GamePlatformId = 19, GameId = 5, PlatformId = 1, Description = "PC (Epic) - nhiều chế độ chơi.", Status = 1, Delete = false },
+            new GamePlatform { GamePlatformId = 20, GameId = 4, PlatformId = 4, Description = "Nintendo Switch - ưu tiên chế độ hiệu năng.", Status = 1, Delete = false }
         );
 
         modelBuilder.Entity<GameImage>().HasData(
@@ -482,46 +430,6 @@ public static class PatchSellerDbSeeder
                 URL = "/seed/games/valorant-1.jpg",
                 Name = "VALORANT - Screenshot 01",
                 Description = "Đặt/giải spike, sử dụng kỹ năng agent.",
-                Status = 1,
-                Delete = false
-            },
-            new GameImage
-            {
-                GameImageId = 6,
-                GameId = 6,
-                URL = "/seed/games/lol-1.jpg",
-                Name = "LoL - Screenshot 01",
-                Description = "Giao tranh tổng, kiểm soát mục tiêu lớn.",
-                Status = 1,
-                Delete = false
-            },
-            new GameImage
-            {
-                GameImageId = 7,
-                GameId = 7,
-                URL = "/seed/games/r6s-1.jpg",
-                Name = "R6S - Screenshot 01",
-                Description = "Phá hủy tường, drone và setup phòng thủ.",
-                Status = 1,
-                Delete = false
-            },
-            new GameImage
-            {
-                GameImageId = 8,
-                GameId = 8,
-                URL = "/seed/games/cs2-1.jpg",
-                Name = "CS2 - Screenshot 01",
-                Description = "Smoke/utility và đấu súng 5v5.",
-                Status = 1,
-                Delete = false
-            },
-            new GameImage
-            {
-                GameImageId = 9,
-                GameId = 9,
-                URL = "/seed/games/fortnite-1.jpg",
-                Name = "Fortnite - Screenshot 01",
-                Description = "Battle Royale theo mùa, nhiều sự kiện collab.",
                 Status = 1,
                 Delete = false
             }
@@ -583,54 +491,6 @@ public static class PatchSellerDbSeeder
                 Name = "Crosshair training pack (VALORANT)",
                 Price = 39_000,
                 Description = "Bộ bài tập aim + routine 20 phút/ngày (file + checklist).",
-                UpdateBy = "editor",
-                Status = 1,
-                CreatedAt = new DateTime(2020, 1, 1),
-                Delete = false
-            },
-            new Patch
-            {
-                PatchId = 6,
-                GameId = 6,
-                Name = "Gói tối ưu ping/packet loss (LoL)",
-                Price = 29_000,
-                Description = "Hướng dẫn tối ưu DNS, MTU, cấu hình router cơ bản + checklist kiểm tra mạng.",
-                UpdateBy = "admin",
-                Status = 1,
-                CreatedAt = new DateTime(2020, 1, 1),
-                Delete = false
-            },
-            new Patch
-            {
-                PatchId = 7,
-                GameId = 7,
-                Name = "Bộ setup map callout tiếng Việt (R6S)",
-                Price = 45_000,
-                Description = "Tài liệu callout theo map phổ biến, kèm mini-map đánh dấu vị trí.",
-                UpdateBy = "editor",
-                Status = 1,
-                CreatedAt = new DateTime(2020, 1, 1),
-                Delete = false
-            },
-            new Patch
-            {
-                PatchId = 8,
-                GameId = 8,
-                Name = "Config tối ưu FPS + độ trễ (CS2)",
-                Price = 89_000,
-                Description = "Autoexec, launch options, tối ưu chuột/Hz, giảm input lag (khuyến nghị theo cấu hình).",
-                UpdateBy = "admin",
-                Status = 1,
-                CreatedAt = new DateTime(2020, 1, 1),
-                Delete = false
-            },
-            new Patch
-            {
-                PatchId = 9,
-                GameId = 9,
-                Name = "Preset hiệu năng + nhìn rõ (Fortnite)",
-                Price = 55_000,
-                Description = "Tối ưu hiệu năng, setting competitive, hướng dẫn bật chế độ Performance Mode.",
                 UpdateBy = "editor",
                 Status = 1,
                 CreatedAt = new DateTime(2020, 1, 1),
@@ -817,150 +677,6 @@ public static class PatchSellerDbSeeder
                 Note = "Ưu tiên tập đúng form hơn là tốc độ.",
                 CreateAt = new DateTime(2026, 1, 16),
                 Delete = false
-            },
-
-            // Patch 6 - LoL network
-            new PatchVersion
-            {
-                PatchVersionId = 11,
-                PatchId = 6,
-                StaffId = 1,
-                WorkWithGameVersion = "14.x",
-                VersionName = "v1.0",
-                FileUrl = "/seed/files/lol-network-v1.zip",
-                FileSize = 1_150_000,
-                ExtractionPassword = "patchseller",
-                InstallationGuide = "Chạy script kiểm tra mạng -> áp dụng DNS/MTU theo ISP -> test trong custom.",
-                Changelog = "- Checklist tối ưu\n- Cách test packet loss",
-                Status = 1,
-                Note = "Không can thiệp file game.",
-                CreateAt = new DateTime(2026, 1, 8),
-                Delete = false
-            },
-            new PatchVersion
-            {
-                PatchVersionId = 12,
-                PatchId = 6,
-                StaffId = 2,
-                WorkWithGameVersion = "14.x",
-                VersionName = "v1.1",
-                FileUrl = "/seed/files/lol-network-v1_1.zip",
-                FileSize = 1_300_000,
-                ExtractionPassword = "patchseller",
-                InstallationGuide = "Bổ sung hướng dẫn tối ưu WiFi (5GHz), ưu tiên dây LAN nếu có.",
-                Changelog = "- Thêm phần tối ưu WiFi\n- Mẹo giảm jitter",
-                Status = 1,
-                Note = "Nếu dùng VPN, thử tắt để đối chiếu.",
-                CreateAt = new DateTime(2026, 1, 23),
-                Delete = false
-            },
-
-            // Patch 7 - R6S callout
-            new PatchVersion
-            {
-                PatchVersionId = 13,
-                PatchId = 7,
-                StaffId = 2,
-                WorkWithGameVersion = "Y9S4",
-                VersionName = "v1.0",
-                FileUrl = "/seed/files/r6s-callout-vi-v1.zip",
-                FileSize = 4_800_000,
-                ExtractionPassword = "patchseller",
-                InstallationGuide = "Tải về -> mở PDF -> học theo map. Có flashcard để ôn nhanh.",
-                Changelog = "- Callout tiếng Việt + tiếng Anh\n- Mini-map đánh dấu",
-                Status = 1,
-                Note = "Ưu tiên dùng callout ngắn, thống nhất trong team.",
-                CreateAt = new DateTime(2026, 1, 9),
-                Delete = false
-            },
-            new PatchVersion
-            {
-                PatchVersionId = 14,
-                PatchId = 7,
-                StaffId = 1,
-                WorkWithGameVersion = "Y9S4.1",
-                VersionName = "v1.1",
-                FileUrl = "/seed/files/r6s-callout-vi-v1_1.zip",
-                FileSize = 5_050_000,
-                ExtractionPassword = "patchseller",
-                InstallationGuide = "Bổ sung map mới + cập nhật tên khu vực. In ra hoặc dùng trên điện thoại.",
-                Changelog = "- Thêm map mới\n- Sửa lại thuật ngữ phổ biến",
-                Status = 1,
-                Note = "Có phần luyện callout 10 phút/ngày.",
-                CreateAt = new DateTime(2026, 1, 21),
-                Delete = false
-            },
-
-            // Patch 8 - CS2 config
-            new PatchVersion
-            {
-                PatchVersionId = 15,
-                PatchId = 8,
-                StaffId = 1,
-                WorkWithGameVersion = "Build 2025.12",
-                VersionName = "v1.0",
-                FileUrl = "/seed/files/cs2-config-v1.zip",
-                FileSize = 2_950_000,
-                ExtractionPassword = "patchseller",
-                InstallationGuide = "Copy autoexec.cfg -> set launch options -> chỉnh Windows mouse + Hz theo guide.",
-                Changelog = "- Autoexec cơ bản\n- Launch options an toàn\n- Tối ưu input lag",
-                Status = 1,
-                Note = "Không dùng lệnh gây VAC risk. Chỉ config hợp lệ.",
-                CreateAt = new DateTime(2026, 1, 3),
-                Delete = false
-            },
-            new PatchVersion
-            {
-                PatchVersionId = 16,
-                PatchId = 8,
-                StaffId = 2,
-                WorkWithGameVersion = "Build 2026.01",
-                VersionName = "v1.1",
-                FileUrl = "/seed/files/cs2-config-v1_1.zip",
-                FileSize = 3_150_000,
-                ExtractionPassword = "patchseller",
-                InstallationGuide = "Bổ sung preset cho CPU yếu + hướng dẫn giới hạn FPS hợp lý.",
-                Changelog = "- Thêm preset low-end\n- Tối ưu net settings",
-                Status = 1,
-                Note = "Nếu dùng laptop, ưu tiên chế độ hiệu năng cao.",
-                CreateAt = new DateTime(2026, 1, 24),
-                Delete = false
-            },
-
-            // Patch 9 - Fortnite performance
-            new PatchVersion
-            {
-                PatchVersionId = 17,
-                PatchId = 9,
-                StaffId = 2,
-                WorkWithGameVersion = "Chapter 5",
-                VersionName = "v1.0",
-                FileUrl = "/seed/files/fortnite-perf-v1.zip",
-                FileSize = 7_750_000,
-                ExtractionPassword = "patchseller",
-                InstallationGuide = "Bật Performance Mode -> áp dụng preset -> test trong Creative map benchmark.",
-                Changelog = "- Preset hiệu năng\n- Gợi ý setting theo GPU",
-                Status = 1,
-                Note = "Nếu bị drop FPS, giảm view distance trước.",
-                CreateAt = new DateTime(2026, 1, 7),
-                Delete = false
-            },
-            new PatchVersion
-            {
-                PatchVersionId = 18,
-                PatchId = 9,
-                StaffId = 1,
-                WorkWithGameVersion = "Chapter 5.1",
-                VersionName = "v1.1",
-                FileUrl = "/seed/files/fortnite-perf-v1_1.zip",
-                FileSize = 8_050_000,
-                ExtractionPassword = "patchseller",
-                InstallationGuide = "Cập nhật preset, bổ sung hướng dẫn tắt background apps và tối ưu shader cache.",
-                Changelog = "- Cập nhật theo bản vá\n- Thêm checklist tối ưu Windows",
-                Status = 1,
-                Note = "Khuyến nghị cập nhật driver trước khi test.",
-                CreateAt = new DateTime(2026, 1, 25),
-                Delete = false
             }
         );
 
@@ -971,15 +687,11 @@ public static class PatchSellerDbSeeder
             new PatchImage { PatchImageId = 3, PatchId = 3, PatchVersionId = null, URL = "/seed/patches/mw2-audio-thumb.jpg", Name = "Thumbnail", Description = "Ảnh đại diện patch", IsThumbnail = true, Delete = false },
             new PatchImage { PatchImageId = 4, PatchId = 4, PatchVersionId = null, URL = "/seed/patches/warzone-visual-thumb.jpg", Name = "Thumbnail", Description = "Ảnh đại diện patch", IsThumbnail = true, Delete = false },
             new PatchImage { PatchImageId = 5, PatchId = 5, PatchVersionId = null, URL = "/seed/patches/valorant-aim-thumb.jpg", Name = "Thumbnail", Description = "Ảnh đại diện patch", IsThumbnail = true, Delete = false },
-            new PatchImage { PatchImageId = 6, PatchId = 6, PatchVersionId = null, URL = "/seed/patches/lol-network-thumb.jpg", Name = "Thumbnail", Description = "Ảnh đại diện patch", IsThumbnail = true, Delete = false },
-            new PatchImage { PatchImageId = 7, PatchId = 7, PatchVersionId = null, URL = "/seed/patches/r6s-callout-thumb.jpg", Name = "Thumbnail", Description = "Ảnh đại diện patch", IsThumbnail = true, Delete = false },
-            new PatchImage { PatchImageId = 8, PatchId = 8, PatchVersionId = null, URL = "/seed/patches/cs2-config-thumb.jpg", Name = "Thumbnail", Description = "Ảnh đại diện patch", IsThumbnail = true, Delete = false },
-            new PatchImage { PatchImageId = 9, PatchId = 9, PatchVersionId = null, URL = "/seed/patches/fortnite-perf-thumb.jpg", Name = "Thumbnail", Description = "Ảnh đại diện patch", IsThumbnail = true, Delete = false },
 
             // Some version images
             new PatchImage { PatchImageId = 10, PatchId = null, PatchVersionId = 2, URL = "/seed/patches/bf2042-fps-v1_1-1.jpg", Name = "Preset NVIDIA", Description = "Ảnh minh họa setting NVIDIA", IsThumbnail = false, Delete = false },
             new PatchImage { PatchImageId = 11, PatchId = null, PatchVersionId = 2, URL = "/seed/patches/bf2042-fps-v1_1-2.jpg", Name = "Preset AMD", Description = "Ảnh minh họa setting AMD", IsThumbnail = false, Delete = false },
-            new PatchImage { PatchImageId = 12, PatchId = null, PatchVersionId = 15, URL = "/seed/patches/cs2-config-v1-1.jpg", Name = "Autoexec", Description = "Ví dụ autoexec.cfg", IsThumbnail = false, Delete = false }
+            new PatchImage { PatchImageId = 12, PatchId = null, PatchVersionId = 10, URL = "/seed/patches/cs2-config-v1-1.jpg", Name = "Autoexec", Description = "Ví dụ autoexec.cfg", IsThumbnail = false, Delete = false }
         );
 
         modelBuilder.Entity<User>().HasData(
@@ -1079,11 +791,11 @@ public static class PatchSellerDbSeeder
         );
 
         modelBuilder.Entity<CartItem>().HasData(
-            new CartItem { CartItemId = 1, CartId = 1, PatchId = 8, Delete = false },
+            new CartItem { CartItemId = 1, CartId = 1, PatchId = 1, Delete = false },
             new CartItem { CartItemId = 2, CartId = 1, PatchId = 1, Delete = false },
             new CartItem { CartItemId = 3, CartId = 2, PatchId = 4, Delete = false },
             new CartItem { CartItemId = 4, CartId = 4, PatchId = 5, Delete = false },
-            new CartItem { CartItemId = 5, CartId = 5, PatchId = 6, Delete = false }
+            new CartItem { CartItemId = 5, CartId = 5, PatchId = 5, Delete = false }
         );
 
         modelBuilder.Entity<Discount>().HasData(
@@ -1209,14 +921,13 @@ public static class PatchSellerDbSeeder
         modelBuilder.Entity<OrderDetail>().HasData(
             new OrderDetail { OrderDetailID = 1, OrderId = 1, PatchId = 4, Price = 59_000 },
             new OrderDetail { OrderDetailID = 2, OrderId = 1, PatchId = 5, Price = 39_000 },
-            new OrderDetail { OrderDetailID = 3, OrderId = 2, PatchId = 8, Price = 89_000 },
+            new OrderDetail { OrderDetailID = 3, OrderId = 2, PatchId = 5, Price = 89_000 },
             new OrderDetail { OrderDetailID = 4, OrderId = 2, PatchId = 1, Price = 69_000 }
         );
 
         modelBuilder.Entity<UserPurchase>().HasData(
             new UserPurchase { UserPurchaseId = 1, UserId = 2, PatchId = 4, PurchasedAt = new DateTime(2026, 1, 11) },
             new UserPurchase { UserPurchaseId = 2, UserId = 2, PatchId = 5, PurchasedAt = new DateTime(2026, 1, 11) },
-            new UserPurchase { UserPurchaseId = 3, UserId = 3, PatchId = 8, PurchasedAt = new DateTime(2026, 1, 15) },
             new UserPurchase { UserPurchaseId = 4, UserId = 3, PatchId = 1, PurchasedAt = new DateTime(2026, 1, 15) },
             new UserPurchase { UserPurchaseId = 5, UserId = 1, PatchId = 2, PurchasedAt = new DateTime(2026, 1, 20) }
         );
@@ -1231,18 +942,6 @@ public static class PatchSellerDbSeeder
                 Title = "Preset nhìn rõ, FPS ổn",
                 Content = "Áp dụng theo hướng dẫn là ổn, game đỡ mờ và FPS mượt hơn. Nên có thêm preset cho GPU yếu.",
                 Overall = 4.5,
-                Status = 1
-            },
-            new Review
-            {
-                ReviewId = 2,
-                UserId = 3,
-                PatchId = 8,
-                UserName = "leminh",
-                Title = "Config CS2 hợp lý",
-                Content = "Autoexec gọn, không có lệnh linh tinh. Input lag giảm thấy rõ, recommend.",
-                Overall = 5.0,
-                CreatedAt = new DateTime(2020, 1, 1),
                 Status = 1
             },
             new Review
@@ -1274,7 +973,6 @@ public static class PatchSellerDbSeeder
         modelBuilder.Entity<DownloadLog>().HasData(
             new DownloadLog { DownloadLogId = 1, UserId = 2, PatchVersionId = 7, DownloadedAt = new DateTime(2026, 1, 11, 10, 30, 0) },
             new DownloadLog { DownloadLogId = 2, UserId = 2, PatchVersionId = 9, DownloadedAt = new DateTime(2026, 1, 11, 10, 45, 0) },
-            new DownloadLog { DownloadLogId = 3, UserId = 3, PatchVersionId = 15, DownloadedAt = new DateTime(2026, 1, 15, 21, 10, 0) },
             new DownloadLog { DownloadLogId = 4, UserId = 1, PatchVersionId = 3, DownloadedAt = new DateTime(2026, 1, 20, 9, 5, 0) }
         );
 
