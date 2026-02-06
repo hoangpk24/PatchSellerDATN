@@ -14,17 +14,17 @@ public class Order
     public double TotalAmount { get; set; }
     public double DiscountAmount { get; set; }
     public double FinalAmount { get; set; }
-    public string PaymentLink { get; set; }
+    public string? PaymentLink { get; set; }
     public DateTime? PaymentExpiration { get; set; }
-    public string Note { get; set; }
+    public string? Note { get; set; }
     public int Status { get; set; }
 
     [ForeignKey("UserId")]
     public int UserId { get; set; }
-    public User User { get; set; }
+    public User? User { get; set; }
     
     [ForeignKey("DiscountId")]
     public int? DiscountId { get; set; }
-    public Discount Discount { get; set; }
-    public ICollection<OrderDetail> OrderDetails { get; set; }
+    public Discount? Discount { get; set; }
+    public ICollection<OrderDetail>? OrderDetails { get; set; }
 }

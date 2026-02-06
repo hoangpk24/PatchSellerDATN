@@ -17,6 +17,35 @@ namespace PatchSeller.DAL.Repository
             _context = new PatchSellerDbContext();
         }
 
+        public async Task<int> GetUserTimeUsed(string code, int userId)
+        {
+            try
+            {
+                var discountCode = await GetDiscountCodeByCode(code);
+                return await _context.Orders.Where(x => x.UserId == userId && x.DiscountId == discountCode.DiscountId && x.Status!=3).CountAsync();
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<Discount> GetDiscountCodeByCode(string code)
+        {
+            try
+            {
+                var discount = await _context.Discounts.FirstOrDefaultAsync(x=>x.Code == code);
+                if (discount == null || (discount != null && discount.Delete == true))
+                    return null;
+                return discount;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+        }
+
         public async Task<List<Discount>> GetAll(
             string? keyword = null, 
             string? discountType = null,

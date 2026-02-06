@@ -11,9 +11,9 @@ public class OrderDetail
 
     [ForeignKey("OrderId")]
     public int OrderId { get; set; }
-    public Order Order { get; set; }
+    public Order? Order { get; set; }
     
     [ForeignKey("PatchId")]
     public int PatchId { get; set; }
-    public Patch Patch { get; set; }
+    public Patch? Patch { get; set; }
 }

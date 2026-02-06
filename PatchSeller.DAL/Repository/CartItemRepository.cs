@@ -31,6 +31,20 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<CartItem>> GetAllByUserId(int userId)
+        {
+            try
+            {
+                return await _context.CartItems
+                    .Where(x => x.Delete != true && x.Cart != null && x.Cart.UserId == userId)
+                    .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<CartItem> GetById(int id)
         {
             try
@@ -61,6 +75,24 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<CartItem>> GetByUserIdWithDetails(int userId)
+        {
+            try
+            {
+                return await _context.CartItems
+                    .Where(ci => ci.Delete != true
+                                 && ci.Cart != null
+                                 && ci.Cart.UserId == userId)
+                    .Include(ci => ci.Patch)
+                        .ThenInclude(p => p.Game)
+                    .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<CartItem> Update(CartItem item)
         {
             try
@@ -83,7 +115,7 @@ namespace PatchSeller.DAL.Repository
                 if (item == null)
                     return false;
 
-                item.Delete = true;
+                _context.CartItems.Remove(item);
                 await _context.SaveChangesAsync();
                 return true;
             }
