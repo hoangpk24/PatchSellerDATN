@@ -17,12 +17,31 @@ namespace PatchSeller.DAL.Repository
             _context = new PatchSellerDbContext();
         }
 
-        public async Task<List<Patch>> GetAll()
+        public async Task<List<Patch>> GetAll(string? keyword)
+        {
+            try
+            {
+                var query = _context.Patches.Where(x => x.Delete != true);
+                if (keyword != null)
+                {
+                    query = query.Where(x => x.Name.Contains(keyword) || (x.Description != null && x.Description.Contains(keyword)));
+                }
+                return await query.ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<Patch>> GetByGameId(int gameId)
         {
             try
             {
                 return await _context.Patches
-                    .Where(x => x.Delete != true)
+                    .Where(x => x.GameId == gameId && x.Delete != true)
+                    .Include(p => p.PatchImages)
+                    .Include(p => p.PatchVersions)
                     .ToListAsync();
             }
             catch (Exception)

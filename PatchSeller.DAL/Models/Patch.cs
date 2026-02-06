@@ -7,8 +7,6 @@ public class Patch
 {
     [Key]
     public int PatchId { get; set; }
-    
-
     public string Name { get; set; }
     public double Price { get; set; }
     public string Description { get; set; }
@@ -19,11 +17,11 @@ public class Patch
 
     [ForeignKey("GameId")]
     public int GameId { get; set; }
-    public Game Game { get; set; }
-    public ICollection<CartItem> CartItems { get; set; }
-    public ICollection<UserPurchase> UserPurchases { get; set; }
-    public ICollection<OrderDetail> OrderDetails { get; set; }
-    public ICollection<Review> Reviews { get; set; }
-    public ICollection<PatchImage> PatchImages { get; set; }
-    public ICollection<PatchVersion> PatchVersions { get; set; }
+    public Game? Game { get; set; }
+    public ICollection<CartItem>? CartItems { get; set; }
+    public ICollection<UserPurchase>? UserPurchases { get; set; }
+    public ICollection<OrderDetail>? OrderDetails { get; set; }
+    public ICollection<Review>? Reviews { get; set; }
+    public ICollection<PatchImage>? PatchImages { get; set; }
+    public ICollection<PatchVersion>? PatchVersions { get; set; }
 }
