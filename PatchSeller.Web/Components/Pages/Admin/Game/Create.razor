@@ -7,7 +7,7 @@
     <h1 class="leading-[3rem] mb-4 h-12 text-3xl font-bold text-material-default">Tạo game mới</h1>
 
     <div class="rounded bg-white p-10 shadow-md">
-        <MudForm Model="_model" @ref="_form">
+        <MudForm Model="_model" @ref="_form" Validation="_gameSchema.ValidateValue">
             <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tiêu đề</label> <span class="ml-1 text-red-500">*</span>
 
@@ -20,14 +20,25 @@
             </div>
 
             <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Nhà phát triển</label> <span class="ml-1 text-red-500">*</span>
+
+                <MudTextField T="string"
+                              @bind-Value="_model.Developer"
+                              For="@(() => _model.Developer)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Ví dụ: ..."
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Thể loại</label> <span class="ml-1 text-red-500">*</span>
 
-                <MudSelect T="int" @bind-SelectedValues="_categoryIds" MultiSelection="true" SelectAll="true" Variant="Variant.Outlined" Placeholder="Hành động, chiến thuật..." Margin="Margin.Dense">
+                <MudSelect T="int" MultiSelectionTextFunc="@GetMultiSelectionTextCategory" @bind-SelectedValues="_categoryIds" MultiSelection="true" SelectAll="true" Variant="Variant.Outlined" Placeholder="Hành động, chiến thuật..." Margin="Margin.Dense">
                     @if (_lstCategory.Any())
                     {
                         @foreach(var item in _lstCategory)
                         {
-                            <MudSelectItem Value="@item.CategoryId">@item.CategoryName</MudSelectItem>
+                            <MudSelectItem T="int" Value="@item.CategoryId">@item.CategoryName</MudSelectItem>
                         }
                     }
                 </MudSelect>
@@ -36,12 +47,12 @@
             <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Nền tảng</label> <span class="ml-1 text-red-500">*</span>
 
-                <MudSelect T="int" @bind-SelectedValues="_platformIds" MultiSelection="true" SelectAll="true" Variant="Variant.Outlined" Placeholder="nintendo, ps5..." Margin="Margin.Dense">
+                <MudSelect T="int" MultiSelectionTextFunc="@GetMultiSelectionTextPlatform" @bind-SelectedValues="_platformIds" MultiSelection="true" SelectAll="true" Variant="Variant.Outlined" Placeholder="nintendo, ps5..." Margin="Margin.Dense">
                     @if (_lstPlatform.Any())
                     {
                         @foreach (var item in _lstPlatform)
                         {
-                            <MudSelectItem Value="@item.PlatformId">@item.Name</MudSelectItem>
+                            <MudSelectItem T="int" Value="@item.PlatformId">@item.Name</MudSelectItem>
                         }
                     }
                 </MudSelect>
@@ -95,7 +106,7 @@
                     @if (_imagesWithUrl != null && !string.IsNullOrEmpty(_imagesWithUrl.Url))
                     {
                         <div class="relative flex max-w-40 items-center overflow-hidden rounded-lg border-2 border-gray-300">
-                            <MudImage Src="@_imagesWithUrl.Url" Alt="image game" ObjectFit="ObjectFit.Cover" Class="!aspect-[1/1.5]" />
+                            <MudImage Src="@_imagesWithUrl.Url" Alt="image game" ObjectFit="ObjectFit.Cover" Class="!aspect-[1/1.6]" />
                             <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error" Size="Size.Small" OnClick="@(() => HandleRemoveImages(_imagesWithUrl.File))"
                                             Class="absolute top-1 right-1 text-white !p-0" />
                         </div>
@@ -131,10 +142,11 @@
 
     MudForm _form = new MudForm();
     GameModel _model = new GameModel();
+    GameSchema.CreateUpdate _gameSchema = new GameSchema.CreateUpdate();
     List<DAL.Models.Category> _lstCategory = [];
     List<DAL.Models.Platform> _lstPlatform = [];
     List<DAL.Models.Publisher> _lstPublisher = [];
-    ImageFileResponse _imagesWithUrl = new ImageFileResponse();
+    ImageFileResponse _imagesWithUrl = null;
 
 
     private IEnumerable<int> _categoryIds = new HashSet<int>();
@@ -147,10 +159,12 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+        StateHasChanged();
     }
 
     async Task LoadData()
     {
+        _model.PublisherId = -1;
         var resCategory = await _adminCategoryService.GetAll();
         if(resCategory.IsSuccess && resCategory.Data.Any())
         {
@@ -228,6 +242,19 @@
 
             if (!_form.IsValid) return;
 
+            if (_imagesWithUrl.File == null || string.IsNullOrEmpty(_imagesWithUrl.Url))
+            {
+                _snackbar.Add("Vui lòng thêm ảnh", MudBlazor.Severity.Warning);
+                return;
+            }
+
+            if(!_categoryIds.Any() || !_platformIds.Any())
+            {
+                _snackbar.Add("Vui lòng điền đầy đủ thông tin", MudBlazor.Severity.Warning);
+                return;
+
+            }
+
             List<GamePlatformInputModel> lstPlatform = new List<GamePlatformInputModel>();
             foreach(var item in _platformIds)
             {
@@ -241,8 +268,10 @@
             }
 
             _model.Title = _model.Title.Trim();
+            _model.Developer = _model.Developer.Trim();
             _model.CategoryIds = _categoryIds.ToList();
             _model.Platforms = lstPlatform;
+            _model.Status = Constant.StatusDefault.InActive;
 
             var fileName = Path.GetFileName(_imagesWithUrl.File.Name);
             var randomId = Guid.NewGuid().ToString().Substring(0, 8);
@@ -250,7 +279,7 @@
 
             var res = await _adminGameService.CreateGame(_model);
 
-            if(res.IsSuccess && res.Data != null && res.Data.GameId > 0)
+            if(res.IsSuccess && res.Data != null)
             {
                 var contentRootPath = WebHostEnvironment.WebRootPath;
                 var productImagesPath = Path.Combine(contentRootPath, "uploads", "images", "games", randomId);
@@ -285,6 +314,28 @@
         {
             _isLoading = false;
         }
+    }
+
+    private string GetMultiSelectionTextCategory(IEnumerable<string> selectedValues)
+    {
+        var selectedIds = selectedValues.Select(int.Parse).ToList();
+
+        var names = _lstCategory
+            .Where(x => selectedIds.Contains(x.CategoryId))
+            .Select(x => x.CategoryName);
+
+        return string.Join(", ", names);
+    }
+
+    private string GetMultiSelectionTextPlatform(IEnumerable<string> selectedValues)
+    {
+        var selectedIds = selectedValues.Select(int.Parse).ToList();
+
+        var names = _lstPlatform
+            .Where(x => selectedIds.Contains(x.PlatformId))
+            .Select(x => x.Name);
+
+        return string.Join(", ", names);
     }
 }
 

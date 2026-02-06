@@ -631,6 +631,10 @@ video {
   top: 0px;
 }
 
+.top-1 {
+  top: 0.25rem;
+}
+
 .top-2 {
   top: 0.5rem;
 }
@@ -641,10 +645,6 @@ video {
 
 .top-full {
   top: 100%;
-}
-
-.top-1 {
-  top: 0.25rem;
 }
 
 .z-10 {
@@ -835,12 +835,20 @@ video {
   display: none;
 }
 
+.\!aspect-\[1\/1\.5\] {
+  aspect-ratio: 1/1.5 !important;
+}
+
 .aspect-\[1\/1\.2\] {
   aspect-ratio: 1/1.2;
 }
 
 .aspect-\[1\/1\.5\] {
   aspect-ratio: 1/1.5;
+}
+
+.aspect-\[1\/1\.7\] {
+  aspect-ratio: 1/1.7;
 }
 
 .aspect-\[16\/9\] {
@@ -855,12 +863,12 @@ video {
   aspect-ratio: 16 / 9;
 }
 
-.\!aspect-\[1\/1\.5\] {
-  aspect-ratio: 1/1.5 !important;
+.aspect-\[1\/1\.6\] {
+  aspect-ratio: 1/1.6;
 }
 
-.aspect-\[1\/1\.7\] {
-  aspect-ratio: 1/1.7;
+.\!aspect-\[1\/1\.6\] {
+  aspect-ratio: 1/1.6 !important;
 }
 
 .\!h-10 {
@@ -932,10 +940,6 @@ video {
   height: 100vh;
 }
 
-.\!h-full {
-  height: 100% !important;
-}
-
 .max-h-\[350px\] {
   max-height: 350px;
 }
@@ -1004,6 +1008,10 @@ video {
   width: 2rem;
 }
 
+.w-\[100px\] {
+  width: 100px;
+}
+
 .w-\[18\.75rem\] {
   width: 18.75rem;
 }
@@ -1045,18 +1053,6 @@ video {
   width: 100vw;
 }
 
-.\!w-\[150px\] {
-  width: 150px !important;
-}
-
-.w-\[10rem\] {
-  width: 10rem;
-}
-
-.w-\[100px\] {
-  width: 100px;
-}
-
 .min-w-\[100px\] {
   min-width: 100px;
 }
@@ -1085,12 +1081,20 @@ video {
   max-width: 48rem;
 }
 
+.max-w-40 {
+  max-width: 10rem;
+}
+
 .max-w-\[1280px\] {
   max-width: 1280px;
 }
 
 .max-w-\[1520px\] {
   max-width: 1520px;
+}
+
+.max-w-\[250px\] {
+  max-width: 250px;
 }
 
 .max-w-\[500px\] {
@@ -1111,22 +1115,6 @@ video {
 
 .max-w-md {
   max-width: 28rem;
-}
-
-.\!max-w-\[150px\] {
-  max-width: 150px !important;
-}
-
-.max-w-40 {
-  max-width: 10rem;
-}
-
-.max-w-\[200px\] {
-  max-width: 200px;
-}
-
-.max-w-\[250px\] {
-  max-width: 250px;
 }
 
 .flex-1 {
@@ -1384,6 +1372,11 @@ video {
   border-color: rgb(255 255 255 / 0.15) !important;
 }
 
+.border-gray-300 {
+  --tw-border-opacity: 1;
+  border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
+}
+
 .border-gray-700 {
   --tw-border-opacity: 1;
   border-color: rgb(55 65 81 / var(--tw-border-opacity, 1));
@@ -1422,11 +1415,6 @@ video {
 
 .border-white\/5 {
   border-color: rgb(255 255 255 / 0.05);
-}
-
-.border-gray-300 {
-  --tw-border-opacity: 1;
-  border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
 }
 
 .\!bg-black-default2 {
