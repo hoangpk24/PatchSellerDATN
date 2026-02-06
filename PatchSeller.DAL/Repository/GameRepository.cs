@@ -106,10 +106,19 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
+                var duplicateName = await _context.Games.AnyAsync(c => c.Title == game.Title && c.Delete != true);
+                if (duplicateName)
+                {
+                    throw new InvalidOperationException("DUPLICATE_NAME");
+                }
                 game.Delete = false;
                 var added = _context.Games.Add(game).Entity;
                 await _context.SaveChangesAsync();
                 return added;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {
@@ -121,9 +130,36 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
-                _context.Games.Update(game);
+                var existingGame = await _context.Games.FindAsync(game.GameId);
+
+                if (existingGame == null || (existingGame != null && existingGame.Delete == true))
+                {
+                    throw new InvalidOperationException("NOT_FOUND");
+                }
+
+                var duplicateName = await _context.Games.AnyAsync(c => c.GameId != game.GameId && c.Title == game.Title && c.Delete != true);
+
+                if (duplicateName)
+                {
+                    throw new InvalidOperationException("DUPLICATE_NAME");
+                }
+
+                existingGame.Title = game.Title;
+                existingGame.Description = game.Description;
+                existingGame.Developer = game.Developer;
+                existingGame.Thumbnail = game.Thumbnail;
+                existingGame.ReleaseDate = game.ReleaseDate;
+                existingGame.Status = game.Status;
+                existingGame.PublisherId = game.PublisherId;
+                existingGame.Delete = game.Delete;
+
+                _context.Games.Update(existingGame);
                 await _context.SaveChangesAsync();
                 return game;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {
@@ -136,12 +172,16 @@ namespace PatchSeller.DAL.Repository
             try
             {
                 var game = await _context.Games.FindAsync(id);
-                if (game == null)
-                    return false;
+                if (game == null || (game != null && game.Delete == true))
+                    throw new InvalidOperationException("NOT_FOUND");
 
                 game.Delete = true;
                 await _context.SaveChangesAsync();
                 return true;
+            }
+            catch(InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {

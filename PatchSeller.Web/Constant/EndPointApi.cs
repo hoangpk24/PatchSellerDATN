@@ -62,6 +62,15 @@
             public const string RankCreate = "/admin/rank/create";
             public const string RankUpdate = "/admin/rank/update";
             public const string RankDelete = "/admin/rank/delete/:id";
+
+            // Game
+            public const string GameGetAll = "/admin/game/get-all-games";
+            public const string GameDetailGetAll = "/admin/game/get-all-games-detail";
+            public const string GameGetById = "/admin/game/get-game-by-id/:id";
+            public const string GameDetailGetById = "/admin/game/get-by-id-detail/:id";
+            public const string GameCreate = "/admin/game/create";
+            public const string GameUpdate = "/admin/game/update";
+            public const string GameDelete = "/admin/game/delete/:id";
         }
     }
 }

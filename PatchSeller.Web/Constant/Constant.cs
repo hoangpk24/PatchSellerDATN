@@ -13,6 +13,7 @@
         public const string UserFirstLoginLocalStorage = "firstLogin";
 
         // Image default
+        public const string MainImages = "/uploads/images/games/";
         public const string DefaultImages = "/Assets/Images/default-image.png";
 
         // Discount type

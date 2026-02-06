@@ -1,7 +1,7 @@
 namespace PatchSeller.API.DTOs
 {
 
-    public class GameCreateDTO
+    public class GameCreateEditDTO
     {
         public int GameId { get; set; } // Cái này thêm cũng được, không thêm cũng được, DB tự sinh key nhé, thêm vào cho nó nhìn chuẩn cấu trúc =)
         public string Title { get; set; } = string.Empty;
