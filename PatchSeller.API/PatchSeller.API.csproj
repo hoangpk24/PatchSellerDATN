@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GoogleServiceLib\GoogleServiceLib.csproj" />
     <ProjectReference Include="..\PatchSeller.DAL\PatchSeller.DAL.csproj" />
   </ItemGroup>
 
