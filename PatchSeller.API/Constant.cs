@@ -1,4 +1,4 @@
-﻿namespace PatchSeller.API
+namespace PatchSeller.API
 {
     public class Constant
     {
@@ -28,6 +28,7 @@
             public const string PasswordIsTheSame = "password_same";
 
             // Not Found Errors
+            public const string InvalidPatchId = "invalid_patch_id";
             public const string CustomerNotFound = "customer_not_found";
             public const string StaffNotFound = "staff_not_found";
             public const string CustomerNotFoundWidthEmailOrPhone = "customer_not_found_with_email_or_phone";
