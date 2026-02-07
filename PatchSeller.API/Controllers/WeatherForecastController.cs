@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PatchSeller.API.Utilities;
+using GoogleServiceLib;
 
 namespace PatchSeller.API.Controllers
 {
@@ -12,14 +13,53 @@ namespace PatchSeller.API.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IGoogleDriveService _googleDriveService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(IGoogleDriveService googleDriveService)
         {
-            _logger = logger;
+            _googleDriveService = googleDriveService;
         }
 
+
+
         [HttpPost("upload")]
+        public async Task<IActionResult> Upload(IFormFile file, string fileName)
+        {
+            using var stream = file.OpenReadStream();
+            var link = await _googleDriveService.UploadFileAsync(stream, fileName);
+            return Ok(link);
+        }
+
+        [HttpGet("delete-file-goole")]
+        public async Task<bool> DeleteFileGoogle(string url)
+        {
+            var result  = await _googleDriveService.DeleteFileAsync(url);
+            if (result == true)
+                return true;
+            return false;
+        }
+
+        [HttpGet("check-file")]
+        public async Task<IActionResult> CheckFile(string url)
+        {
+            var file = await _googleDriveService.GetFileMetadataAsync(url);
+
+            if (file == null)
+            {
+                return NotFound(new { message = "File không tồn tại" });
+            }
+
+            return Ok(new
+            {
+                exists = true,
+                name = file.Name,
+                sizeMb = Math.Round((double)(file.Size ?? 0) / (1024 * 1024), 2)
+            });
+        }
+
+
+
+        [HttpPost("upload-file")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {

@@ -1,3 +1,4 @@
+using GoogleServiceLib;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -60,6 +61,7 @@ builder.Services.AddSwaggerGen(opt =>
 
 builder.Services.AddScoped<StaffRepository>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<IGoogleDriveService, GoogleDriveService>();
 
 var app = builder.Build();
 

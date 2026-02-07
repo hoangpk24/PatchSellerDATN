@@ -47,7 +47,7 @@ namespace PatchSeller.API.Controllers.Admin
                         PatchVersionId = pv.PatchVersionId,
                         WorkWithGameVersion = pv.WorkWithGameVersion,
                         VersionName = pv.VersionName,
-                        FileUrl = pv.FileUrl,
+                        Links = pv.Links,
                         FileSize = pv.FileSize,
                         ExtractionPassword = pv.ExtractionPassword,
                         InstallationGuide = pv.InstallationGuide,
