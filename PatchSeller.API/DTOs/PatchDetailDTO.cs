@@ -29,7 +29,7 @@ namespace PatchSeller.API.DTOs
         public int PatchVersionId { get; set; }
         public string WorkWithGameVersion { get; set; }
         public string VersionName { get; set; }
-        public string FileUrl { get; set; }
+        public string Links { get; set; }
         public long FileSize { get; set; }
         public string ExtractionPassword { get; set; }
         public string InstallationGuide { get; set; }
