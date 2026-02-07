@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="GoogleServiceLib/GoogleServiceLib.csproj" Id="aeb4f663-6f43-4045-9e63-e7ca32b94ebd" />
   <Project Path="PatchSeller.API/PatchSeller.API.csproj" />
   <Project Path="PatchSeller.DAL/PatchSeller.DAL.csproj" />
   <Project Path="PatchSeller.Web/PatchSeller.Web.csproj" />
