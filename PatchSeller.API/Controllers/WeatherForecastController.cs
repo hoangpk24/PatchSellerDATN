@@ -8,11 +8,7 @@ namespace PatchSeller.API.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
+       
         private readonly IGoogleDriveService _googleDriveService;
 
         public WeatherForecastController(IGoogleDriveService googleDriveService)
@@ -30,7 +26,7 @@ namespace PatchSeller.API.Controllers
             return Ok(link);
         }
 
-        [HttpGet("delete-file-goole")]
+        [HttpGet("delete-file-google")]
         public async Task<bool> DeleteFileGoogle(string url)
         {
             var result  = await _googleDriveService.DeleteFileAsync(url);
@@ -59,22 +55,24 @@ namespace PatchSeller.API.Controllers
 
 
 
-        [HttpPost("upload-file")]
+        [HttpPost("upload-file-to-server")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadFile(IFormFile file)
-        {
-            string _storagePath = "D:\\OutS\\Upload";
+        public async Task<IActionResult> UploadFile(IFormFile file, string gameTitle, string patchTitle,string version)
+        {          
+
+            string _storagePath = Environment.GetEnvironmentVariable("STORAGE_PATH")?? Directory.GetCurrentDirectory().Replace("PatchSeller.API", "PatchSeller.Web") + "\\wwwroot\\uploads\\patchs"+"\\"+gameTitle+"\\"+patchTitle+"\\"+version;
+            if (!Directory.Exists(_storagePath))
+            {
+                Directory.CreateDirectory(_storagePath);
+            }            
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
-
             var trustedFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
             var filePath = Path.Combine(_storagePath, trustedFileName);
-
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
-
             string fullFilePath = Path.Combine(_storagePath, trustedFileName);
             SecurityService securityService = new SecurityService();
             var result = await securityService.ScanWithDefenderAsync(fullFilePath);
@@ -83,8 +81,6 @@ namespace PatchSeller.API.Controllers
                System.IO.File.Delete(fullFilePath);
                 return BadRequest("Có mã độc");
             }    
-
-
             return Ok(new { FileName = trustedFileName, Path = filePath });
         }
     }

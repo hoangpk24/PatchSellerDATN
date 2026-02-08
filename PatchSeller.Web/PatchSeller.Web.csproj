@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="Services\Customer\" />
+    <Folder Include="wwwroot\uploads\patchs\" />
   </ItemGroup>
 
 </Project>
