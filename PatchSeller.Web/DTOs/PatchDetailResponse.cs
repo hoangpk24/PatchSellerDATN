@@ -1,6 +1,6 @@
-namespace PatchSeller.API.DTOs
+﻿namespace PatchSeller.Web.DTOs
 {
-    public class PatchDetailDTO
+    public class PatchDetailResponse
     {
         public int PatchId { get; set; }
         public string Name { get; set; }
@@ -10,7 +10,7 @@ namespace PatchSeller.API.DTOs
         public int Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int GameId { get; set; }
-        public GameDTO Game { get; set; } = new GameDTO();
+        public GameDTO Game { get; set; }
         public List<PatchImageBasicDTO> PatchImages { get; set; } = new List<PatchImageBasicDTO>();
         public List<PatchVersionBasicDTO> PatchVersions { get; set; } = new List<PatchVersionBasicDTO>();
     }

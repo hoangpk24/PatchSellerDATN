@@ -71,6 +71,14 @@
             public const string GameCreate = "/admin/game/create";
             public const string GameUpdate = "/admin/game/update";
             public const string GameDelete = "/admin/game/delete/:id";
+
+            // Patch
+            public const string PatchGetAll = "/admin/patch/get-all-patches";
+            public const string PatchDetailGetAll = "/admin/patch/get-all-patches-detail";
+            public const string PatchGetById = "/admin/patch/get-patch-by-id/:id";
+            public const string PatchCreate = "/admin/patch/create";
+            public const string PatchUpdate = "/admin/patch/update";
+            public const string PatchDelete = "/admin/patch/delete/:id";
         }
     }
 }
