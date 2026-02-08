@@ -217,6 +217,14 @@ namespace PatchSeller.API.Controllers.Public
                     userPurchase.PurchasedAt = DateTime.Now;
                     await userPurchaseRepository.Create(userPurchase);
                 }
+
+                UserRepository userRepository = new UserRepository();
+                var user = await userRepository.GetById(order.UserId);
+                if(user != null)
+                {
+                    user.RewardPoint += order.FinalAmount*0.05;
+                    await userRepository.Update(user);
+                }
                 return Ok(order);
             }
             catch (Exception)
