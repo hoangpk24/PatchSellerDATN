@@ -835,8 +835,8 @@ video {
   display: none;
 }
 
-.\!aspect-\[1\/1\.5\] {
-  aspect-ratio: 1/1.5 !important;
+.\!aspect-\[1\/1\.6\] {
+  aspect-ratio: 1/1.6 !important;
 }
 
 .aspect-\[1\/1\.2\] {
@@ -847,8 +847,8 @@ video {
   aspect-ratio: 1/1.5;
 }
 
-.aspect-\[1\/1\.7\] {
-  aspect-ratio: 1/1.7;
+.aspect-\[1\/1\.6\] {
+  aspect-ratio: 1/1.6;
 }
 
 .aspect-\[16\/9\] {
@@ -861,14 +861,6 @@ video {
 
 .aspect-video {
   aspect-ratio: 16 / 9;
-}
-
-.aspect-\[1\/1\.6\] {
-  aspect-ratio: 1/1.6;
-}
-
-.\!aspect-\[1\/1\.6\] {
-  aspect-ratio: 1/1.6 !important;
 }
 
 .\!h-10 {
