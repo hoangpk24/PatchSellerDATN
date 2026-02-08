@@ -26,11 +26,23 @@ namespace PatchSeller.API.Controllers.Public
                 {
                     return BadRequest("Chỉ áp dụng cho khách hàng đã đăng nhập");
                 }
+                UserRepository userRepository = new UserRepository();
+                var user = await userRepository.GetById(int.Parse(userIdClaim));
+                if (user == null)
+                {
+                    return BadRequest("Khách hàng không tồn tại");
+                }
+           
 
                 var discountCode = await discountCodeRepository.GetDiscountCodeByCode(code);
                 if (discountCode == null)
                 {
                     return NotFound(Constant.ErrorCode.DataNotFound);
+                }
+
+                if (discountCode.RankId != null && discountCode.RankId >user.RankId)
+                {
+                    return BadRequest("Mã giảm giá không áp dụng cho rank này");
                 }
 
                 int userTimeUsed = await discountCodeRepository.GetUserTimeUsed(code, int.Parse(userIdClaim));
