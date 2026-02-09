@@ -125,7 +125,26 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return NotFound(Constant.ErrorCode.NotFound);
                 }
-                return Ok(result);
+                return (result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
+
+        [HttpGet("get-patch-detail-by-id/{id}")]
+        public async Task<ActionResult<PatchDetailDTO>> GetPatchDetailById(int id)
+        {
+            try
+            {
+                var result = await _patchRepository.GetDetailById(id);
+                if (result == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+                }
+                var dto = MapToPatchDetailDTO(result);
+                return Ok(dto);
             }
             catch (Exception ex)
             {

@@ -1,6 +1,6 @@
 ﻿<MudDialog>
     <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa gói</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa phiên bản</MudText>
     </TitleContent>
     <DialogContent>
         <MudText>Bạn chắc chắn muốn xóa không?</MudText>
@@ -20,7 +20,7 @@
 
     async Task OnSubmit()
     {
-        var res = await _adminPatchService.Delete(id);
+        var res = await _adminPatchVersionService.Delete(id);   
 
         if (res)
         {

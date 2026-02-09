@@ -71,6 +71,30 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<Patch> GetDetailById(int id)
+        {
+            try
+            {
+                var patch = await _context.Patches
+                    .Where(x => x.PatchId == id && x.Delete != true)
+                    .Include(x => x.PatchVersions)
+                    .Include(x => x.UserPurchases)
+                    .Include(x => x.PatchImages)
+                    .FirstOrDefaultAsync();
+
+                if (patch == null)
+                {
+                    return null;
+                }
+             
+                return patch;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<Patch> GetById(int id)
         {
             try

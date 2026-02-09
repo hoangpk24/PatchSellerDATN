@@ -5,29 +5,25 @@ using PatchSeller.Web.Models;
 
 namespace PatchSeller.Web.Services.Admin
 {
-    public class AdminPatchService
+    public class AdminPatchVersionService
     {
         private readonly HttpClient _httpClient;
 
-        public AdminPatchService(HttpClient httpClient)
+        public AdminPatchVersionService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public async Task<ServiceResult<List<Patch>>> GetAll(string? keyword = null)
+        public async Task<ServiceResult<List<PatchVersionDetailResponse>>> GetAll()
         {
-            var url = string.IsNullOrEmpty(keyword)
-                      ? Constant.EndPointApi.Admin.PatchGetAll
-                      : $"{Constant.EndPointApi.Admin.PatchGetAll}?keyword={keyword}";
-
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.PatchVersionGetAll);
 
             var response = await _httpClient.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<List<Patch>>();
-                return ServiceResult<List<Patch>>.Success(result);
+                var result = await response.Content.ReadFromJsonAsync<List<PatchVersionDetailResponse>>();
+                return ServiceResult<List<PatchVersionDetailResponse>>.Success(result);
             }
             else
             {
@@ -37,20 +33,20 @@ namespace PatchSeller.Web.Services.Admin
                 var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
                                     ? Constant.Constant.Errors[errorCode ?? ""]
                                     : result;
-                return ServiceResult<List<Patch>>.Failure(result, errorMess, response.StatusCode.ToString());
+                return ServiceResult<List<PatchVersionDetailResponse>>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
 
-        public async Task<ServiceResult<Patch>> GetById(int id)
+        public async Task<ServiceResult<PatchVersionDetailResponse>> GetById(int id)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.PatchGetById.Replace(":id", id.ToString()));
+            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.PatchVersionGetById.Replace(":id", id.ToString()));
 
             var response = await _httpClient.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<Patch>();
-                return ServiceResult<Patch>.Success(result);
+                var result = await response.Content.ReadFromJsonAsync<PatchVersionDetailResponse>();
+                return ServiceResult<PatchVersionDetailResponse>.Success(result);
             }
             else
             {
@@ -60,20 +56,20 @@ namespace PatchSeller.Web.Services.Admin
                 var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
                                     ? Constant.Constant.Errors[errorCode ?? ""]
                                     : result;
-                return ServiceResult<Patch>.Failure(result, errorMess, response.StatusCode.ToString());
+                return ServiceResult<PatchVersionDetailResponse>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
 
-        public async Task<ServiceResult<PatchDetailResponse>> GetDetailById(int id)
+        public async Task<ServiceResult<PatchVersionDetailResponse>> GetByGameId(int id)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.PatchDetailGetById.Replace(":id", id.ToString()));
+            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.PatchVersionGetByGameId.Replace(":id", id.ToString()));
 
             var response = await _httpClient.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<PatchDetailResponse>();
-                return ServiceResult<PatchDetailResponse>.Success(result);
+                var result = await response.Content.ReadFromJsonAsync<PatchVersionDetailResponse>();
+                return ServiceResult<PatchVersionDetailResponse>.Success(result);
             }
             else
             {
@@ -83,24 +79,20 @@ namespace PatchSeller.Web.Services.Admin
                 var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
                                     ? Constant.Constant.Errors[errorCode ?? ""]
                                     : result;
-                return ServiceResult<PatchDetailResponse>.Failure(result, errorMess, response.StatusCode.ToString());
+                return ServiceResult<PatchVersionDetailResponse>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
 
-        public async Task<ServiceResult<List<PatchDetailResponse>>> GetAllWithDetail(string? keyword = null)
+        public async Task<ServiceResult<PatchVersionDetailResponse>> GetByPatchId(int id)
         {
-            var url = string.IsNullOrEmpty(keyword)
-                      ? Constant.EndPointApi.Admin.PatchDetailGetAll
-                      : $"{Constant.EndPointApi.Admin.PatchDetailGetAll}?keyword={keyword}";
-
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.PatchVersionGetByPatchId.Replace(":id", id.ToString()));
 
             var response = await _httpClient.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<List<PatchDetailResponse>>();
-                return ServiceResult<List<PatchDetailResponse>>.Success(result);
+                var result = await response.Content.ReadFromJsonAsync<PatchVersionDetailResponse>();
+                return ServiceResult<PatchVersionDetailResponse>.Success(result);
             }
             else
             {
@@ -110,14 +102,14 @@ namespace PatchSeller.Web.Services.Admin
                 var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
                                     ? Constant.Constant.Errors[errorCode ?? ""]
                                     : result;
-                return ServiceResult<List<PatchDetailResponse>>.Failure(result, errorMess, response.StatusCode.ToString());
+                return ServiceResult<PatchVersionDetailResponse>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
 
-        public async Task<ServiceResult<Patch>> CreatePatch(PatchModel patch, string token)
+        public async Task<ServiceResult<PatchVersion>> CreatePatchVersion(PatchVersionModel patchVersion, string token)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, Constant.EndPointApi.Admin.PatchCreate);
-            request.Content = JsonContent.Create(patch);
+            var request = new HttpRequestMessage(HttpMethod.Post, Constant.EndPointApi.Admin.PatchVersionCreate);
+            request.Content = JsonContent.Create(patchVersion);
             if (!string.IsNullOrEmpty(token))
             {
                 var formatToken = token.Trim('"');
@@ -127,8 +119,8 @@ namespace PatchSeller.Web.Services.Admin
             var response = await _httpClient.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<Patch>();
-                return ServiceResult<Patch>.Success(result);
+                var result = await response.Content.ReadFromJsonAsync<PatchVersion>();
+                return ServiceResult<PatchVersion>.Success(result);
             }
             else
             {
@@ -137,26 +129,25 @@ namespace PatchSeller.Web.Services.Admin
                 var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
                                     ? Constant.Constant.Errors[errorCode ?? ""]
                                     : result;
-                return ServiceResult<Patch>.Failure(result, errorMess, response.StatusCode.ToString());
+                return ServiceResult<PatchVersion>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
 
-        public async Task<ServiceResult<Patch>> UpdatePatch(PatchModel patch, string token)
+        public async Task<ServiceResult<PatchVersion>> UpdatePatchVersion(PatchVersionModel patchVersion, string token)
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, Constant.EndPointApi.Admin.PatchUpdate);
-            request.Content = JsonContent.Create(patch); 
+            var request = new HttpRequestMessage(HttpMethod.Put, Constant.EndPointApi.Admin.PatchVersionUpdate);
+            request.Content = JsonContent.Create(patchVersion);
             if (!string.IsNullOrEmpty(token))
             {
                 var formatToken = token.Trim('"');
                 request.Headers.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", formatToken);
             }
-
             var response = await _httpClient.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<Patch>();
-                return ServiceResult<Patch>.Success(result);
+                var result = await response.Content.ReadFromJsonAsync<PatchVersion>();
+                return ServiceResult<PatchVersion>.Success(result);
             }
             else
             {
@@ -165,13 +156,13 @@ namespace PatchSeller.Web.Services.Admin
                 var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
                                     ? Constant.Constant.Errors[errorCode ?? ""]
                                     : result;
-                return ServiceResult<Patch>.Failure(result, errorMess, response.StatusCode.ToString());
+                return ServiceResult<PatchVersion>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
 
         public async Task<bool> Delete(int id)
         {
-            var request = new HttpRequestMessage(HttpMethod.Delete, Constant.EndPointApi.Admin.PatchDelete.Replace(":id", id.ToString()));
+            var request = new HttpRequestMessage(HttpMethod.Delete, Constant.EndPointApi.Admin.PatchVersionDelete.Replace(":id", id.ToString()));
 
             var response = await _httpClient.SendAsync(request);
 
