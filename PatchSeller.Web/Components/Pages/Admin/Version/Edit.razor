@@ -145,7 +145,7 @@
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.Edit"
                            OnClick="@(async () => await OnSubmit())"
-                           Disabled="@_isLoading"
+                           Disabled="@(_isLoading || _isLoadingUpload)"
                            Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
                     Sửa
                 </MudButton>

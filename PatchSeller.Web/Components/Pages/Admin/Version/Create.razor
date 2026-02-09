@@ -107,7 +107,8 @@
                     <ActivatorContent>
                         <MudButton Variant="Variant.Filled"
                                    Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.CloudUpload">
+                                   Disabled="@(_uploadFileResponse != null || _isLoadingUpload || _isLoading)"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload">                                  
                             Upload Files
                         </MudButton>
                     </ActivatorContent>
@@ -145,7 +146,7 @@
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.Add"
                            OnClick="@(async () => await OnSubmit())"
-                           Disabled="@_isLoading"
+                           Disabled="@(_isLoading || _isLoadingUpload)"
                            Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
                     Tạo mới
                 </MudButton>
