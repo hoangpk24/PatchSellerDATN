@@ -38,6 +38,7 @@ namespace PatchSeller.API.Controllers.Admin
                 StaffId = pv.StaffId,
                 GameId = pv.Patch?.GameId ?? 0,
                 GameName = pv.Patch?.Game?.Title ?? string.Empty,
+                StaffName = pv.Staff?.FullName ?? string.Empty,
                 PatchName = pv.Patch?.Name ?? string.Empty,
                 PatchDescription = pv.Patch?.Description ?? string.Empty,
                 UploaderFullName = pv.Staff?.FullName ?? string.Empty,

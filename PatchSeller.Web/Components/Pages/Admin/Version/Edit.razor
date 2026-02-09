@@ -3,11 +3,250 @@
 
 <PageTitle>@Constant.PageTitleAdmin Patch Version Edit</PageTitle>
 
-<section class="p-6">
-    <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa phiên bản việt hóa</h1>
+<section class="mx-auto max-w-[1280px] p-6">
+    <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa phiên bản</h1>
+
+    <div class="rounded bg-white p-10 shadow-md">
+        <MudForm Model="_model" @ref="_form" Validation="_schema.ValidateValue">
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Phiên bản</label> <span class="ml-1 text-red-500">*</span>
+
+                <MudTextField T="string"
+                              @bind-Value="_model.VersionName"
+                              For="@(() => _model.VersionName)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Ví dụ: v1.1..."
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tóm tắt phiên bản</label> <span class="ml-1 text-red-500">*</span>
+
+                <MudTextField T="string"
+                              Lines="5"
+                              @bind-Value="_model.Changelog"
+                              For="@(() => _model.Changelog)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Nhập tóm tắt ngắn gọn về phiên bản này..."
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Mật khẩu giải nén</label>
+
+                <MudTextField T="string"
+                              @bind-Value="_model.ExtractionPassword"
+                              For="@(() => _model.ExtractionPassword)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Nhập mật khẩu nếu có..."
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Quy trình cài đặt</label>
+
+                <RichTextEditor @bind-Content="@_model.InstallationGuide"
+                                Placeholder="Quy trình các bước cài đặt..."
+                                ToolbarOptions="@ToolbarOptions.FullToolbarOptions"
+                                Theme="@QuillTheme.Snow" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Thuộc gói</label> <span class="ml-1 text-red-500">*</span>
+
+                <MudSelect T="int" @bind-Value="_model.PatchId" For="@(() => _model.PatchId)" Variant="Variant.Outlined" Placeholder="Riot Games" Margin="Margin.Dense">
+                    <MudSelectItem Value="0">- Vui lòng chọn -</MudSelectItem>
+                    @if (_lstPatch.Any())
+                    {
+                        @foreach (var item in _lstPatch)
+                        {
+                            <MudSelectItem Value="@item.PatchId">@item.Name</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Nhân viên sửa</label> <span class="ml-1 text-red-500">*</span>
+
+                <MudSelect T="int" @bind-Value="_model.StaffId" For="@(() => _model.StaffId)" Variant="Variant.Outlined" Placeholder="Riot Games" Margin="Margin.Dense">
+                    <MudSelectItem Value="0">- Vui lòng chọn -</MudSelectItem>
+                    @if (_lstStaff.Any())
+                    {
+                        @foreach (var item in _lstStaff)
+                        {
+                            <MudSelectItem Value="@item.StaffId">@item.FullName</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Ghi chú</label>
+
+                <MudTextField T="string"
+                              Lines="5"
+                              @bind-Value="_model.Note"
+                              For="@(() => _model.Note)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Nhập ghi chú..."
+                              Margin="Margin.Dense" />
+            </div>
+
+            <MudDivider Class="mb-8 mt-4 !border-slate-200" />
+
+            <div class="flex items-center justify-end gap-3">
+                <MudButton Variant="Variant.Text"
+                           Class="px-6 py-2 text-slate-500 hover:bg-slate-200"
+                           OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Version)">
+                    Quay lại
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Edit"
+                           OnClick="@(async () => await OnSubmit())"
+                           Disabled="@_isLoading"
+                           Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
+                    Sửa
+                </MudButton>
+            </div>
+        </MudForm>
+    </div>
 </section>
 
 @code {
     [Parameter]
     public int id { get; set; }
+
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public MineResponse _mine { get; set; }
+
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    MudForm _form = new MudForm();
+    List<DAL.Models.Patch> _lstPatch = [];
+    List<DAL.Models.Staff> _lstStaff = [];
+    PatchVersionModel _model = new PatchVersionModel();
+    PatchVersionSchema.CreateUpdate _schema = new PatchVersionSchema.CreateUpdate();
+
+    bool _isLoading = false;
+    string _content = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+        }
+        catch (Exception)
+        {
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var response = await _adminPatchService.GetAll();
+        if (response.IsSuccess)
+        {
+            _lstPatch = response.Data;
+        }
+
+        var responseStaff = await _adminStaffService.GetAll();
+        if (responseStaff.IsSuccess)
+        {
+            _lstStaff = responseStaff.Data;
+        }
+
+        var resPatchVersion = await _adminPatchVersionService.GetById(id);
+
+        if(resPatchVersion.IsSuccess)
+        {
+            var data = resPatchVersion.Data;
+            _model = new PatchVersionModel
+            {
+                PatchVersionId = data.PatchVersionId,
+                PatchId = data.PatchId,
+                Changelog = data.Changelog,
+                ExtractionPassword = data.ExtractionPassword,
+                InstallationGuide = data.InstallationGuide,
+                StaffId = data.StaffId,
+                Status = data.Status,
+                FileSize = data.FileSize,
+                Links = data.Links,
+                Note =data.Note,
+                VersionName = data.VersionName,
+                WorkWithGameVersion = data.WorkWithGameVersion,
+            };
+        }
+        else if (resPatchVersion.IsSuccess == false && resPatchVersion.StatusCode == "NotFound")
+        {
+            _snackbar.Add("Không tìm thấy này.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.NotFound);
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho quản trị.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.Admin.Patch);
+        }
+    }
+
+    async Task OnSubmit()
+    {
+        if (_isLoading) return;
+
+        try
+        {
+            _isLoading = true;
+            await _form.Validate();
+
+            if (!_form.IsValid) return;
+
+            if (string.IsNullOrEmpty(_model.InstallationGuide))
+            {
+                _snackbar.Add("Vui lòng nhập quy trình cài đặt", MudBlazor.Severity.Warning);
+                return;
+            }
+
+            _model.VersionName = _model.VersionName.Trim();
+            if (!string.IsNullOrEmpty(_model.InstallationGuide)) _model.InstallationGuide = _model.InstallationGuide.Trim();
+            if (!string.IsNullOrEmpty(_model.Note)) _model.Note = _model.Note.Trim();
+            if (!string.IsNullOrEmpty(_model.Changelog)) _model.Changelog = _model.Changelog.Trim();
+
+            var res = await _adminPatchVersionService.UpdatePatchVersion(_model, _token);
+
+            if (res.IsSuccess)
+            {
+                _snackbar.Add("Sửa thành công", MudBlazor.Severity.Success);
+                navigation.NavigateTo(RouterConfig.Admin.Version);
+            }
+            else
+            {
+                _snackbar.Add("Sửa thất bại", MudBlazor.Severity.Error);
+            }
+        }
+        catch (Exception)
+        {
+            _isLoading = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 }
+
+<style>
+    .reset-css,
+    .reset-css * {
+        all: unset;
+        all: revert;
+        box-sizing: border-box;
+    }
+</style>
+

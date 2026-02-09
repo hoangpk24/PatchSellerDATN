@@ -120,6 +120,7 @@ namespace PatchSeller.DAL.Repository
             try
             {
                 version.Delete = false;
+                version.CreateAt = DateTime.Now;
                 var added = _context.PatchVersions.Add(version).Entity;
                 await _context.SaveChangesAsync();
                 return added;

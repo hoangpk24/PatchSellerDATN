@@ -4,7 +4,7 @@
 <PageTitle>@Constant.PageTitleAdmin Patch Edit</PageTitle>
 
 <section class="p-6">
-    <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa gói việt hóa</h1>
+    <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa gói</h1>
 
     <div class="rounded bg-white p-10 shadow-md">
         <MudForm Model="_model" @ref="_form" Validation="_patchSchema.ValidateValue">
@@ -14,7 +14,7 @@
                               @bind-Value="_model.Name"
                               For="@(() => _model.Name)"
                               Variant="Variant.Outlined"
-                              Placeholder="Ví dụ: Gói việt hóa..."
+                              Placeholder="Ví dụ: Gói..."
                               Margin="Margin.Dense" />
             </div>
 
@@ -58,7 +58,7 @@
 
             <div class="mb-6">
                 <label class="mb-2 block text-sm font-bold uppercase tracking-wider text-slate-700">Trạng thái hiển thị</label>
-                <MudRadioGroup T="int" @bind-Value="_model.Status" For="@(() => _model.Status)">
+                <MudRadioGroup Disabled="@(_patchDetail.PatchVersions == null || (_patchDetail.PatchVersions != null && !_patchDetail.PatchVersions.Any()))" T="int" @bind-Value="_model.Status" For="@(() => _model.Status)">
                     <div class="flex gap-6">
                         <MudRadio Value="1" Color="Color.Primary" Class="!ml-0">
                             <span class="text-sm font-medium text-slate-600">Hoạt động</span>
@@ -101,6 +101,7 @@
 
     MudForm _form = new MudForm();
     PatchModel _model = new PatchModel();
+    PatchDetailResponse _patchDetail = new PatchDetailResponse();
     List<DAL.Models.Game> _lstGame = new List<DAL.Models.Game>();
     PatchSchema.CreateUpdate _patchSchema = new PatchSchema.CreateUpdate();
 
@@ -132,9 +133,10 @@
             _model.GameId = resGame.Data.FirstOrDefault()?.GameId ?? 0;
         }
 
-        var resPatch = await _adminPatchService.GetById(id);
+        var resPatch = await _adminPatchService.GetDetailById(id);
         if (resPatch.IsSuccess && resPatch.Data != null)
         {
+            _patchDetail = resPatch.Data;
             _model = new PatchModel             
             {
                 PatchId = resPatch.Data.PatchId,
@@ -145,7 +147,18 @@
                 Status = resPatch.Data.Status,
             };
         }
+        else if (resPatch.IsSuccess == false && resPatch.StatusCode == "NotFound")
+        {
+            _snackbar.Add("Không tìm thấy này.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.NotFound);
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho khách hàng.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.Admin.Staff);
+        }
     }
+
     async Task OnSubmit()
     {
         if (_isLoading) return;

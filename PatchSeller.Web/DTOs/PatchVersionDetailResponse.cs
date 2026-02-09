@@ -1,6 +1,6 @@
-namespace PatchSeller.API.DTOs
+namespace PatchSeller.Web.DTOs
 {
-    public class PatchVersionDetailDTO
+    public class PatchVersionDetailResponse
     {
         public int PatchVersionId { get; set; }
         public string WorkWithGameVersion { get; set; } = string.Empty;
@@ -24,6 +24,15 @@ namespace PatchSeller.API.DTOs
         public string PatchName { get; set; } = string.Empty;
         public string PatchDescription { get; set; } = string.Empty;
         public string UploaderFullName { get; set; } = string.Empty;
-        public List<PatchImageBasicDTO> PatchImages { get; set; } = new List<PatchImageBasicDTO>();
+        public List<PatchImageBasicResponse> PatchImages { get; set; } = new List<PatchImageBasicResponse>();
+    }
+
+    public class PatchImageBasicResponse
+    {
+        public int PatchImageId { get; set; }
+        public string URL { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public bool IsThumbnail { get; set; }
     }
 }
