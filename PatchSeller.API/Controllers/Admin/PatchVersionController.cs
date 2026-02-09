@@ -180,7 +180,7 @@ namespace PatchSeller.API.Controllers.Admin
                 }
 
                 return Ok(result);
-            }
+                }
             catch (Exception)
             {
                 return StatusCode(500, Constant.ErrorCode.OtherError);
@@ -188,7 +188,7 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult<PatchVersion>> Update([FromBody] PatchVersionUpdateDTO dto)
+        public async Task<ActionResult<PatchVersionDetailDTO>> Update([FromBody] PatchVersionUpdateDTO dto)
         {
             try
             {
@@ -237,7 +237,13 @@ namespace PatchSeller.API.Controllers.Admin
                     return StatusCode(500, Constant.ErrorCode.DatabaseError);
                 }
 
-                return Ok(result);
+                var updatedDetail = await _patchVersionRepository.GetById(result.PatchVersionId);
+                if (updatedDetail == null)
+                {
+                    return StatusCode(500, Constant.ErrorCode.DatabaseError);
+                }
+
+                return Ok(MapToDetailDTO(updatedDetail));
             }
             catch (Exception)
             {
