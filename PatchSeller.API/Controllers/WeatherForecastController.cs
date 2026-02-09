@@ -19,8 +19,12 @@ namespace PatchSeller.API.Controllers
 
 
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload(IFormFile file, string fileName)
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(MultipartBodyLengthLimit = 10737418240)]
+        public async Task<IActionResult> Upload(IFormFile file, [FromForm] string fileName)
         {
+            if (file == null || file.Length == 0) return BadRequest(Constant.ErrorCode.DataRequired);
+
             using var stream = file.OpenReadStream();
             var link = await _googleDriveService.UploadFileAsync(stream, fileName);
             return Ok(link);

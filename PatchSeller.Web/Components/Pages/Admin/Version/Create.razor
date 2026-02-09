@@ -3,6 +3,13 @@
 
 <PageTitle>@Constant.PageTitleAdmin Patch Version Create</PageTitle>
 
+@if(_isLoadingUpload)
+{
+    <div class="absolute bottom-0 left-0 right-0 top-0 z-20 bg-black/50">
+        <Loading />    
+    </div>
+}
+
 <section class="mx-auto max-w-[1280px] p-6">
     <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo phiên bản</h1>
 
@@ -93,6 +100,39 @@
                               Margin="Margin.Dense" />
             </div>
 
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tải lên file</label>
+
+                <MudFileUpload T="IBrowserFile" FilesChanged="@(async (file) => await UploadFile(file))">
+                    <ActivatorContent>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload">
+                            Upload Files
+                        </MudButton>
+                    </ActivatorContent>
+                </MudFileUpload>
+
+                @if(_uploadFileResponse != null)
+                {
+                    <div class="mt-4 flex items-center gap-4 rounded border border-slate-200 bg-slate-50 p-4">
+                        <div class="flex-1">
+                            <div class="font-bold text-slate-700">@_fileName</div>
+                            <div class="text-sm text-slate-500">Kích thước: @_uploadFileResponse.SizeMb mb</div>
+                        </div>
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Error"
+                                   StartIcon="@Icons.Material.Filled.Delete"
+                                   OnClick="RemoveFileAsync">
+                            Xóa file
+                        </MudButton>
+                    </div>
+                }
+                <div>
+
+                </div>
+            </div>
+
             <MudDivider Class="mb-8 mt-4 !border-slate-200" />
 
             <div class="flex items-center justify-end gap-3">
@@ -117,14 +157,16 @@
 @code {
     [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
     public string _token { get; set; }
-
     MudForm _form = new MudForm();
+    UploadFileResponse _uploadFileResponse = null;
     List<DAL.Models.Patch> _lstPatch = [];
     List<DAL.Models.Staff> _lstStaff = [];
     PatchVersionModel _model = new PatchVersionModel();
     PatchVersionSchema.CreateUpdate _schema = new PatchVersionSchema.CreateUpdate();
 
     bool _isLoading = false;
+    string _fileName = string.Empty;
+    bool _isLoadingUpload = false;
     string _content = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -158,8 +200,89 @@
         }
     }
 
+    private async Task UploadFile(IBrowserFile file)
+    {
+        if (file == null) return;
+
+        try
+        {
+            _isLoadingUpload = true;
+            long maxFileSize = 10L * 1024 * 1024 * 1024;
+
+            using var stream = file.OpenReadStream(maxAllowedSize: maxFileSize);
+
+            var res = await _adminUploadService.UploadFileAsync(stream, file.Name);
+
+            if (res.IsSuccess)
+            {
+                _uploadFileResponse = res.Data;
+                _fileName = file.Name;
+                _model.Links = res.Data.Link;
+                _model.FileSize = file.Size;
+                _snackbar.Add("Tải file lên thành công!", MudBlazor.Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add($"Lỗi upload: {res.ErrorMessage}", MudBlazor.Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Có lỗi xảy ra: {ex.Message}", MudBlazor.Severity.Error);
+        }
+        finally
+        {
+            _isLoadingUpload = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RemoveFileAsync()
+    {
+        if (_uploadFileResponse == null) return;
+
+        try
+        {
+            _isLoadingUpload = true;
+
+            var res = await _adminUploadService.DeleteFileAsync(_uploadFileResponse.Link);
+
+            if(res.IsSuccess)
+            {
+                _snackbar.Add("Xóa file thành công!", MudBlazor.Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add($"Lỗi xóa file: {res.ErrorMessage}", MudBlazor.Severity.Error);
+            }
+        } catch (Exception)
+        {
+        }
+        finally
+        {
+            _isLoadingUpload = false;
+            _uploadFileResponse = null;
+            _fileName = string.Empty;
+            _model.Links = string.Empty;
+            _model.FileSize = 0;
+            StateHasChanged();
+        }
+    }
+
     async Task OnSubmit()
     {
+        if (_isLoadingUpload)
+        {
+            _snackbar.Add("Vui lòng đợi file tải lên hoàn tất", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        if( _uploadFileResponse == null)
+        {
+            _snackbar.Add("Vui lòng tải lên file trước khi tạo phiên bản", MudBlazor.Severity.Warning);
+            return;
+        }
+
         if (_isLoading) return;
 
         try
@@ -176,8 +299,8 @@
             }
 
             _model.VersionName = _model.VersionName.Trim();
-            _model.Links = "/seed/files/warzone-visual-v1_1.zip";
-            _model.FileSize = 8450000;
+            _model.Links = _uploadFileResponse.LinkDownload;
+            _model.FileSize = _uploadFileResponse.Size ?? 0;
             if (!string.IsNullOrEmpty(_model.InstallationGuide)) _model.InstallationGuide = _model.InstallationGuide.Trim();
             if (!string.IsNullOrEmpty(_model.Note)) _model.Note = _model.Note.Trim();
             if (!string.IsNullOrEmpty(_model.Changelog)) _model.Changelog = _model.Changelog.Trim();

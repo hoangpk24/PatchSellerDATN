@@ -3,6 +3,13 @@
 
 <PageTitle>@Constant.PageTitleAdmin Patch Version Edit</PageTitle>
 
+@if (_isLoadingUpload)
+{
+    <div class="absolute bottom-0 left-0 right-0 top-0 z-20 bg-black/50">
+        <Loading />
+    </div>
+}
+
 <section class="mx-auto max-w-[1280px] p-6">
     <h1 class="leading-[3rem] text-3xl font-bold text-material-default">Sửa phiên bản</h1>
 
@@ -82,6 +89,39 @@
             </div>
 
             <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tải lên file</label>
+
+                <MudFileUpload T="IBrowserFile" FilesChanged="@(async (file) => await UploadFile(file))">
+                    <ActivatorContent>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Disabled="@(_uploadFileResponse != null)"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload">
+                            Upload Files
+                        </MudButton>
+                    </ActivatorContent>
+                </MudFileUpload>
+
+                @if (_uploadFileResponse != null)
+                {
+                    <div class="mt-4 flex items-center gap-4 rounded border border-slate-200 bg-slate-50 p-4">
+                        <div class="flex-1">
+                            <div class="font-bold text-slate-700">@_fileName</div>
+                            <div class="text-sm text-slate-500">Kích thước: @_uploadFileResponse.SizeMb mb</div>
+                        </div>
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Error"
+                                   StartIcon="@Icons.Material.Filled.Delete"
+                                   OnClick="RemoveFileAsync">
+                            Xóa file
+                        </MudButton>
+                    </div>
+                }
+                <div>
+                </div>
+            </div>
+
+            <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Ghi chú</label>
 
                 <MudTextField T="string"
@@ -127,9 +167,14 @@
     MudForm _form = new MudForm();
     List<DAL.Models.Patch> _lstPatch = [];
     List<DAL.Models.Staff> _lstStaff = [];
+    UploadFileResponse _uploadFileResponse = null;
+    CheckFileResponse _checkFileResponse = null;
     PatchVersionModel _model = new PatchVersionModel();
     PatchVersionSchema.CreateUpdate _schema = new PatchVersionSchema.CreateUpdate();
 
+    string _fileName = string.Empty;
+    bool _isLoadingUpload = false;
+    string _oldFileLink = string.Empty;
     bool _isLoading = false;
     string _content = string.Empty;
 
@@ -163,6 +208,7 @@
             _lstStaff = responseStaff.Data;
         }
 
+
         var resPatchVersion = await _adminPatchVersionService.GetById(id);
 
         if(resPatchVersion.IsSuccess)
@@ -183,6 +229,22 @@
                 VersionName = data.VersionName,
                 WorkWithGameVersion = data.WorkWithGameVersion,
             };
+
+            if (!string.IsNullOrEmpty(data.Links))
+            {
+                _oldFileLink = data.Links;
+
+                var checkFile = await _adminUploadService.CheckFile(data.Links);
+                if (checkFile.IsSuccess)
+                {
+                    _uploadFileResponse = new UploadFileResponse
+                    {
+                        Link = data.Links,
+                        SizeMb = checkFile.Data.SizeMb,
+                    };
+                    _fileName = checkFile.Data.Name;
+                }
+            }
         }
         else if (resPatchVersion.IsSuccess == false && resPatchVersion.StatusCode == "NotFound")
         {
@@ -196,9 +258,82 @@
         }
     }
 
+    private async Task UploadFile(IBrowserFile file)
+    {
+        if (file == null) return;
+
+        try
+        {
+            _isLoadingUpload = true;
+
+            using var stream = file.OpenReadStream(maxAllowedSize: 10L * 1024 * 1024 * 1024);
+            var res = await _adminUploadService.UploadFileAsync(stream, file.Name);
+
+            if (res.IsSuccess)
+            {
+                _uploadFileResponse = res.Data;
+                _fileName = file.Name;
+                _snackbar.Add("Đã tải file mới lên thành công!", MudBlazor.Severity.Info);
+            }
+        }
+        catch (Exception ex) { /* handle ex */ }
+        finally
+        {
+            _isLoadingUpload = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RemoveFileAsync()
+    {
+        if (_uploadFileResponse == null) return;
+
+        try
+        {
+            _isLoadingUpload = true;
+
+            if (_uploadFileResponse.Link == _oldFileLink)
+            {
+                _snackbar.Add("Xóa file thành công!", MudBlazor.Severity.Success);
+                _uploadFileResponse = null;
+                return;
+            }
+
+            var res = await _adminUploadService.DeleteFileAsync(_uploadFileResponse.Link);
+
+            if (res.IsSuccess)
+            {
+                _snackbar.Add("Xóa file thành công!", MudBlazor.Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add($"Lỗi xóa file: {res.ErrorMessage}", MudBlazor.Severity.Error);
+            }
+        }
+        catch (Exception)
+        {
+        }
+        finally
+        {
+            _isLoadingUpload = false;
+            _uploadFileResponse = null;
+            _fileName = string.Empty;
+            _model.Links = string.Empty;
+            _model.FileSize = 0;
+            StateHasChanged();
+        }
+    }
+
     async Task OnSubmit()
     {
         if (_isLoading) return;
+
+
+        if (_uploadFileResponse == null)
+        {
+            _snackbar.Add("Vui lòng tải lên file trước khi sửa phiên bản", MudBlazor.Severity.Warning);
+            return;
+        }
 
         try
         {
@@ -213,7 +348,20 @@
                 return;
             }
 
+            if(_uploadFileResponse.Link != _oldFileLink)
+            {
+                if (!string.IsNullOrEmpty(_oldFileLink))
+                {
+                    var resDelete = await _adminUploadService.DeleteFileAsync(_oldFileLink);
+                }
+            }
+
             _model.VersionName = _model.VersionName.Trim();
+            if(_oldFileLink != _uploadFileResponse.Link)
+            {
+                _model.Links = _uploadFileResponse.Link;
+                _model.FileSize = _uploadFileResponse?.Size ?? 0;
+            }
             if (!string.IsNullOrEmpty(_model.InstallationGuide)) _model.InstallationGuide = _model.InstallationGuide.Trim();
             if (!string.IsNullOrEmpty(_model.Note)) _model.Note = _model.Note.Trim();
             if (!string.IsNullOrEmpty(_model.Changelog)) _model.Changelog = _model.Changelog.Trim();

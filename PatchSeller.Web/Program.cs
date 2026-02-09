@@ -1,4 +1,5 @@
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Http.Features;
 using MudBlazor;
 using MudBlazor.Services;
 using PatchSeller.Web.Components;
@@ -37,10 +38,21 @@ builder.Services.AddScoped<AdminRankService>();
 builder.Services.AddScoped<AdminGameService>();
 builder.Services.AddScoped<AdminPatchService>();
 builder.Services.AddScoped<AdminPatchVersionService>();
+builder.Services.AddScoped<AdminUploadService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7226/")
+});
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10737418240; // 10GB tính bằng bytes
+});
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 10737418240; // 10GB
 });
 
 builder.Services.AddBlazoredLocalStorage();
