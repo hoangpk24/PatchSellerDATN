@@ -95,7 +95,7 @@
                     <ActivatorContent>
                         <MudButton Variant="Variant.Filled"
                                    Color="Color.Primary"
-                                   Disabled="@(_uploadFileResponse != null)"
+                                   Disabled="@(_uploadFileResponse != null || _isLoadingUpload || _isLoading)"
                                    StartIcon="@Icons.Material.Filled.CloudUpload">
                             Upload Files
                         </MudButton>
