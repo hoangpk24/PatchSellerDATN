@@ -29,7 +29,18 @@ namespace PatchSeller.API.Controllers.Admin
                 UpdateBy = patch.UpdateBy ?? string.Empty,
                 Status = patch.Status,
                 CreatedAt = patch.CreatedAt,
-                GameId = patch.GameId,
+                Game = patch.Game == null ? null : new GameDTO
+                {
+                    GameId = patch.Game.GameId,
+                    Title = patch.Game.Title,
+                    Developer = patch.Game.Developer,
+                    Description = patch.Game.Description,
+                    CreatedAt = patch.Game.CreatedAt,
+                    Thumbnail = patch.Game.Thumbnail,
+                    ReleaseDate = patch.Game.ReleaseDate,
+                    Status = patch.Game.Status,
+                    Delete = patch.Game.Delete
+                },
                 PatchImages = patch.PatchImages?
                     .Where(pi => pi.Delete != true)
                     .Select(pi => new PatchImageBasicDTO
@@ -84,6 +95,29 @@ namespace PatchSeller.API.Controllers.Admin
             }
         }
 
+        [HttpGet("get-all-patches-detail")]
+        public async Task<ActionResult<List<PatchDetailDTO>>> GetAllGamesDetail(string? keyword)
+        {
+            try
+            {
+                List<Patch> result = await _patchRepository.GetAllDetail(keyword);
+                if (result == null)
+                {
+                    return NoContent();
+                }
+                if (result.Any())
+                {
+                    result = result.OrderByDescending(c => c.CreatedAt).ToList();
+                }
+                var dtos = result.Select(MapToPatchDetailDTO).ToList();
+                return Ok(dtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
+
         [HttpGet("get-patch-by-id/{id}")]
         public async Task<ActionResult<Patch>> GetPatchById(int id)
         {
@@ -94,7 +128,26 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return NotFound(Constant.ErrorCode.NotFound);
                 }
-                return Ok(result);
+                return (result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
+
+        [HttpGet("get-patch-detail-by-id/{id}")]
+        public async Task<ActionResult<PatchDetailDTO>> GetPatchDetailById(int id)
+        {
+            try
+            {
+                var result = await _patchRepository.GetDetailById(id);
+                if (result == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+                }
+                var dto = MapToPatchDetailDTO(result);
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -146,7 +199,7 @@ namespace PatchSeller.API.Controllers.Admin
                     CreatedAt = dto.CreatedAt ?? DateTime.UtcNow,
                     Status = 1,
                     Delete = false,
-                    UpdateBy = userId
+                    UpdateBy = dto.UpdateBy ?? userId
                 };
 
                 var result = await _patchRepository.Create(patch);
@@ -186,7 +239,7 @@ namespace PatchSeller.API.Controllers.Admin
                     CreatedAt = dto.CreatedAt,
                     Status = dto.Status,
                     Delete = dto.Delete,
-                    UpdateBy = userId
+                    UpdateBy = dto.UpdateBy ?? userId
                 };
 
                 var result = await _patchRepository.Update(patch);

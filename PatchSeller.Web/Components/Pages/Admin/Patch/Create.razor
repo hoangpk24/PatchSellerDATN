@@ -3,9 +3,156 @@
 
 <PageTitle>@Constant.PageTitleAdmin Patch Create</PageTitle>
 
-<section class="p-6">
-    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Tạo gói việt hóa</h1>
+<section class="mx-auto max-w-[1280px] p-6">
+    <h1 class="leading-[3rem] mb-4 h-12 text-3xl font-bold text-material-default">Tạo gói mới</h1>
+
+    <div class="rounded bg-white p-10 shadow-md">
+        <MudForm Model="_model" @ref="_form" Validation="_patchSchema.ValidateValue">
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tên</label> <span class="ml-1 text-red-500">*</span>
+                <MudTextField T="string"
+                              @bind-Value="_model.Name"
+                              For="@(() => _model.Name)"
+                              Variant="Variant.Outlined"
+                              Placeholder="Ví dụ: Gói việt hóa..."
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Giá</label> <span class="ml-1 text-red-500">*</span>
+                <MudNumericField @bind-Value="_model.Price"
+                                 For="@(() => _model.Price)"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Adornment="Adornment.End"
+                                 Format="F0" Step="1000"
+                                 AdornmentText="đ"
+                                 HideSpinButtons="true"
+                                 Placeholder="179000" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Mô tả chi tiết</label>
+                <MudTextField T="string"
+                              @bind-Value="_model.Description"
+                              For="@(() => _model.Description)"
+                              Placeholder="Nhập mô tả ngắn gọn về gói này..."
+                              Variant="Variant.Outlined"
+                              Lines="4"
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Thuộc game</label> <span class="ml-1 text-red-500">*</span>
+                <MudSelect class="mt-0" Margin="Margin.Dense" Variant="Variant.Outlined" @bind-Value="@_model.GameId">
+                    <MudSelectItem Value="0">UnKnow</MudSelectItem>
+                    @if (_lstGame.Any())
+                    {
+                        @foreach (var rank in _lstGame)
+                        {
+                            <MudSelectItem Value="@rank.GameId">@rank.Title</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </div>
+
+            <MudDivider Class="mb-8 mt-4 !border-slate-200" />
+
+            <div class="flex items-center justify-end gap-3">
+                <MudButton Variant="Variant.Text"
+                           Class="px-6 py-2 text-slate-500 hover:bg-slate-200"
+                           OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Patch)">
+                    Quay lại
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="@(async () => await OnSubmit())"
+                           Disabled="@_isLoading"
+                           Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
+                    Tạo mới
+                </MudButton>
+            </div>
+        </MudForm>
+    </div>
 </section>
 
 @code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public MineResponse _mine { get; set; }
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    MudForm _form = new MudForm();
+    PatchModel _model = new PatchModel();
+    List<DAL.Models.Game> _lstGame = new List<DAL.Models.Game>();
+    PatchSchema.CreateUpdate _patchSchema = new PatchSchema.CreateUpdate();
+
+    private bool _isLoading = false;
+
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+            StateHasChanged();
+        }
+        catch(Exception) {}
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+    async Task LoadData()
+    {
+        var resGame = await _adminGameService.GetAll();
+
+        if(resGame.IsSuccess && resGame.Data.Any())
+        {
+            _lstGame = resGame.Data;
+            _model.GameId = resGame.Data.FirstOrDefault()?.GameId ?? 0;
+        }
+    }
+    async Task OnSubmit()
+    {
+        if (_isLoading) return;
+
+        try
+        {
+            _isLoading = true;
+
+            await _form.Validate();
+
+            if (!_form.IsValid) return;
+
+            _model.Name = _model.Name.Trim();
+            _model.Description = _model.Description.Trim();
+            _model.Status = Constant.StatusDefault.InActive;
+            _model.UpdateBy = _mine.FullName ?? "";
+
+            var response = await _adminPatchService.CreatePatch(_model, _token);
+
+            if (response.IsSuccess)
+            {
+                _snackbar.Add("Tạo thành công!", MudBlazor.Severity.Success);
+                navigation.NavigateTo(RouterConfig.Admin.Patch);
+            }
+            else
+            {
+                var mess = string.IsNullOrEmpty(response.ErrorMessage) ? "Tạo thất bại" : response.ErrorMessage;
+                _snackbar.Add(mess, MudBlazor.Severity.Error);
+            }
+        }
+        catch (Exception)
+        {
+            _isLoading = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 }

@@ -71,6 +71,24 @@
             public const string GameCreate = "/admin/game/create";
             public const string GameUpdate = "/admin/game/update";
             public const string GameDelete = "/admin/game/delete/:id";
+
+            // Patch
+            public const string PatchGetAll = "/admin/patch/get-all-patches";
+            public const string PatchDetailGetAll = "/admin/patch/get-all-patches-detail";
+            public const string PatchDetailGetById = "/admin/patch/get-patch-detail-by-id/:id";
+            public const string PatchGetById = "/admin/patch/get-patch-by-id/:id";
+            public const string PatchCreate = "/admin/patch/create";
+            public const string PatchUpdate = "/admin/patch/update";
+            public const string PatchDelete = "/admin/patch/delete/:id";
+
+            // Patch Version
+            public const string PatchVersionGetAll = "/admin/patch-version/get-all";
+            public const string PatchVersionGetById = "/admin/patch-version/get-by-id/:id";
+            public const string PatchVersionGetByGameId = "/admin/patch-version/get-game-id/:id";
+            public const string PatchVersionGetByPatchId = "/admin/patch-version/get-patch-id/:id";
+            public const string PatchVersionCreate = "/admin/patch-version/create";
+            public const string PatchVersionUpdate = "/admin/patch-version/update";
+            public const string PatchVersionDelete = "/admin/patch-version/delete/:id";
         }
     }
 }

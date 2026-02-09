@@ -25,7 +25,7 @@
 
         <MudDivider Class="mb-5 !border-slate-200" />
 
-        <div class="max-h-[calc(100lvh-280px)] flex flex-col gap-2 overflow-y-auto px-3">
+        <div class="max-h-[calc(100lvh-190px)] flex flex-col gap-2 overflow-y-auto px-3">
             <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Home))" Class="@ActiveMenuClass(RouterConfig.Admin.Home)" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
             <MudNavGroup Title="Quản lý game">
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Game))" Class="@ActiveMenuClass(RouterConfig.Admin.Game)" Icon="@Icons.Material.Filled.VideogameAsset">Game</MudNavLink>
@@ -33,8 +33,8 @@
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Platform))" Class="@ActiveMenuClass(RouterConfig.Admin.Platform)" Icon="@Icons.Material.Filled.Airplay">Nền tảng</MudNavLink>
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Publisher))" Class="@ActiveMenuClass(RouterConfig.Admin.Publisher)" Icon="@Icons.Material.Filled.DeveloperMode">Nhà phát hành</MudNavLink>
             </MudNavGroup>
-            <MudNavGroup Title="Quản lý gói việt hóa">
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Patch))" Class="@ActiveMenuClass(RouterConfig.Admin.Patch)" Icon="@Icons.Material.Filled.Backpack">Gói việt hóa</MudNavLink>
+            <MudNavGroup Title="Quản lý gói">
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Patch))" Class="@ActiveMenuClass(RouterConfig.Admin.Patch)" Icon="@Icons.Material.Filled.Backpack">Gói</MudNavLink>
                 <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Version))" Class="@ActiveMenuClass(RouterConfig.Admin.Version)" Icon="@Icons.Material.Filled.Difference">Phiên bản</MudNavLink>
             </MudNavGroup>
             <MudNavGroup Title="Quản lý tài khoản">

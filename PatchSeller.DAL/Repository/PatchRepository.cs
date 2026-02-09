@@ -34,6 +34,27 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<Patch>> GetAllDetail(string? keyword)
+        {
+            try
+            {
+                var query = _context.Patches
+                    .Where(x => x.Delete != true)
+                    .Include(p => p.PatchImages)
+                    .Include(p => p.Game)
+                    .Include(p => p.PatchVersions).ToList();
+                if (keyword != null)
+                {
+                    query = query.Where(x => x.Name.Contains(keyword) || (x.Description != null && x.Description.Contains(keyword))).ToList();
+                }
+                return query;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<List<Patch>> GetByGameId(int gameId)
         {
             try
@@ -43,6 +64,30 @@ namespace PatchSeller.DAL.Repository
                     .Include(p => p.PatchImages)
                     .Include(p => p.PatchVersions)
                     .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Patch> GetDetailById(int id)
+        {
+            try
+            {
+                var patch = await _context.Patches
+                    .Where(x => x.PatchId == id && x.Delete != true)
+                    .Include(x => x.PatchVersions)
+                    .Include(x => x.UserPurchases)
+                    .Include(x => x.PatchImages)
+                    .FirstOrDefaultAsync();
+
+                if (patch == null)
+                {
+                    return null;
+                }
+             
+                return patch;
             }
             catch (Exception)
             {
@@ -70,6 +115,7 @@ namespace PatchSeller.DAL.Repository
             try
             {
                 patch.Delete = false;
+                patch.CreatedAt = DateTime.Now;
                 var added = _context.Patches.Add(patch).Entity;
                 await _context.SaveChangesAsync();
                 return added;
