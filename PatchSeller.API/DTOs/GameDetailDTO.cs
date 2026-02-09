@@ -46,12 +46,13 @@ namespace PatchSeller.API.DTOs
     public class PatchBasicDTO
     {
         public int PatchId { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public double Price { get; set; }
-        public string Description { get; set; }
-        public string UpdateBy { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public string UpdateBy { get; set; } = string.Empty;
         public int Status { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public List<PatchVersionBasicDTO> PatchVersions { get; set; } = new List<PatchVersionBasicDTO>();
     }
 
     public class GameImageBasicDTO

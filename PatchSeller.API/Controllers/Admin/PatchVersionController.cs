@@ -19,7 +19,7 @@ namespace PatchSeller.API.Controllers.Admin
 
         private static PatchVersionDetailDTO MapToDetailDTO(PatchVersion? pv)
         {
-            if (pv == null) return null!;
+            if (pv == null || pv.Delete) return null!;
             return new PatchVersionDetailDTO
             {
                 PatchVersionId = pv.PatchVersionId,
@@ -64,7 +64,7 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return NoContent();
                 }
-                var dtos = result.Select(MapToDetailDTO).ToList();
+                var dtos = result.Select(MapToDetailDTO).Where(dto => dto != null).ToList();
                 return Ok(dtos);
             }
             catch (Exception)
@@ -101,7 +101,7 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return NoContent();
                 }
-                var dtos = result.Select(MapToDetailDTO).ToList();
+                var dtos = result.Select(MapToDetailDTO).Where(dto => dto != null).ToList();
                 return Ok(dtos);
             }
             catch (Exception)
@@ -120,7 +120,7 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return NoContent();
                 }
-                var dtos = result.Select(MapToDetailDTO).ToList();
+                var dtos = result.Select(MapToDetailDTO).Where(dto => dto != null).ToList();
                 return Ok(dtos);
             }
             catch (Exception)

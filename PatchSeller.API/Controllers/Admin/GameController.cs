@@ -67,9 +67,28 @@ namespace PatchSeller.API.Controllers.Admin
                         Name = p.Name,
                         Price = p.Price,
                         Description = p.Description,
-                        UpdateBy = p.UpdateBy,
+                        UpdateBy = p.UpdateBy ?? string.Empty,
                         Status = p.Status,
-                        CreatedAt = p.CreatedAt
+                        CreatedAt = p.CreatedAt,
+                        PatchVersions = p.PatchVersions?
+                            .Where(pv => pv.Delete != true)
+                            .Select(pv => new PatchVersionBasicDTO
+                            {
+                                PatchVersionId = pv.PatchVersionId,
+                                WorkWithGameVersion = pv.WorkWithGameVersion,
+                                VersionName = pv.VersionName,
+                                Links = pv.Links,
+                                FileSize = pv.FileSize,
+                                ExtractionPassword = pv.ExtractionPassword,
+                                InstallationGuide = pv.InstallationGuide,
+                                Changelog = pv.Changelog,
+                                Status = pv.Status,
+                                Note = pv.Note,
+                                CreateAt = pv.CreateAt,
+                                Delete = pv.Delete,
+                                PatchId = pv.PatchId,
+                                GameId = p.GameId
+                            }).ToList() ?? new List<PatchVersionBasicDTO>()
                     }).ToList() ?? new List<PatchBasicDTO>(),
                 GameImages = game.GameImages?
                     .Where(gi => gi.Delete != true)

@@ -26,7 +26,7 @@ namespace PatchSeller.API.Controllers.Admin
                 Name = patch.Name,
                 Price = patch.Price,
                 Description = patch.Description,
-                UpdateBy = patch.UpdateBy,
+                UpdateBy = patch.UpdateBy ?? string.Empty,
                 Status = patch.Status,
                 CreatedAt = patch.CreatedAt,
                 GameId = patch.GameId,
@@ -54,7 +54,10 @@ namespace PatchSeller.API.Controllers.Admin
                         Changelog = pv.Changelog,
                         Status = pv.Status,
                         Note = pv.Note,
-                        CreateAt = pv.CreateAt
+                        CreateAt = pv.CreateAt,
+                        Delete = pv.Delete,
+                        PatchId = pv.PatchId,
+                        GameId = patch.GameId
                     }).ToList() ?? new List<PatchVersionBasicDTO>()
             };
         }

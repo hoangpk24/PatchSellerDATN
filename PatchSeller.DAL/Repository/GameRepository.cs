@@ -51,7 +51,7 @@ namespace PatchSeller.DAL.Repository
                     .Include(g => g.Publisher)
                     .Include(g => g.GamePlatforms).ThenInclude(gp => gp.Platform)
                     .Include(g => g.GameCategories).ThenInclude(gc => gc.Category)
-                    .Include(g => g.Patches)
+                    .Include(g => g.Patches).ThenInclude(p => p.PatchVersions)
                     .Include(g => g.GameImages).ToList();
 
                 if (keyword != null)
@@ -91,7 +91,7 @@ namespace PatchSeller.DAL.Repository
                     .Include(g => g.Publisher)
                     .Include(g => g.GamePlatforms).ThenInclude(gp => gp.Platform)
                     .Include(g => g.GameCategories).ThenInclude(gc => gc.Category)
-                    .Include(g => g.Patches)
+                    .Include(g => g.Patches).ThenInclude(p => p.PatchVersions)
                     .Include(g => g.GameImages)
                     .FirstOrDefaultAsync();
                 return game;
