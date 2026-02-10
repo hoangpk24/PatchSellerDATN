@@ -24,7 +24,7 @@
             public const string Profile = "/profile";
 
             // Game
-            public const string Game = "/game";
+            public const string Game = "/game/:id";
             // Cart
             public const string CartDetail = "/cart/detail";
 

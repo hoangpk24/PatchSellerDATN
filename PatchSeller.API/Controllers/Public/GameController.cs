@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using PatchSeller.API.DTOs;
 using PatchSeller.DAL.Models;
 using PatchSeller.DAL.Repository;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace PatchSeller.API.Controllers.Public
 {
@@ -166,6 +167,36 @@ namespace PatchSeller.API.Controllers.Public
             {
                 return StatusCode(500, Constant.ErrorCode.OtherError);
             }
-        }        
+        }
+
+        [HttpGet("get-for-home")]
+        public async Task<ActionResult<GameForHomeDTO>> GetAllForHome()
+        {
+            try
+            {
+                List<Game> result = await _gameRepository.GetAllDetail("");
+
+                if (result == null)
+                {
+                    return NoContent();
+                }
+
+                var lstCommingSoon = result.Where(x => x.Status == 2).Take(6).ToList();
+                var lstNew = result.Where(x => x.Status != 2).OrderByDescending(x => x.CreatedAt).Take(6).ToList();
+
+                var dto = new GameForHomeDTO
+                {
+                    LstCommingSoon = lstCommingSoon.Select(MapToGameDetailDTO).ToList(),
+                    LstNew = lstNew.Select(MapToGameDetailDTO).ToList(),
+                    LstHot = []
+                };
+
+                return Ok(dto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
     }
 }

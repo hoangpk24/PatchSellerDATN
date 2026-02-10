@@ -50,7 +50,7 @@ namespace PatchSeller.API.Controllers
                  new Claim(ClaimTypes.Email, customer.Email),
                   new Claim(ClaimTypes.Name, customer.FullName),
                      new Claim(ClaimTypes.MobilePhone, customer.PhoneNumber),
-                      new Claim(ClaimTypes.Surname, customer.RankId.ToString())
+                      new Claim(ClaimTypes.Surname, customer.RankId.ToString()),
             };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -162,15 +162,20 @@ namespace PatchSeller.API.Controllers
                     rankName = rankRepository.GetById(rankId).Result.RankName;
                 }
 
+                var userId = int.Parse(User.FindFirst(ClaimTypes.SerialNumber)?.Value);
+
+                var cart = cartRepository.GetCartByUserId(userId);
+
                 var userInfo = new
                 {
-                    id = User.FindFirst(ClaimTypes.SerialNumber)?.Value,
+                    id = userId,
                     username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
                     role = User.FindFirst(ClaimTypes.Role)?.Value,
                     email = User.FindFirst(ClaimTypes.Email)?.Value,
                     fullName = User.FindFirst(ClaimTypes.Name)?.Value,
                     phoneNumber = User.FindFirst(ClaimTypes.MobilePhone)?.Value,
                     rankId = User.FindFirst(ClaimTypes.Surname)?.Value,
+                    cartId = cart != null ? cart.Id : 0,
                     rankName = rankName,
                     expirationTime = expirationTime,
                     isExpired = isExpired

@@ -163,6 +163,8 @@
             _mine = null;
             _firstLogin = false;
         }
+
+        await _cartActionService.LoadCartAsync(_mine?.Id);
     }
 
     public void HandleOpenCartDrawer()

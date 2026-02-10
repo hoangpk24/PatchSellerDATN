@@ -7,22 +7,29 @@
     <div class="flex flex-col gap-5">
         <MudDivider Class="!border-white/15" />
 
-        <div class="h-[calc(100lvh-295px)] overflow-y-auto">
-            @for(int i = 0; i < 4; i++)
+        <div class="h-[calc(100lvh-295px)] flex flex-col gap-4 overflow-y-auto">
+            @if(_cartActionService.CartDetails.CartItems.Any())
             {
-                <div class="flex items-center gap-2">
-                    <div class="h-full w-full max-w-[6.25rem] flex-shrink-0">
-                        <a>
-                            <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" />
-                        </a>
-                    </div>
+                @foreach (var item in _cartActionService.CartDetails.CartItems)
+                {
+                    <div class="flex items-center gap-2">
+                        <div class="h-full w-full max-w-[6.25rem] flex-shrink-0">
+                            <a>
+                                <img src="@item.GameThumbnail" alt="game" />
+                            </a>
+                        </div>
 
-                    <div class="flex flex-col">
-                        <p class="whitespace-pre-wrap text-sm text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
-                        <span class="whitespace-pre-wrap text-sm font-medium text-white">100.000đ</span>
-                        <button class="w-fit p-2 text-xs text-purple-500 hover:text-red-500">Xóa</button>
+                        <div class="flex flex-col">
+                            <p class="whitespace-pre-wrap text-sm text-white">@item.GameTitle</p>
+                            <p class="whitespace-pre-wrap text-xs text-white/70">Gói: @item.PatchName</p>
+                            <span class="whitespace-pre-wrap text-sm font-medium text-white">@item.PatchPrice.ToString("C0", vietnameseCulture)</span>
+                            <button @onclick="@(() => Delete(item.CartItemId))" class="w-fit p-2 text-xs text-purple-500 hover:text-red-500">Xóa</button>
+                        </div>
                     </div>
-                </div>
+                }
+            } else
+            {
+                <p class="mt-4 text-center text-white/70">Chưa có gói nào.</p>
             }
         </div>
 
@@ -31,7 +38,7 @@
 
             <div class="flex justify-between gap-2">
                 <span class="flex-shrink-0 text-base font-bold uppercase text-white">Tổng tiền tạm tính:</span>
-                <span class="whitespace-pre-wrap text-base font-bold text-purple-500">100.000đ</span>
+                <span class="whitespace-pre-wrap text-base font-bold text-purple-500">@_cartActionService.CartDetails.TemporaryTotal.ToString("C0", vietnameseCulture)</span>
             </div>
 
             <div>
@@ -44,9 +51,33 @@
 
 
 @code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public MineResponse _mine { get; set; }
+
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+
     protected override void OnInitialized()
     {
         _drawerService.OnChange += StateHasChanged;
+    }
+
+    async Task Delete(int id)
+    {
+        if (id <= 0) return;
+
+        var res = await _cartItemService.Delete(id, _token);
+
+        if(res)
+        {
+            _snackbar.Add("Xóa thành công!", MudBlazor.Severity.Success);
+            await _cartActionService.LoadCartAsync(_mine.Id);
+        } else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra, vui lòng thử lại!", MudBlazor.Severity.Error);
+        }
     }
 
     public void Dispose()

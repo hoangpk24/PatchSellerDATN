@@ -90,5 +90,14 @@
             public const string PatchVersionUpdate = "/admin/patch-version/update";
             public const string PatchVersionDelete = "/admin/patch-version/delete/:id";
         }
+
+        public static class Customer
+        {
+            public const string GameForHome = "/game/get-for-home";
+            public const string GameDetail = "/game/get-by-id-detail/:id";
+            public const string addCart = "/cart/add-to-cart";
+            public const string getCartByUserId = "/cart/get-cart-item-by-user-id";
+            public const string DeleteCartItem = "/cart-item/delete/:id";
+        }
     }
 }

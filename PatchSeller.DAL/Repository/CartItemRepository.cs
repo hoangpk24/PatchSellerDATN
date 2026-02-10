@@ -107,6 +107,33 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<CartItem> DeleteCartItem(int id)
+        {
+            try
+            {
+                var cartItem = await _context.CartItems.FindAsync(id);
+
+                if (cartItem == null || (cartItem != null && cartItem.Delete == true))
+                {
+                    throw new InvalidOperationException("NOT_FOUND");
+                }
+
+                cartItem.Delete = true;
+
+                var updatedCartItem = _context.CartItems.Update(cartItem).Entity;
+                await _context.SaveChangesAsync();
+                return updatedCartItem;
+            }
+            catch (InvalidOperationException) 
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<bool> Delete(int id)
         {
             try

@@ -6,6 +6,8 @@ using System.Security.Claims;
 
 namespace PatchSeller.API.Controllers.Public
 {
+    [Route("/cart")]
+    [ApiController]
     public class CartController : ControllerBase
     {
         CartRepository _cartRepository;
@@ -54,7 +56,7 @@ namespace PatchSeller.API.Controllers.Public
                 var items = await _cartItemRepository.GetByUserIdWithDetails(userId);
                 if (items == null || !items.Any())
                 {
-                    return NoContent();
+                    return Ok(Enumerable.Empty<CartItemDetailDTO>());
                 }
 
                 var dtos = items
@@ -65,6 +67,7 @@ namespace PatchSeller.API.Controllers.Public
                         CartId = ci.CartId,
                         PatchId = ci.Patch.PatchId,
                         PatchName = ci.Patch.Name,
+                        GameThumbnail = ci.Patch.Game?.Thumbnail ?? string.Empty,
                         GameTitle = ci.Patch.Game.Title,
                         GameId = ci.Patch.Game.GameId,
                         PatchPrice = ci.Patch.Price,

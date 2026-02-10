@@ -7,7 +7,8 @@ namespace PatchSeller.API.DTOs
         public int CartId { get; set; }
 
         public int PatchId { get; set; }             
-        public string PatchName { get; set; }        
+        public string PatchName { get; set; } 
+        public string GameThumbnail { get; set; }
         public string GameTitle { get; set; }        
         public int GameId { get; set; }              
         public double PatchPrice { get; set; }       

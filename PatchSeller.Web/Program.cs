@@ -5,6 +5,7 @@ using MudBlazor.Services;
 using PatchSeller.Web.Components;
 using PatchSeller.Web.Services;
 using PatchSeller.Web.Services.Admin;
+using PatchSeller.Web.Services.Customer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,7 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
 
+// Admin service
 builder.Services.AddScoped<AccessService>();
 builder.Services.AddScoped<DrawerService>();
 builder.Services.AddScoped<AdminCategoryService>();
@@ -39,6 +41,12 @@ builder.Services.AddScoped<AdminGameService>();
 builder.Services.AddScoped<AdminPatchService>();
 builder.Services.AddScoped<AdminPatchVersionService>();
 builder.Services.AddScoped<AdminUploadService>();
+
+// Customer Service
+builder.Services.AddScoped<GameService>();
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<CartActionService>();
+builder.Services.AddScoped<CartItemService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {
