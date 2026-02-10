@@ -25,26 +25,31 @@
                             </tr>
                         </thead>
                         <tbody class="text-white">
-                            @foreach (var item in _cartItems)
+                            @foreach (var item in _lstCartItem)
                             {
                                 <tr class="group border-b border-white/5">
                                     <td class="py-6">
-                                        <button class="text-white/40 transition-colors hover:text-red-500">
+                                        <button @onclick="@(() => Delete(item.CartItemId))" class="text-white/40 transition-colors hover:text-red-500">
                                             <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
                                         </button>
                                     </td>
                                     <td class="py-6">
                                         <div class="flex items-center gap-6">
-                                            <img src="@item.Image" alt="@item.Name"
+                                            <img src="@item.GameThumbnail" alt="game"
                                                  class="aspect-[3/4] w-20 rounded-md object-cover shadow-lg" />
-                                            <span class="cursor-pointer text-base font-medium transition-colors hover:text-purple-500">
-                                                @item.Name
-                                            </span>
+                                            <div class="flex flex-col gap-1">
+                                                <span class="cursor-pointer text-base font-medium transition-colors hover:text-purple-500">
+                                                    @item.GameTitle
+                                                </span>
+                                                <span class="cursor-pointer text-sm font-medium text-white/70 transition-colors hover:text-purple-500">
+                                                    Gói: @item.PatchName
+                                                </span>
+                                            </div>
                                         </div>
                                     </td>
 
                                     <td class="py-6 text-center text-white/80">
-                                        @item.Price.ToString("N0")đ
+                                        @item.PatchPrice.ToString("C0", vietnameseCulture)
                                     </td>
                                 </tr>
                             }
@@ -54,22 +59,22 @@
 
                 @*giao dien mobile*@
                 <div class="hidden sm:block xs:block">
-                    @foreach (var item in _cartItems)
+                    @foreach (var item in _lstCartItem)
                     {
                         <div class="relative flex flex-col border-b border-white/10 py-6 last:border-0">
-                            <button class="absolute right-0 top-6 text-white/40">
+                            <button @onclick="@(() => Delete(item.CartItemId))" class="absolute right-0 top-6 text-white/40">
                                 <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
                             </button>
 
                             <div class="flex gap-4">
-                                <img src="@item.Image" class="aspect-[1/1.2] w-24 rounded object-cover shadow-lg" />
+                                <img src="@item.GameThumbnail" class="aspect-[1/1.2] w-24 rounded object-cover shadow-lg" />
 
                                 <div class="flex flex-1 flex-col gap-3">
-                                    <h4 class="pr-6 text-base font-bold leading-tight text-white">@item.Name</h4>
-
+                                    <h4 class="pr-6 text-base font-bold leading-tight text-white">@item.GameTitle</h4>
+                                    <h4 class="pr-6 text-sm font-medium leading-tight text-white/70">@item.PatchName</h4>
                                     <div class="flex items-center justify-between border-t border-dashed border-white/10 pt-2">
                                         <span class="text-xs uppercase text-white/50">Giá</span>
-                                        <span class="text-sm font-medium text-white">@item.Price.ToString("N0")đ</span>
+                                        <span class="text-sm font-medium text-white">@item.PatchPrice.ToString("C0", vietnameseCulture)</span>
                                     </div>
                                 </div>
                             </div>
@@ -82,17 +87,17 @@
                 <h3 class="mb-5 text-xl font-medium text-white">Đơn hàng</h3>
                 <div class="flex justify-between gap-2">
                     <span class="w-36 flex-shrink-0 text-base font-medium text-white">Tạm tính:</span>
-                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-base text-white/70">100.000đ</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-base text-white/70">@(_lstCartItem.Any() ? _lstCartItem.Sum(x => x.PatchPrice).ToString("C0", vietnameseCulture) : "0đ")</span>
                 </div>
                 <MudDivider Class="my-6 !border-white/15" />
                 <div class="flex justify-between gap-2">
                     <span class="w-36 flex-shrink-0 text-2xl font-medium text-white">Tổng tiền:</span>
-                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-2xl font-bold text-purple-500">100.000đ</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-2xl font-bold text-purple-500">@(_lstCartItem.Any() ? _lstCartItem.Sum(x => x.PatchPrice).ToString("C0", vietnameseCulture) : "0đ")</span>
                 </div>
                 <MudDivider Class="my-6 !border-white/15" />
-                <a href="@RouterConfig.Customer.Checkout" class="block w-full rounded-full bg-purple-500 py-3.5 text-center text-white">
+                <MudButton Disabled="@(_isLoading || !_lstCartItem.Any())" Variant="Variant.Filled" FullWidth Class="!rounded-full !bg-purple-500 !py-3 !text-white">
                     Tiến hành thanh toán
-                </a>
+                </MudButton>
             </div>
         </div>
     </div>
@@ -128,25 +133,56 @@
 </section>
 
 @code {
-    private List<CartItem> _cartItems = new()
-    {
-        new CartItem { Name = "The Bus", Price = 29000, Quantity = 1, Image = "https://avigames.net/wp-content/uploads/2024/03/thebus.jpg" },
-        new CartItem { Name = "Mafia: The Old Country Deluxe Edition", Price = 149000, Quantity = 3, Image = "https://avigames.net/wp-content/uploads/2025/08/mafiatoc.jpg" },
-        new CartItem { Name = "Wuchang: Fallen Feathers – Deluxe Edition", Price = 115000, Quantity = 2, Image = "https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" }
-    };
+    [CascadingParameter( Name = Constant.CascadingNameParams.Mine)]
+    public MineResponse _mine { get; set; }
 
-    private void UpdateQuantity(CartItem item, int change)
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    List<CartItemDetailResponse> _lstCartItem = [];
+
+
+    bool _isLoading = false;
+
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+
+    protected override async Task OnInitializedAsync()
     {
-        item.Quantity += change;
-        if (item.Quantity < 1) item.Quantity = 1;
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+        } catch(Exception) {}
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+    async Task LoadData()
+    {
+        var res = await _cartService.GetCart(_mine.Id);
+
+        if(res.IsSuccess)
+        {
+            _lstCartItem = res.Data;
+        }
     }
 
-    public class CartItem
+    async Task Delete(int id)
     {
-        public string Name { get; set; }
-        public long Price { get; set; }
-        public int Quantity { get; set; }
-        public string Image { get; set; }
+        if (id <= 0) return;
+
+        var res = await _cartItemService.Delete(id, _token);
+
+        if(res)
+        {
+            _snackbar.Add("Xóa thành công!", MudBlazor.Severity.Success);
+            await _cartActionService.LoadCartAsync(_mine.Id);
+            await LoadData();
+        } else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra, vui lòng thử lại!", MudBlazor.Severity.Error);
+        }
     }
 
     private List<BreadcrumbItem> _itemBreadcrumbs = [

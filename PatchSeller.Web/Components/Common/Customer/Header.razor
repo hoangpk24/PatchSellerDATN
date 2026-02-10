@@ -84,7 +84,7 @@
 
                 <div @onclick="OpenCartDrawer" class="group relative flex cursor-pointer items-center gap-3">
                     <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Class="text-white group-hover:text-purple-500" />
-                    <span class="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 font-bold text-[10px] text-white">0</span>
+                    <span class="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 font-bold text-[10px] text-white">@_cartActionService.CartDetails.TotalItemCount</span>
                 </div>
             </div>
         </div>
@@ -94,6 +94,9 @@
 @code {
     [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
     public MineResponse _mine { get; set; }
+
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
 
     [Parameter]
     public EventCallback OnLoggedOut { get; set; }
@@ -107,6 +110,17 @@
     [Parameter]
     public bool FirstLogin { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+
+        if(_mine != null)
+        {
+            await _cartActionService.LoadCartAsync(_mine.Id);
+        }
+
+        _cartActionService.OnCountChange += StateHasChanged;
+    }
+
     private string GetInitials(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) return "U";
@@ -116,6 +130,11 @@
 
     async Task OpenCartDrawer()
     {
+        if(string.IsNullOrEmpty(_token) || _mine == null)
+        {
+            _snackbar.Add("Vui lòng đăng nhập!", MudBlazor.Severity.Warning);
+            return;
+        }
         await OnOpenCartDrawer.InvokeAsync();
     }
 
@@ -127,5 +146,10 @@
     async Task Logout()
     {
         await OnLoggedOut.InvokeAsync();
+    }
+
+    public void Dispose()
+    {
+        _cartActionService.OnCountChange -= StateHasChanged;
     }
 }

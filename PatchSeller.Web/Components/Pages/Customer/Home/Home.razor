@@ -2,6 +2,13 @@
 
 <PageTitle>@Constant.PageTitleUser Home</PageTitle>
 
+@if (_isLoading)
+{
+    <div class="absolute bottom-0 left-0 right-0 top-0 z-20 overflow-hidden bg-black/50">
+        <Loading />
+    </div>
+}
+
 <section class="relative mx-auto max-w-[1520px] overflow-hidden rounded-2xl shadow-2xl shadow-purple-500/10 xs:mx-4 sm:mx-4 md:mt-6 lg:mt-6 sm:mt-0">
     <MudCarousel Class="mud-width-full aspect-[16/9] sm:aspect-[4/2.25] xs:aspect-[4/2.25]"
                  ShowArrows="true"
@@ -16,6 +23,29 @@
     </MudCarousel>
 </section>
 
+@if (_gameForHome.LstCommingSoon.Any())
+{
+    <section class="mx-auto mb-10 mt-10 max-w-[1520px] px-3 lg:px-0">
+        <div class="mb-6 flex items-center gap-2">
+            <MudIcon Icon="@Icons.Material.Filled.Games" Class="!text-purple-500" Size="Size.Large" />
+            <h2 class="text-2xl font-bold text-white xs:text-2xl">Sắp Ra Mắt</h2>
+        </div>
+
+        <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
+                @foreach (var item in _gameForHome.LstCommingSoon)
+                {
+                    <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                        <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
+                            <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
+
+                            <p class="line-clamp-2 text-base font-medium text-white">@item.Title</p>
+                        </a>
+                    </div>
+                }
+        </div>
+    </section>
+}
+
 <section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
     <div class="mb-6 flex items-center gap-2">
         <MudIcon Icon="@Icons.Material.Filled.Whatshot" Class="!text-purple-500" Size="Size.Large" />
@@ -29,7 +59,7 @@
                 <a href="@RouterConfig.Customer.Game" class="flex h-full w-full flex-col gap-4">
                     <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" class="aspect-[1/1.5] object-cover" />
 
-                    <p class="line-clamp-2 text-base font-medium text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
+                    <p class="line-clamp-2 h-12 text-base font-medium text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
 
                     <p class="text-base text-purple-500">100.000đ</p>
                 </a>
@@ -52,24 +82,29 @@
     </div>
 
     <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
-        @for (int i = 0; i < 6; i++)
-        {
-            <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
-                <a href="@RouterConfig.Customer.Game" class="flex h-full w-full flex-col gap-4">
-                    <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" class="aspect-[1/1.5] object-cover" />
+        @if(_gameForHome.LstNew.Any())
+        {   
+            @foreach(var item in _gameForHome.LstNew)
+            {
+                <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                    <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
+                        <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
 
-                    <p class="line-clamp-2 text-base font-medium text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
+                        <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
 
-                    <p class="text-base text-purple-500">100.000đ</p>
-                </a>
+                        <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.Patches)">
+                            @GetPriceDisplay(item.Patches)
+                        </p>
+                    </a>
 
-                <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
-                    <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
-                        <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
-                        <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
+                    <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
+                        <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
+                            <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))" Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
+                            <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
         }
     </div>
 </section>
@@ -133,6 +168,85 @@
 </section>
 
 @code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public MineResponse _mine { get; set; }
+
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    GameForHomeResponse _gameForHome = new GameForHomeResponse();
+
+    bool _isLoading = false;
+
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+        } 
+        catch(Exception){}
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var resGame = await _gameService.GetAllForHome();
+
+        if(resGame.IsSuccess)
+        {
+            _gameForHome = resGame.Data;
+        }
+    }
+
+    private string GetPriceDisplay(List<PatchBasicDTO> patches)
+    {
+        if (patches == null || !patches.Any())
+        {
+            return "Liên hệ";
+        }
+
+        var prices = patches.Select(p => p.Price).OrderBy(p => p).ToList();
+        double minPrice = prices.First();
+        double maxPrice = prices.Last();
+
+        string format = "C0";
+
+        if (minPrice == maxPrice)
+        {
+            return minPrice <= 0 ? "Miễn phí" : $"{minPrice.ToString(format, vietnameseCulture)}";
+        }
+
+        return $"{minPrice.ToString(format, vietnameseCulture)} - {maxPrice.ToString(format, vietnameseCulture)}";
+    }
+
+    async Task OpenDialogFastAddCart(int gameId)
+    {
+        var paraeters = new DialogParameters<Components.Common.Customer.FastAddCart>
+        {
+            {x => x.gameId, gameId},
+            {x => x.cartId, _mine.cartId},
+            {x => x.userId, _mine.Id},
+            {x => x.token, _token}
+        };
+
+        var dialog = await _dialogService.ShowAsync<Components.Common.Customer.FastAddCart>("Options Dialog", paraeters, _dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+            await _cartActionService.LoadCartAsync(_mine.Id);
+            StateHasChanged();
+        }
+    }
+
     private IList<string> _itemSliders = new List<string>()
     {
         "/assets/images/banner.jpg",

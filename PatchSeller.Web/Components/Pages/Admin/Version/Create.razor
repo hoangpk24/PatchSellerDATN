@@ -123,6 +123,7 @@
                         </div>
                         <MudButton Variant="Variant.Text"
                                    Color="Color.Error"
+                                   Disabled="@(_isLoading || _isLoadingUpload)"
                                    StartIcon="@Icons.Material.Filled.Delete"
                                    OnClick="RemoveFileAsync">
                             Xóa file

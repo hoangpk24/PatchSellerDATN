@@ -63,4 +63,11 @@ namespace PatchSeller.API.DTOs
         public string Description { get; set; }
         public int Status { get; set; }
     }
+
+    public class GameForHomeDTO
+    {
+        public List<GameDetailDTO> LstCommingSoon { get; set; } = new List<GameDetailDTO>();
+        public List<GameDetailDTO> LstHot { get; set; } = new List<GameDetailDTO>();
+        public List<GameDetailDTO> LstNew { get; set; } = new List<GameDetailDTO>();
+    }
 }

@@ -23,6 +23,7 @@
 @using PatchSeller.Web.Schema
 @using PatchSeller.Web.Services
 @using PatchSeller.Web.Services.Admin
+@using PatchSeller.Web.Services.Customer
 @using Spillgebees.Blazor.RichTextEditor.Components
 @using Spillgebees.Blazor.RichTextEditor.Components.Toolbar
 @using Spillgebees.Blazor.RichTextEditor.Components.Toolbar.Controls
@@ -46,3 +47,8 @@
 @inject AdminPatchService _adminPatchService
 @inject AdminPatchVersionService _adminPatchVersionService
 @inject AdminUploadService _adminUploadService
+
+@inject GameService _gameService
+@inject CartService _cartService
+@inject CartActionService _cartActionService
+@inject CartItemService _cartItemService
