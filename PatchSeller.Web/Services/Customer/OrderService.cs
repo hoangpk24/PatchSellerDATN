@@ -1,0 +1,90 @@
+﻿using Newtonsoft.Json.Linq;
+using PatchSeller.Web.DTOs;
+using PatchSeller.Web.Models;
+
+namespace PatchSeller.Web.Services.Customer
+{
+    public class OrderService
+    {
+        private readonly HttpClient _httpClient;
+
+        public OrderService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public async Task<ServiceResult<CheckoutResponse>> Checkout(CheckoutModel checkout, string token)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, Constant.EndPointApi.Customer.Checkout);
+
+            request.Content = JsonContent.Create(checkout);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                var formatToken = token.Trim('"');
+                request.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", formatToken);
+            }
+
+            var response = await _httpClient.SendAsync(request);
+
+            if(response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<CheckoutResponse>();
+                return ServiceResult<CheckoutResponse>.Success(result);
+            } else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                    ? Constant.Constant.Errors[errorCode ?? ""]
+                                    : result;
+                return ServiceResult<CheckoutResponse>.Failure(result, errorMess, response.StatusCode.ToString());
+               
+            }
+        }
+
+        public async Task<ServiceResult<DAL.Models.Order>> PaymentSuccess(int orderId)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, Constant.EndPointApi.Customer.PaymentSuccess + $"?orderId={orderId}");
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<DAL.Models.Order>();
+                return ServiceResult<DAL.Models.Order>.Success(result);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                    ? Constant.Constant.Errors[errorCode ?? ""]
+                                    : result;
+                return ServiceResult<DAL.Models.Order>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
+
+        public async Task<ServiceResult<DAL.Models.Order>> PaymentCanceled(int orderId)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, Constant.EndPointApi.Customer.PaymentCancelled + $"?orderId={orderId}");
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<DAL.Models.Order>();
+                return ServiceResult<DAL.Models.Order>.Success(result);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                    ? Constant.Constant.Errors[errorCode ?? ""]
+                                    : result;
+                return ServiceResult<DAL.Models.Order>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
+    }
+}

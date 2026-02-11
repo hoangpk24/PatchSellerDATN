@@ -1,0 +1,41 @@
+﻿@page "/order/payment-cancelled"
+@layout MainLayout
+
+<section>
+    <div class="w-full bg-[#9797971c] py-6">
+        <div class="mx-auto w-full max-w-[1520px] px-6">
+            <h1 class="mb-2.5 font-medium leading-tight text-[44px] text-white">Thanh Toán</h1>
+            <MudBreadcrumbs Class="custom-breadcrumb !p-0 !text-xs" Items="_itemBreadcrumbs" Separator="/" />
+        </div>
+    </div>
+    <div class="flex w-full flex-col items-center justify-center gap-4 p-6 text-center">
+        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Class="!text-4xl" />
+        <h2 class="text-2xl font-bold text-white">Đơn hàng đã bị hủy!</h2>
+        <div class="flex justify-center gap-3">
+            <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="@(() => navigation.NavigateTo(RouterConfig.Customer.Home))">trang chủ</MudButton>
+        </div>
+    </div>
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "order-id")]
+    public int _orderId { get; set; } = 0;
+
+    private List<BreadcrumbItem> _itemBreadcrumbs = [
+        new("TRANG CHỦ", href: RouterConfig.Customer.Home),
+        new("THANH TOÁN", href: null, disabled: true),
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        if (_orderId > 0)
+        {
+            var result = await _orderService.PaymentCanceled(_orderId);
+        }
+    }
+}

@@ -98,6 +98,10 @@
             public const string addCart = "/cart/add-to-cart";
             public const string getCartByUserId = "/cart/get-cart-item-by-user-id";
             public const string DeleteCartItem = "/cart-item/delete/:id";
+            public const string Checkout = "/order/checkout";
+            public const string ApplyDiscountCode = "/discount/ApplyDiscountCodeValue";
+            public const string PaymentSuccess = "/order/payment-success";
+            public const string PaymentCancelled = "/order/payment-cancelled";
         }
     }
 }
