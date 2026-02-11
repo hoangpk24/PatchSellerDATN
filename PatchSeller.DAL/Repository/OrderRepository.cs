@@ -21,8 +21,19 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
-                // Order không có trường Delete nên lấy tất cả
                 return await _context.Orders.ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<Order>> GetAllByUserId(int userId)
+        {
+            try
+            {
+                return await _context.Orders.Where(x=>x.UserId == userId).ToListAsync();
             }
             catch (Exception)
             {
