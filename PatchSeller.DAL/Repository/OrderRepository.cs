@@ -3,6 +3,7 @@ using PatchSeller.DAL.Context;
 using PatchSeller.DAL.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PatchSeller.DAL.Repository
@@ -34,6 +35,27 @@ namespace PatchSeller.DAL.Repository
             try
             {
                 return await _context.Orders.FindAsync(id);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Order> GetByIdWithDetails(int id)
+        {
+            try
+            {
+                return await _context.Orders
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.Patch)
+                            .ThenInclude(p => p!.Game)
+                                .ThenInclude(g => g!.GameImages)
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.Patch)
+                            .ThenInclude(p => p!.PatchImages)
+                    .Include(o => o.Discount)
+                    .FirstOrDefaultAsync(o => o.OrderId == id);
             }
             catch (Exception)
             {

@@ -1,4 +1,4 @@
-﻿using Hangfire;
+using Hangfire;
 using Hangfire.Server;
 using Microsoft.AspNetCore.Mvc;
 using Net.payOS;
@@ -20,6 +20,89 @@ namespace PatchSeller.API.Controllers.Public
         public OrderController()
         {
             _orderRepository = new OrderRepository();
+        }
+
+        private static OrderDetailResponseDTO MapToOrderDetailResponse(Order order)
+        {
+            if (order == null) return null!;
+            return new OrderDetailResponseDTO
+            {
+                OrderId = order.OrderId,
+                PaymentStatus = order.PaymentStatus ?? string.Empty,
+                OrderCode = order.OrderCode ?? string.Empty,
+                OrderDate = order.OrderDate,
+                UsedRewardPoint = order.UsedRewardPoint,
+                TotalAmount = order.TotalAmount,
+                DiscountAmount = order.DiscountAmount,
+                FinalAmount = order.FinalAmount,
+                PaymentLink = order.PaymentLink,
+                PaymentExpiration = order.PaymentExpiration,
+                Note = order.Note,
+                Status = order.Status,
+                UserId = order.UserId,
+                DiscountId = order.DiscountId,
+                OrderDetails = order.OrderDetails?
+                    .Select(od => new OrderDetailItemDTO
+                    {
+                        OrderDetailId = od.OrderDetailID,
+                        OrderId = od.OrderId,
+                        PatchId = od.PatchId,
+                        GameId = od.Patch?.GameId ?? 0,
+                        GameName = od.Patch?.Game?.Title ?? string.Empty,
+                        PatchName = od.Patch?.Name ?? string.Empty,
+                        Price = od.Price,
+                        GameImages = od.Patch?.Game?.GameImages?
+                            .Where(gi => gi.Delete != true)
+                            .Select(gi => new GameImageBasicDTO
+                            {
+                                GameImageId = gi.GameImageId,
+                                URL = gi.URL,
+                                Name = gi.Name,
+                                Description = gi.Description,
+                                Status = gi.Status
+                            }).ToList() ?? new List<GameImageBasicDTO>(),
+                        PatchImages = od.Patch?.PatchImages?
+                            .Where(pi => pi.Delete != true)
+                            .Select(pi => new PatchImageBasicDTO
+                            {
+                                PatchImageId = pi.PatchImageId,
+                                URL = pi.URL,
+                                Name = pi.Name,
+                                Description = pi.Description,
+                                IsThumbnail = pi.IsThumbnail
+                            }).ToList() ?? new List<PatchImageBasicDTO>()
+                    }).ToList() ?? new List<OrderDetailItemDTO>()
+            };
+        }
+
+        [HttpGet("get-order-detail/{orderId}")]
+        public async Task<ActionResult<OrderDetailResponseDTO>> GetOrderDetail(int orderId)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
+                if (userIdClaim == null)
+                {
+                    return Unauthorized();
+                }
+
+                var order = await _orderRepository.GetByIdWithDetails(orderId);
+                if (order == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+                }
+
+                if (order.UserId != int.Parse(userIdClaim))
+                {
+                    return Forbid();
+                }
+
+                return Ok(MapToOrderDetailResponse(order));
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
         }
 
         [HttpPost("checkout")]
@@ -44,28 +127,28 @@ namespace PatchSeller.API.Controllers.Public
 
             double totalPrice = checkoutParam.ListItemCheckout.Sum(p => p.Price);
             double finalAmount = totalPrice;
-            if (checkoutParam.DiscountApplydId>0)
+            if (checkoutParam.DiscountApplydId > 0)
             {
                 finalAmount -= checkoutParam.DiscountAmount;
             }
-            if(checkoutParam.UsedRewardPoint>0)
+
+            double actualUsedRewardPoint = 0;
+            if (finalAmount > 0 && checkoutParam.UsedRewardPoint > 0)
             {
                 var user = await userRepository.GetById(int.Parse(userIdClaim));
-                if(user != null)
+                if (user != null)
                 {
-                    if(user.RewardPoint >= checkoutParam.UsedRewardPoint)
-                    {
-                        finalAmount -= (int)checkoutParam.UsedRewardPoint;
-                        user.RewardPoint -= checkoutParam.UsedRewardPoint;
-                        await userRepository.Update(user);
-                    }
-                    else
+                    if (user.RewardPoint < checkoutParam.UsedRewardPoint)
                     {
                         return BadRequest(Constant.ErrorCode.NotEnoughRewardPoint);
                     }
+                    // Chỉ trừ tối đa đủ để finalAmount = 0, không trừ quá
+                    actualUsedRewardPoint = Math.Min(checkoutParam.UsedRewardPoint, Math.Min(user.RewardPoint, finalAmount));
+                    finalAmount -= actualUsedRewardPoint;
+                    user.RewardPoint -= actualUsedRewardPoint;
+                    await userRepository.Update(user);
                 }
             }
-           
 
             int ordCode = new Random().Next(1, int.MaxValue);
 
@@ -73,7 +156,7 @@ namespace PatchSeller.API.Controllers.Public
             tempOrder.OrderCode = "INVP" + ordCode.ToString();
             tempOrder.PaymentStatus = Constant.PaymentStatus.WaitingForPayment;
             tempOrder.OrderDate = DateTime.Now;
-            tempOrder.UsedRewardPoint = checkoutParam.UsedRewardPoint;
+            tempOrder.UsedRewardPoint = actualUsedRewardPoint;
             tempOrder.TotalAmount = totalPrice;
             tempOrder.FinalAmount = finalAmount;
             tempOrder.DiscountAmount = checkoutParam.DiscountAmount;
