@@ -75,6 +75,26 @@ namespace PatchSeller.API.Controllers.Public
             };
         }
 
+        [HttpGet("get-all")]
+        public async Task<ActionResult<List<OrderDetailResponseDTO>>> GetAllOrder()
+        {
+
+            var userIdClaim = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var orders = await _orderRepository.GetAllByUserId(int.Parse(userIdClaim));
+            List<OrderDetailResponseDTO> listOrderDetail = new List<OrderDetailResponseDTO>();
+            foreach (var order in orders)
+            {
+                var obj = await _orderRepository.GetByIdWithDetails(order.OrderId);
+                listOrderDetail.Add(MapToOrderDetailResponse(obj));
+            }
+            return Ok(listOrderDetail);
+        }
+
         [HttpGet("get-order-detail/{orderId}")]
         public async Task<ActionResult<OrderDetailResponseDTO>> GetOrderDetail(int orderId)
         {
@@ -142,13 +162,14 @@ namespace PatchSeller.API.Controllers.Public
                     {
                         return BadRequest(Constant.ErrorCode.NotEnoughRewardPoint);
                     }
-                    // Chỉ trừ tối đa đủ để finalAmount = 0, không trừ quá
                     actualUsedRewardPoint = Math.Min(checkoutParam.UsedRewardPoint, Math.Min(user.RewardPoint, finalAmount));
                     finalAmount -= actualUsedRewardPoint;
                     user.RewardPoint -= actualUsedRewardPoint;
                     await userRepository.Update(user);
                 }
             }
+            if(finalAmount<0)
+                finalAmount = 0;
 
             int ordCode = new Random().Next(1, int.MaxValue);
 
@@ -203,6 +224,8 @@ namespace PatchSeller.API.Controllers.Public
 
                     }
                 }
+                if(finalAmount>0)
+                {
                     DateTimeOffset utcNow = DateTimeOffset.UtcNow;
                     DateTimeOffset expirationTime = utcNow.AddMinutes(15);
                     long expiredAt = expirationTime.ToUnixTimeSeconds();
@@ -211,56 +234,70 @@ namespace PatchSeller.API.Controllers.Public
                     CreatePaymentResult createPayment = await payOS.createPaymentLink(paymentData);
 
                     if (createPayment.status == "PENDING")
-                    {                       
-                    tempOrder.PaymentExpiration = DateTime.Now.AddMinutes(15);
-                    tempOrder.PaymentLink = createPayment.checkoutUrl;
-                    await _orderRepository.Update(tempOrder);
-                    CheckoutDTO checkoutDTO = new CheckoutDTO();
-                    checkoutDTO.OrderCode = tempOrder.OrderCode;
-                    checkoutDTO.OrderId = tempOrder.OrderId;
-                    checkoutDTO.PaymentLink = createPayment.checkoutUrl;                 
-                    return Ok(checkoutDTO);
+                    {
+                        tempOrder.PaymentExpiration = DateTime.Now.AddMinutes(15);
+                        tempOrder.PaymentLink = createPayment.checkoutUrl;
+                        await _orderRepository.Update(tempOrder);
+                        CheckoutDTO checkoutDTO = new CheckoutDTO();
+                        checkoutDTO.OrderCode = tempOrder.OrderCode;
+                        checkoutDTO.OrderId = tempOrder.OrderId;
+                        checkoutDTO.PaymentLink = createPayment.checkoutUrl;
+                        return Ok(checkoutDTO);
                     }
                     else
                     {
                         return BadRequest();
-                    }               
+                    }
+                }
+                else
+                {
+                    tempOrder.PaymentExpiration = null;
+                    tempOrder.PaymentLink = null;
+                    CheckoutDTO checkoutDTO = new CheckoutDTO();
+                    checkoutDTO.OrderCode = tempOrder.OrderCode;
+                    checkoutDTO.OrderId = tempOrder.OrderId;
+                    checkoutDTO.PaymentLink = "";
+                    checkoutDTO.IsOrderZero = true;
+                    await _orderRepository.Update(tempOrder);
+                    await PaymentSuccess(tempOrder.OrderId);
+                    return Ok(checkoutDTO);
+
+                }                    
 
             }
-
 
         }
 
         [HttpPut("payment-cancelled")]
-         public async Task<ActionResult<Order>> PaymentCanceled([FromQuery] int orderId)
-         {
+        public async Task<ActionResult<Order>> PaymentCanceled([FromQuery] int orderId)
+        {
             try
             {
                 DiscountRepository discountRepository = new DiscountRepository();
                 var order = await _orderRepository.GetById(orderId);
-                if(order == null)
+                if (order == null)
                 {
                     return BadRequest(Constant.ErrorCode.NotFound);
                 }
                 order.PaymentStatus = Constant.PaymentStatus.PaymentCanceled;
-                order.Status = Constant.OrderStatus.OrderCanceled;                
+                order.Status = Constant.OrderStatus.OrderCanceled;
                 await _orderRepository.Update(order);
 
-                if(order.DiscountId!=null && order.DiscountId>0)
+                if (order.DiscountId != null && order.DiscountId > 0)
                 {
                     var discount = await discountRepository.GetById((int)order.DiscountId);
-                    if(discount != null)
+                    if (discount != null)
                     {
                         discount.UsedCount--;
                         await discountRepository.Update(discount);
                     }
                 }
 
-                if(order.UsedRewardPoint>0)
+                if (order.UsedRewardPoint > 0)
                 {
                     UserRepository userRepository = new UserRepository();
                     var user = await userRepository.GetById(order.UserId);
-                    if(user != null)
+                    if (user != null)
                     {
                         user.RewardPoint += order.UsedRewardPoint;
                         await userRepository.Update(user);
@@ -282,7 +319,7 @@ namespace PatchSeller.API.Controllers.Public
             {
                 OrderDetailRepository orderDetailRepository = new OrderDetailRepository();
                 var order = await _orderRepository.GetById(orderId);
-                if(order == null)
+                if (order == null)
                 {
                     return BadRequest(Constant.ErrorCode.NotFound);
                 }
@@ -303,9 +340,9 @@ namespace PatchSeller.API.Controllers.Public
 
                 UserRepository userRepository = new UserRepository();
                 var user = await userRepository.GetById(order.UserId);
-                if(user != null)
+                if (user != null)
                 {
-                    user.RewardPoint += order.FinalAmount*0.05;
+                    user.RewardPoint += order.FinalAmount * 0.05;
                     await userRepository.Update(user);
                 }
                 return Ok(order);

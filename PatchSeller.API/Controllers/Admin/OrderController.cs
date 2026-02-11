@@ -110,5 +110,36 @@ namespace PatchSeller.API.Controllers.Admin
             }
         }
 
+        [HttpGet("get-all")]
+        public async Task<ActionResult<List<OrderDetailResponseDTO>>> GetAllOrder()
+        {
+
+            var userIdClaim = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+            else
+            {
+                StaffRepository staffRepository = new StaffRepository();
+
+                var user = staffRepository.GetById(int.Parse(userIdClaim));
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+            }
+            var orders = await _orderRepository.GetAll();
+            List<OrderDetailResponseDTO> listOrderDetail = new List<OrderDetailResponseDTO>();
+            foreach (var order in orders)
+            {
+                var obj = await _orderRepository.GetByIdWithDetails(order.OrderId);
+                listOrderDetail.Add(MapToOrderDetailResponse(obj));
+            }
+            return Ok(listOrderDetail);
+        }
+
+
+
     }
 }
