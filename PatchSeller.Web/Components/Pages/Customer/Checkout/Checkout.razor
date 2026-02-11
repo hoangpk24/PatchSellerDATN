@@ -12,7 +12,7 @@
     <div class="mx-auto my-10 max-w-[1520px] px-2">
         <div class="flex justify-between lg:flex-row sm:flex-col-reverse md:flex-col-reverse lg:gap-8 md:gap-4 sm:gap-6">
             <div class="h-fit w-3/5 md:w-full sm:w-full">
-                <h3 class="font-semibold text-[22px] text-white"><span class="text-purple-500">1.</span> Thông tin khách hàng</h3>
+                @* <h3 class="font-semibold text-[22px] text-white"><span class="text-purple-500">1.</span> Thông tin khách hàng</h3>
 
                 <div class="mt-6">
                     <MudForm>
@@ -52,27 +52,39 @@
                                           Class="custom-text-field" />
                         </div>
                     </MudForm>
-                </div>
+                </div> *@
 
-                <h3 class="mt-10 font-semibold text-[22px] text-white"><span class="text-purple-500">2.</span> Phương thức thanh toán</h3>
+              @*   <h3 class="font-semibold text-[22px] text-purple-500">Phương thức thanh toán</h3> *@
 
-                <div class="mt-6 bg-[#9797971c] p-6">
+                <div class="bg-[#9797971c] p-6">
                     <div class="flex items-center gap-3">
                         <p class="text-base font-medium text-white">Thanh toán bằng chuyển khoản ngân hàng (quét mã QR)</p>
                         <img src="/assets/images/payos_crop.png" width="100" logo="logo payment" />
                     </div>
                     <MudDivider Class="my-6 !border-white/15" />
                     <div class="flex w-full items-center gap-2">
-                        <MudTextField T="string" placeholder="nhập mã giảm giá" Variant="Variant.Outlined" Style="height: 40px" />
-                        <MudIcon Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Class="cursor-pointer" />
-                        <MudButton Class="!h-10 w-[8rem] flex-shrink-0 !rounded-full !bg-purple-500 !text-white" Variant="Variant.Filled">
+                        <MudTextField T="string" @bind-Value="_discountCode" placeholder="nhập mã giảm giá" Variant="Variant.Outlined" Style="height: 40px" />
+                        <MudIcon Disabled="@_isLoading" hidden="@(_discountResponse == null)" @onclick="DeleteDiscountCode" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Class="cursor-pointer" />
+                        <MudButton Disabled="@(_isLoading || !_lstCartItem.Any())" OnClick="ApplyCode" Class="!h-10 w-[8rem] flex-shrink-0 !rounded-full !bg-purple-500 !text-white" Variant="Variant.Filled">
                             Áp Dụng
                         </MudButton>
                     </div>
                     <MudDivider Class="my-6 !border-white/15" />
-                    <MudButton class="!w-full !rounded-full !bg-purple-500 !py-3 !text-white">
+                    <MudButton Disabled="@(_isLoading || !_lstCartItem.Any())" OnClick="OnSubmit" class="!w-full !rounded-full !bg-purple-500 !py-3 !text-white">
                         Thanh toán
                     </MudButton>
+                </div>
+
+                <div class="mt-10">
+                    <label class="mb-2 block text-sm font-medium text-white">
+                        Ghi chú
+                    </label>
+                    <MudTextField T="string"
+                                  @bind-Value="_note"
+                                  Lines="5"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Class="custom-text-field" />
                 </div>
             </div>
 
@@ -80,36 +92,65 @@
                 <h3 class="mb-5 text-xl font-medium text-white">Thông tin đơn hàng</h3>
                 <div class="flex justify-between gap-2">
                     <span class="w-36 flex-shrink-0 text-base font-medium text-white">Sản phẩm</span>
-                    <span class="w-36 flex-shrink-0 text-right text-base font-medium text-white/70">(4)</span>
+                    <span class="w-36 flex-shrink-0 text-right text-base font-medium text-white/70">(@_lstCartItem.Count())</span>
                 </div>
                 <MudDivider Class="my-4 !border-white/15" />
                 <div class="hide-scrollbar flex max-h-[350px] flex-col gap-3 overflow-y-auto">
-                    @for (int i = 0; i < 4; i++)
+                    @if(_lstCartItem.Any())
                     {
-                        <div class="flex items-center gap-2 border-b border-solid border-white/15 pb-3 last:!border-0">
-                            <div class="h-full w-full max-w-[6.25rem] flex-shrink-0">
-                                <a>
-                                    <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" />
-                                </a>
-                            </div>
+                        @foreach (var item in _lstCartItem)
+                        {
+                            <div class="flex items-center gap-2 border-b border-solid border-white/15 pb-3 last:!border-0">
+                                <div class="h-full w-full max-w-[6.25rem] flex-shrink-0">
+                                    <a>
+                                        <img src="@item.GameThumbnail" alt="game" />
+                                    </a>
+                                </div>
 
-                            <div class="flex flex-col gap-1">
-                                <p class="whitespace-pre-wrap text-sm text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
-                                <span class="whitespace-pre-wrap text-sm font-medium text-white">100.000đ</span>
-                                <button class="w-fit p-2 text-xs text-purple-500 hover:text-red-500">Xóa</button>
+                                <div class="flex flex-col gap-1">
+                                    <p class="whitespace-pre-wrap text-sm text-white">@item.GameTitle</p>
+                                    <p class="whitespace-pre-wrap text-sm text-white/70">Gói: @item.PatchName</p>
+                                    <span class="whitespace-pre-wrap text-sm font-medium text-white">@item.PatchPrice.ToString("C0", vietnameseCulture)</span>
+                                    <button disabled="@_isLoading" @onclick="@(() => Delete(item.CartItemId))" class="w-fit p-2 text-xs text-purple-500 hover:text-red-500">Xóa</button>
+                                </div>
                             </div>
-                        </div>
+                        }
                     }
+                    else
+                    {
+                        <p class="text-center text-white/70">Chưa có sản phẩm nào.</p>
+                    }
+                </div>
+                <MudDivider Class="my-4 !border-white/15" />
+                <div class="flex items-center justify-between gap-2">
+                    <span class="w-36 flex-shrink-0 text-base font-medium text-white">
+                        Điểm: @_mine.rewardPoint.ToString("N0")
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <MudSwitch Disabled="@(_mine.rewardPoint == 0)"
+                                   T="bool"
+                                   Color="Color.Primary"
+                                   Value="@_isUsePoint"
+                                   ValueChanged="HandleUsePoint" />
+                    </div>
                 </div>
                 <MudDivider Class="my-4 !border-white/15" />
                 <div class="flex justify-between gap-2">
                     <span class="w-36 flex-shrink-0 text-base font-medium text-white">Tạm tính:</span>
-                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-base text-white/70">100.000đ</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-base text-white/70">@FormatCurrency(CalculateSubtotal())</span>
+                </div>
+                <div class="mt-2 flex justify-between gap-2">
+                    <span class="w-36 flex-shrink-0 text-base font-medium text-white">Giảm giá:</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-base text-white/70">@FormatCurrency(_discountAmount)</span>
+                </div>
+                <div class="mt-2 flex justify-between gap-2">
+                    <span class="w-36 flex-shrink-0 text-base font-medium text-white">Đổi điểm:</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-base text-white/70">@FormatCurrency(_point)</span>
                 </div>
                 <MudDivider Class="my-4 !border-white/15" />
                 <div class="flex justify-between gap-2">
                     <span class="w-36 flex-shrink-0 text-2xl font-medium text-white">Tổng tiền:</span>
-                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-2xl font-bold text-purple-500">100.000đ</span>
+                    <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-2xl font-bold text-purple-500">@FormatCurrency(CalculateTotal())</span>
                 </div>
             </div>
         </div>
@@ -117,6 +158,280 @@
 </section>
 
 @code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public MineResponse _mine { get; set; }
+
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    List<CartItemDetailResponse> _lstCartItem = [];
+    DiscountResponse _discountResponse = null;
+
+    string _discountCode = string.Empty;
+    double _discountAmount = 0;
+    int _point = 0;
+    bool _isLoading = false;
+    bool _isUsePoint = false;
+    string _note = string.Empty;
+
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+            await LoadCartItemData();
+        }
+        catch (Exception ex) { }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    async Task LoadCartItemData()
+    {
+        var res = await _cartService.GetCart(_mine.Id);
+
+        if (res.IsSuccess)
+        {
+            _lstCartItem = res.Data;
+        }
+    }
+
+    async Task ApplyCode()
+    {
+        if (string.IsNullOrWhiteSpace(_discountCode))
+        {
+            _snackbar.Add("Vui lòng nhập mã giảm giá.", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        if (!_lstCartItem.Any())
+        {
+            _snackbar.Add("Giỏ hàng không có sản phẩm.", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            _isLoading = true;
+            var totalAmount = CalculateSubtotal();
+            var res = await _discountService.ApplyDiscountCode(_discountCode.Trim(), totalAmount, _token);
+
+            if (res.IsSuccess)
+            {
+                var resApply = res.Data;
+                _discountResponse = resApply;
+                _discountAmount = resApply.Amount;
+                _snackbar.Add($"Áp dụng mã thành công! Giảm giá: {FormatCurrency(_discountAmount)}", MudBlazor.Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add($"Áp dụng mã {_discountCode.Trim()} thất bại: {res.ErrorMessage}", MudBlazor.Severity.Warning);
+                if (_discountResponse != null)
+                {
+                    _discountCode = _discountResponse.Code;
+                }
+                else
+                {
+                    _discountCode = string.Empty;
+                    _discountResponse = null;
+                    _discountAmount = 0;
+                    CalculateTotal();
+                }
+            }
+        }
+        catch (Exception ex) { }
+        finally
+        {
+            _isLoading = false;
+            CalculateTotal();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ReapplyDiscountsAsync()
+    {
+        if (string.IsNullOrEmpty(_discountCode) || !_lstCartItem.Any())
+        {
+            _discountAmount = 0;
+            _discountCode = string.Empty;
+            _discountResponse = null;
+            return;
+        }
+
+        double totalAmount = CalculateSubtotal();
+
+        var result = await _discountService.ApplyDiscountCode(_discountCode, totalAmount, _token);
+
+        if (result.IsSuccess)
+        {
+            _discountAmount = result.Data.Amount;
+            _discountResponse = result.Data;
+        }
+        else if (!result.IsSuccess)
+        {
+            _snackbar.Add($"Mã giảm giá {_discountCode} không còn đủ điều kiện áp dụng nữa.", MudBlazor.Severity.Warning);
+            _discountAmount = 0;
+        }
+    }
+
+    void HandleUsePoint(bool isUse)
+    {
+        _isUsePoint = isUse;
+
+        if (isUse)
+        {
+            var subTotal = CalculateSubtotal();
+            var remainAmount = subTotal - _discountAmount;
+
+            _point = (int)Math.Min(remainAmount, _mine.rewardPoint);
+        }
+        else
+        {
+            _point = 0;
+        }
+
+        StateHasChanged();
+    }
+
+    async Task Delete(int id)
+    {
+        if (id <= 0) return;
+
+        var res = await _cartItemService.Delete(id, _token);
+
+        if (res)
+        {
+            _snackbar.Add("Xóa thành công!", MudBlazor.Severity.Success);
+            await _cartActionService.LoadCartAsync(_mine.Id);
+            await LoadCartItemData();
+            await ReapplyDiscountsAsync();
+            StateHasChanged();
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra, vui lòng thử lại!", MudBlazor.Severity.Error);
+        }
+    }
+
+    void DeleteDiscountCode()
+    {
+        _discountAmount = 0;
+        _discountCode = string.Empty;
+        _discountResponse = null;
+        CalculateTotal();
+        StateHasChanged();
+    }
+
+    private string FormatCurrency(double amount)
+    {
+        if (amount < 0) return 0.ToString("C", vietnameseCulture);
+
+        return amount.ToString("C", vietnameseCulture);
+    }
+
+    private double CalculateSubtotal()
+    {
+        if (_lstCartItem == null || !_lstCartItem.Any()) return 0;
+
+        return _lstCartItem.Sum(i => (i.PatchPrice));
+    }
+
+    private double CalculateTotal()
+    {
+        double subTotal = CalculateSubtotal();
+        double afterDiscount = subTotal - _discountAmount;
+
+        if (_isUsePoint)
+        {
+            _point = (int)Math.Min(afterDiscount, _mine.rewardPoint);
+        }
+        else
+        {
+            _point = 0;
+        }
+
+        double total = afterDiscount - _point;
+        return total < 0 ? 0 : total;
+    }
+
+    async Task OnSubmit()
+    {
+        if(_isLoading) return;
+
+        if(!_lstCartItem.Any())
+        {
+            _snackbar.Add("Giỏ hàng của bạn đang trống. Vui lòng thêm sản phẩm vào giỏ hàng.", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            _isLoading = true;
+
+            var lstItem = _lstCartItem.Select(item => new CheckoutItemModel
+            {
+                GameName = item.GameTitle,
+                PatchName = item.PatchName,
+                Price = item.PatchPrice,
+                PatchId = item.PatchId
+            }).ToList();
+
+            if (!lstItem.Any())
+            {
+                _snackbar.Add("Không có sản phẩm để thanh toán.", MudBlazor.Severity.Error);
+                return;
+            }
+
+            CheckoutModel payload = new CheckoutModel
+            {
+                ListItemCheckout = lstItem,
+                DiscountAmount = _discountAmount,
+                DiscountApplydId = _discountResponse != null ? _discountResponse.Id : -1,
+                UsedRewardPoint = _point,
+                Note = _note
+            };
+
+            var res = await _orderService.Checkout(payload, _token);
+
+            if (res.IsSuccess)
+            {
+                var data = res.Data;
+
+                await ClearCartAfterCheckout();
+                await _cartActionService.LoadCartAsync();
+
+                if(data.IsOrderZero)
+                {
+                    _snackbar.Add("Thanh toán thành công", MudBlazor.Severity.Success);
+                    navigation.NavigateTo(RouterConfig.Customer.OrderDetail.Replace(":id", data.OrderId.ToString()));
+                } else
+                {
+                    _snackbar.Add("Chuyển hướng đến cổng thanh toán...", MudBlazor.Severity.Info);
+                    navigation.NavigateTo(data.PaymentLink);
+                }
+
+                await LoadCartItemData();
+            }
+        } catch (Exception) {}
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task ClearCartAfterCheckout()
+    {
+        foreach (var item in _lstCartItem)
+        {
+            await _cartItemService.Delete(item.CartItemId, _token);
+        }
+    }
+
     private List<BreadcrumbItem> _itemBreadcrumbs = [
         new("TRANG CHỦ", href: RouterConfig.Customer.Home),
         new("THANH TOÁN", href: null, disabled: true),
@@ -135,12 +450,12 @@
 
     .mud-input-outlined-border {
         border-color: rgba(156, 163, 175, 0.3) !important;
-        border-radius: 9999px !important;
+        border-radius: 8px !important;
     }
 
     .mud-input-outlined {
         background-color: #242424 !important;
-        border-radius: 9999px !important;
+        border-radius: 8px !important;
         color: white !important;
     }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PatchSeller.API.DTOs;
 using PatchSeller.DAL.Repository;
 using System.Security.Claims;
 
@@ -16,7 +17,7 @@ namespace PatchSeller.API.Controllers.Public
         }
 
         [HttpGet("ApplyDiscountCodeValue")]
-        public async Task<ActionResult<decimal>> ApplyDiscountCodeValue(string code, double totalAmount)
+        public async Task<ActionResult<DiscountCodeDTO>> ApplyDiscountCodeValue(string code, double totalAmount)
         {
             try
             {
@@ -90,17 +91,30 @@ namespace PatchSeller.API.Controllers.Public
                             discount = discountCode.MaxDiscount ?? discount;
                         }
                        double finalDiscount = discount > totalAmount ? totalAmount : discount;
-                   
-                   
-                    return Ok(finalDiscount);
+
+                    DiscountCodeDTO result = new DiscountCodeDTO
+                    {
+                        Amount = finalDiscount,
+                        Code = discountCode.Code,
+                        Id = discountCode.DiscountId
+                    };
+
+                    return Ok(result);
                 }
                 else if (discountCode.DiscountType == Constant.DiscountType.Fixed) // Fixed Amount
                 {
 
 
                     double finalDiscount = discountCode.Value > totalAmount ? totalAmount : discountCode.Value;
-                                  
-                    return Ok(finalDiscount);
+
+                    DiscountCodeDTO result = new DiscountCodeDTO
+                    {
+                        Amount = finalDiscount,
+                        Code = discountCode.Code,
+                        Id = discountCode.DiscountId
+                    };
+
+                    return Ok(result);
                 }
                 else
                 {

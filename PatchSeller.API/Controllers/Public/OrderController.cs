@@ -183,8 +183,8 @@ namespace PatchSeller.API.Controllers.Public
             tempOrder.DiscountAmount = checkoutParam.DiscountAmount;
             tempOrder.Status = Constant.OrderStatus.OrderWaitingForPayment;
             tempOrder.UserId = int.Parse(userIdClaim);
-            tempOrder.DiscountId = checkoutParam.DiscountApplydId;
-            tempOrder.Note = "";
+            tempOrder.DiscountId = checkoutParam.DiscountApplydId > 0 ? checkoutParam.DiscountApplydId : null;
+            tempOrder.Note = checkoutParam.Note;
             tempOrder.PaymentLink = "";
 
             var result = await _orderRepository.Create(tempOrder);

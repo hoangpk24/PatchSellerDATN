@@ -8,6 +8,6 @@
 
         public double DiscountAmount { get; set; } = 0;
         
-
+        public string? Note { get; set; } = string.Empty; 
     }
 }
