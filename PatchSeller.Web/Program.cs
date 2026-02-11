@@ -47,6 +47,8 @@ builder.Services.AddScoped<GameService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<CartActionService>();
 builder.Services.AddScoped<CartItemService>();
+builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<DiscountCodeService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {

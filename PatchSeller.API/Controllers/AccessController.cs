@@ -163,7 +163,7 @@ namespace PatchSeller.API.Controllers
                 }
 
                 var userId = int.Parse(User.FindFirst(ClaimTypes.SerialNumber)?.Value);
-
+                var user = await _customerRepository.GetById(userId);
                 var cart = cartRepository.GetCartByUserId(userId);
 
                 var userInfo = new
@@ -177,6 +177,7 @@ namespace PatchSeller.API.Controllers
                     rankId = User.FindFirst(ClaimTypes.Surname)?.Value,
                     cartId = cart != null ? cart.Id : 0,
                     rankName = rankName,
+                    rewardPoint = user != null ? user.RewardPoint : 0,
                     expirationTime = expirationTime,
                     isExpired = isExpired
                 };

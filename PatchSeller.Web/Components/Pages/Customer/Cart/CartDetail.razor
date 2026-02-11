@@ -95,7 +95,7 @@
                     <span class="w-[calc(100%-144px)] whitespace-pre-wrap text-right text-2xl font-bold text-purple-500">@(_lstCartItem.Any() ? _lstCartItem.Sum(x => x.PatchPrice).ToString("C0", vietnameseCulture) : "0đ")</span>
                 </div>
                 <MudDivider Class="my-6 !border-white/15" />
-                <MudButton Disabled="@(_isLoading || !_lstCartItem.Any())" Variant="Variant.Filled" FullWidth Class="!rounded-full !bg-purple-500 !py-3 !text-white">
+                <MudButton OnClick="OnCheckout" Disabled="@(_isLoading || !_lstCartItem.Any())" Variant="Variant.Filled" FullWidth Class="!rounded-full !bg-purple-500 !py-3 !text-white">
                     Tiến hành thanh toán
                 </MudButton>
             </div>
@@ -141,7 +141,6 @@
 
     List<CartItemDetailResponse> _lstCartItem = [];
 
-
     bool _isLoading = false;
 
     CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
@@ -183,6 +182,19 @@
         {
             _snackbar.Add("Đã có lỗi xảy ra, vui lòng thử lại!", MudBlazor.Severity.Error);
         }
+    }
+
+    void OnCheckout()
+    {
+        if (_isLoading) return;
+
+        if(!_lstCartItem.Any())
+        {
+            _snackbar.Add("Không có sản phẩm để thanh toán. Vui lòng chọn mua thêm", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        navigation.NavigateTo(RouterConfig.Customer.Checkout);
     }
 
     private List<BreadcrumbItem> _itemBreadcrumbs = [

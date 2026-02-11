@@ -13,6 +13,7 @@
 
         public string PhoneNumber { get; set; }  = string.Empty;
         public int cartId { get; set; }
+        public int rewardPoint { get; set; } = 0;
 
         public DateTime? ExpirationTime { get; set; }
 
