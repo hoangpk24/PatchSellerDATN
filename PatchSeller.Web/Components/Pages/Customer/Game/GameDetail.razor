@@ -23,7 +23,7 @@
                 @if(_gameDetail.Status != 2)
                 {
                     <div class="mt-6">
-                        <MudSelect T="int" Variant="Variant.Outlined" Label="Options" Value="_patchSelect" ValueChanged="HandleChangePatch">
+                        <MudSelect T="int" Variant="Variant.Outlined" Label="Options" Value="_patchSelect" ValueChanged="async (int id) => await HandleChangePatch(id)">
                             @if(_gameDetail.Patches != null && _gameDetail.Patches.Any())
                             {
                                 foreach (var item in _gameDetail.Patches)
@@ -339,6 +339,7 @@
                 {
                     _patchSelect = obj.PatchId;
                     _patchDetail = obj;
+                    await CheckOwnership(obj.PatchId);
                 }
             };
         }
@@ -411,19 +412,39 @@
         }
     }
 
-    void HandleChangePatch(int patchId)
+    async Task HandleChangePatch(int patchId)
     {
         try
         {
             _isLoading = true;
             _patchSelect = patchId;
 
-            var obj = _gameDetail.Patches.Where(x => x.PatchId == patchId).FirstOrDefault();
-            if (obj != null) _patchDetail = obj;
-        } catch(Exception) {}
+            var obj = _gameDetail.Patches.FirstOrDefault(x => x.PatchId == patchId);
+            if (obj != null)
+            {
+                _patchDetail = obj;
+                await CheckOwnership(patchId);
+            }
+        }
+        catch (Exception) { }
         finally
         {
             _isLoading = false;
+        }
+    }
+
+    async Task CheckOwnership(int patchId)
+    {
+        if (string.IsNullOrEmpty(_token))
+        {
+            _isOwned = false;
+            return;
+        }
+
+        var checkPatch = await _userPurchaseService.CheckPatchPurchased(patchId, _token);
+        if (checkPatch.IsSuccess)
+        {
+            _isOwned = checkPatch.Data;
         }
     }
 

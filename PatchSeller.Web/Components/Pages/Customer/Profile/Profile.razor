@@ -1,0 +1,108 @@
+﻿@page "/profile"
+
+<section>
+    <div class="w-full bg-[#9797971c] py-6">
+        <div class="mx-auto w-full max-w-[1520px] px-6">
+            <h1 class="mb-2.5 font-medium leading-tight text-[44px] text-white">Thông Tin</h1>
+            <MudBreadcrumbs Class="custom-breadcrumb !p-0 !text-xs" Items="_itemBreadcrumbs" Separator="/" />
+        </div>
+    </div>
+
+    <div class="mx-auto my-10 w-full max-w-[1520px]">
+        <div class="flex flex-col justify-between gap-8 md:flex-row lg:flex-row">
+            <div class="h-fit w-full bg-[#9797971c] px-4 py-6 md:w-80 lg:w-80">
+                <div class="flex flex-col items-center justify-center gap-4">
+                    <div class="flex flex-col items-center justify-center gap-1">
+                        <MudAvatar Class="!bg-purple-500 !text-white" Size="Size.Large">A</MudAvatar>
+                        <p class="text-center text-xl font-bold text-white">@_user.FullName</p>
+                    </div>
+
+                    <div>
+                        <p class="text-center text-white/70">@_user.Email</p>
+                        <p class="text-center text-white/70">@_user.PhoneNumber</p>
+                        <p class="text-center text-white/70">Ngày đăng ký: @_user.CreatedAt?.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                        <p class="text-center text-white/70">Số gói đã mua: @_isPatchBuyed</p>
+                    </div>
+
+                    <div class="flex w-full flex-col gap-2">
+                        <MudButton FullWidth Class="!rounded-md !bg-purple-500 !text-white" Variant="Variant.Filled" OnClick="HandleChangePassword">Đổi Mật Khẩu</MudButton>
+                        <MudButton FullWidth Class="!rounded-md !border-purple-500 !text-purple-500" Variant="Variant.Outlined" OnClick="HanldeLogout">Đăng Xuất</MudButton>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-[calc(100%-354px)] lg:w-[calc(100%-354px)]">
+                <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Color="Color.Primary" PanelClass="p-6" TabHeaderClass="!bg-[#9797971c] !text-purple-500">
+                    <MudTabPanel Text="Hóa Đơn">
+                        <Order />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Gói Đã Mua">
+                        <Patch />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Yêu Thích">
+                        <Favourites />
+                    </MudTabPanel>
+                </MudTabs>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public MineResponse _mine { get; set; }
+
+    DAL.Models.User _user = new DAL.Models.User();
+
+    int _isPatchBuyed = 0;
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        var resUser = await _mineService.GetById(_mine.Id);
+
+        if(resUser.IsSuccess)
+        {
+            _user = resUser.Data;    
+        }
+
+        var resPurchase = await _userPurchaseService.GetAllByUserId(_mine.Id);
+
+        if(resPurchase.IsSuccess && resPurchase.Data.Any())
+        {
+            _isPatchBuyed = resPurchase.Data.Count();
+        }
+    }
+
+    private async Task HandleChangePassword()
+    {
+        var paraeters = new DialogParameters<Components.Common.Customer.ChangePasswordDialog>
+        {
+            {x => x._token, _token}
+        };
+
+        var dialog = await _dialogService.ShowAsync<Components.Common.Customer.ChangePasswordDialog>("Options Dialog", paraeters, _dialogOptions);
+    }
+
+    async Task HanldeLogout()
+    {
+        await _localStorage.RemoveItemAsync(Constant.TokenNameLocalStorage);
+        await _localStorage.RemoveItemAsync(Constant.TokenExpiredLocalStorage);
+        await _localStorage.RemoveItemAsync(Constant.UserInfoLocalStorage);
+        await _localStorage.RemoveItemAsync(Constant.UserFirstLoginLocalStorage);
+        navigation.NavigateTo(RouterConfig.Customer.Login, true);
+    } 
+
+    private List<BreadcrumbItem> _itemBreadcrumbs = [
+        new("TRANG CHỦ", href: RouterConfig.Customer.Home),
+        new("THÔNG TIN", href: null, disabled: true),
+    ];
+}

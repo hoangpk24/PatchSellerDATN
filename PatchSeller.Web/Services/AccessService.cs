@@ -165,7 +165,7 @@ namespace PatchSeller.Web.Services
             }
         }
 
-        public async Task<ServiceResult<bool>> ChangePassword(ChangePasswordModel request, string token)
+        public async Task<ServiceResult<bool>> ChangePassword(CustomerChangePasswordModel request, string token)
         {
 
             var payload = new ChangePasswordModel()

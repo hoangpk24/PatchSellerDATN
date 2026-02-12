@@ -26,6 +26,7 @@ namespace PatchSeller.API.DTOs
         public int OrderId { get; set; }
         public int PatchId { get; set; }
         public int GameId { get; set; }
+        public string GameThumbnail { get; set; } = string.Empty;
         public string GameName { get; set; } = string.Empty;
         public string PatchName { get; set; } = string.Empty;
         public double Price { get; set; }

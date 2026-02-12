@@ -17,7 +17,7 @@ namespace PatchSeller.API.Controllers.Public
         }
 
         [HttpGet("get-purchase-by-user-id/{userId}")]
-        public async Task<ActionResult<List<Patch>>> GetPurchaseByUserId(int userId)
+        public async Task<ActionResult<List<UserPurchase>>> GetPurchaseByUserId(int userId)
         {
             try
             {                

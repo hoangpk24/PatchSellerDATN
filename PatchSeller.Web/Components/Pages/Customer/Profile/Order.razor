@@ -1,0 +1,162 @@
+﻿<MudTable Items="@_lstOrder"
+          Elevation="0"
+          Loading="@_isLoading"
+          Hover="true"
+          Virtualize="true"
+          FixedHeader="true"
+          HorizontalScrollbar="true"
+          Class="transparent-table"
+          Height="calc(100lvh - 357px)">
+    <HeaderContent>
+        <MudTh hidden>ID</MudTh>
+        <MudTh>Mã hóa đơn</MudTh>
+        <MudTh>Thời gian</MudTh>
+        <MudTh Style="text-align:right">Chiết Khấu</MudTh>
+        <MudTh Style="text-align:right">Dùng điểm</MudTh>
+        <MudTh Style="text-align:right">Tổng tiền</MudTh>
+        <MudTh Style="text-align:center">Trạng thái</MudTh>
+        <MudTh>Ghi chú</MudTh>
+        <MudTh>Chi tiết</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="ID" hidden>@context.OrderId</MudTd>
+        <MudTd DataLabel="Mã hóa đơn">@context.OrderCode</MudTd>
+        <MudTd DataLabel="Thời gian">@context.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")</MudTd>
+        <MudTd DataLabel="Chiết Khấu" Style="text-align:right">@context.DiscountAmount.ToString("C0", vietnameseCulture)</MudTd>
+        <MudTd DataLabel="Dùng điểm" Style="text-align:right">@context.UsedRewardPoint.ToString("N0")</MudTd>
+        <MudTd DataLabel="Tổng tiền" Style="text-align:right" Class="font-bold">@context.FinalAmount.ToString("C0", vietnameseCulture)</MudTd>
+        <MudTd DataLabel="Trạng thái" Style="text-align:center">
+            <span class="@GetStatusStyle(context.Status)">
+                @GetStatusName(context.Status)
+            </span>
+        </MudTd>
+        <MudTd DataLabel="Ghi chú">@context.Note</MudTd>
+        <MudTd DataLabel="Ghi chú">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" aria-label="detail" OnClick="@(() => HandleShowOrderDetail(context.OrderId))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="my-4" Color="Color.Inherit">Không có dữ liệu.</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <div class="flex w-full flex-col gap-3 opacity-50">
+            @for (var i = 0; i < 5; i++)
+            {
+                <div class="flex items-center justify-between gap-2 px-2">
+                    <MudSkeleton Width="100%" Height="5rem" />
+                    <MudSkeleton Width="100%" Height="5rem" />
+                    <MudSkeleton Width="100%" Height="5rem" />
+                    <MudSkeleton Width="100%" Height="5rem" />
+                </div>
+            }
+        </div>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    List<OrderWithDetailResponse> _lstOrder = [];
+    private bool _isLoading = false;
+
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+    System.Globalization.CultureInfo vietnameseCulture = new System.Globalization.CultureInfo("vi-VN");
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+        }
+        catch (Exception) { }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var resOrder = await _orderService.GetAll(_token);
+        if (resOrder.IsSuccess)
+        {
+            _lstOrder = resOrder.Data;
+        }
+    }
+
+    private async Task HandleShowOrderDetail(int id)
+    {
+        var paraeters = new DialogParameters<Components.Common.Customer.OrderDetailDialog>
+        {
+            {x => x._orderId, id},
+            {x => x._token, _token}
+        };
+
+        var dialog = await _dialogService.ShowAsync<Components.Common.Customer.OrderDetailDialog>("Options Dialog", paraeters, _dialogOptions);
+    }
+
+
+    private string GetStatusStyle(int status)
+    {
+        string baseClass = "font-medium uppercase px-2 py-1 rounded-md ";
+        return status switch
+        {
+            1 => baseClass + "text-green-500",      // Hoàn thành
+            2 => baseClass + "text-white",          // Chờ thanh toán
+            3 => baseClass + "text-red-500",        // Huỷ
+            _ => baseClass + "text-gray-400"
+        };
+    }
+
+    private string GetStatusName(int status)
+    {
+        return status switch
+        {
+            1 => "Hoàn thành",
+            2 => "Chờ thanh toán",
+            3 => "Đã hủy",
+            _ => "Không xác định"
+        };
+    }
+}
+
+<style>
+    /* Nền bảng trong suốt */
+    .transparent-table
+    {
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .mud-table-head > .mud-table-row > .mud-table-cell {
+        background-color: #212121 !important;
+    }
+
+    .transparent-table th,
+    .transparent-table td,
+    .transparent-table .mud-table-cell,
+    .transparent-table .mud-table-sort-label,
+    .transparent-table .mud-table-pager,
+    .transparent-table .mud-table-pager-info {
+        color: white !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Đổi màu icon phân trang và icon sắp xếp sang trắng */
+    .transparent-table .mud-icon-root.mud-svg-icon,
+    .mud-table-page-number-information,
+    .mud-table-pagination-information,
+    .mud-input-slot {
+        color: white !important;
+    }
+
+    /* Hiệu ứng hover dòng */
+    .transparent-table .mud-table-row:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+</style>

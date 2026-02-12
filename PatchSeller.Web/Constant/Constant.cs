@@ -136,5 +136,12 @@
             public const int InActive = 0;
             public const int CommingSoon = 2;
         }
+
+        public static class OrderStatus
+        {
+            public const int OrderWaitingForPayment = 2; // Chờ thanh toán
+            public const int OrderCanceled = 3; // Huỷ
+            public const int OrderDone = 1; // Hoàn thành
+        }
     }
 }

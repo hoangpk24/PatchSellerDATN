@@ -48,6 +48,7 @@ namespace PatchSeller.API.Controllers.Admin
                         OrderId = od.OrderId,
                         PatchId = od.PatchId,
                         GameId = od.Patch?.GameId ?? 0,
+                        GameThumbnail = od.Patch?.Game?.Thumbnail ?? string.Empty,
                         GameName = od.Patch?.Game?.Title ?? string.Empty,
                         PatchName = od.Patch?.Name ?? string.Empty,
                         Price = od.Price,
