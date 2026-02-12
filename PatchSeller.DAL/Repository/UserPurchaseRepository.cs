@@ -28,6 +28,18 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<UserPurchase>> GetPurchaseByUserId(int userId)
+        {
+            try
+            {
+                return await _context.UserPurchases.Where(x => x.UserId == userId).ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<UserPurchase> GetById(int id)
         {
             try

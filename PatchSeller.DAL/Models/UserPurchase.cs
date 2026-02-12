@@ -11,9 +11,9 @@ public class UserPurchase
 
     [ForeignKey("UserId")]
     public int UserId { get; set; }
-    public User User { get; set; }
+    public User? User { get; set; }
     
     [ForeignKey("PatchId")]
     public int PatchId { get; set; }
-    public Patch Patch { get; set; }
+    public Patch? Patch { get; set; }
 }
