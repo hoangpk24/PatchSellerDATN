@@ -93,6 +93,7 @@
 
         public static class Customer
         {
+            public const string GetUserById = "/user/get-user-by-id/:id";
             public const string GameForHome = "/game/get-for-home";
             public const string GameDetail = "/game/get-by-id-detail/:id";
             public const string addCart = "/cart/add-to-cart";
@@ -102,6 +103,10 @@
             public const string ApplyDiscountCode = "/discount/ApplyDiscountCodeValue";
             public const string PaymentSuccess = "/order/payment-success";
             public const string PaymentCancelled = "/order/payment-cancelled";
+            public const string GetAllOrder = "/order/get-all";
+            public const string GetOrderDetail = "/order/get-order-detail/:id";
+            public const string GetAllUserPurchase = "/user-purchase/get-purchase-by-user-id/:id";
+            public const string CheckPatchPurchased = "/user-purchase/check-patch-purchased/:id";
         }
     }
 }

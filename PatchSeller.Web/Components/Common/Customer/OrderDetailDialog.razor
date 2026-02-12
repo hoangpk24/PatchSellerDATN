@@ -1,0 +1,185 @@
+﻿<MudDialog Class="!bg-[#121212] !text-white" Style="min-width: 800px; max-height: 90vh;">
+    <TitleContent>
+        <div class="flex items-center justify-between pr-4">
+            <MudText Style="font-size: 20px; font-weight: bold; text-transform: uppercase; color: white">
+                Chi tiết hóa đơn: @_orderDetail.OrderCode
+            </MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Inherit" OnClick="Cancel" />
+        </div>
+    </TitleContent>
+    <DialogContent>
+        @if (_isLoading)
+        {
+            <div class="flex flex-col gap-4 p-4">
+                <MudSkeleton Width="100%" Height="40px" />
+                <MudSkeleton Width="100%" Height="200px" />
+            </div>
+        }
+        else
+        {
+            <div class="p-2">
+                <div class="mb-6 grid grid-cols-2 gap-x-8 gap-y-4 rounded-lg border border-white/10 bg-white/5 p-4">
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-gray-400">Ngày mua:</span>
+                        <span class="font-medium">@_orderDetail.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-gray-400">Trạng thái:</span>
+                        <span class="@GetStatusStyle(_orderDetail.Status) font-bold">@GetStatusName(_orderDetail.Status)</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-gray-400">Tổng tiền đơn:</span>
+                        <span>@_orderDetail.TotalAmount.ToString("C0", vietnameseCulture)</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-gray-400">Chiết khấu:</span>
+                        <span class="text-red-400">- @_orderDetail.DiscountAmount.ToString("C0", vietnameseCulture)</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-gray-400">Điểm đã dùng:</span>
+                        <span>@_orderDetail.UsedRewardPoint.ToString("N0") điểm</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-gray-400">Thanh toán cuối:</span>
+                        <span class="text-lg font-bold text-green-400">@_orderDetail.FinalAmount.ToString("C0", vietnameseCulture)</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(_orderDetail.Note))
+                    {
+                        <div class="col-span-2 flex flex-col gap-1">
+                            <span class="text-gray-400">Ghi chú:</span>
+                            <span class="text-sm italic">@_orderDetail.Note</span>
+                        </div>
+                    }
+                </div>
+
+                @if (_orderDetail.Status == 2)
+                {
+                    bool isExpired = _orderDetail.PaymentExpiration.HasValue && _orderDetail.PaymentExpiration < DateTime.Now;
+
+                    <div class="mb-6 flex flex-col @(isExpired ? "bg-red-500/10 border-red-500/30" : "bg-blue-500/10 border-blue-500/30") items-center gap-3 rounded-lg border p-4">
+                        <div class="text-center">
+                            @if (isExpired)
+                            {
+                                <MudText Color="Color.Error" Typo="Typo.body2" Class="font-bold uppercase text-red-500">Thanh toán đã quá hạn</MudText>
+                            }
+                            else
+                            {
+                                <MudText Color="Color.Info" Typo="Typo.body2">Đơn hàng sẽ hết hạn lúc:</MudText>
+                            }
+                            <MudText Class="font-bold text-white">@(_orderDetail.PaymentExpiration?.ToString("dd/MM/yyyy HH:mm:ss") ?? "---")</MudText>
+                        </div>
+
+                        <p class="text-sm text-white">Vui lòng liên hệ với ITEAM để tạo đơn mua hàng mới. Xin cảm ơn!</p>
+
+                        <MudButton Variant="Variant.Filled"
+                                   Color="isExpired ? Color.Error : Color.Primary"
+                                   Size="Size.Large"
+                                   FullWidth="true"
+                                   Disabled="isExpired"
+                                   Class="disabled:!text-white/70"
+                                   StartIcon="@(isExpired ? Icons.Material.Filled.TimerOff : Icons.Material.Filled.Payment)"
+                                   Href="@_orderDetail.PaymentLink">
+                            @(isExpired ? "Không thể thanh toán" : "Thanh toán ngay")
+                        </MudButton>
+                    </div>
+                }
+
+                <MudTable Items="@_orderDetail.OrderDetails"
+                          Elevation="0"
+                          Dense="true"
+                          Class="transparent-table-dialog"
+                          Hover="true">
+                    <HeaderContent>
+                        <MudTh>Sản phẩm</MudTh>
+                        <MudTh>Bản Patch</MudTh>
+                        <MudTh Style="text-align:right">Đơn giá</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Sản phẩm">
+                            <div class="flex items-center gap-3">
+                                <img src="@context.GameThumbnail" class="aspect-[1/1.6] max-w-[100px] object-cover" />
+                                <span class="font-medium">@context.GameName</span>
+                            </div>
+                        </MudTd>
+                        <MudTd DataLabel="Bản Patch">@context.PatchName</MudTd>
+                        <MudTd DataLabel="Đơn giá" Style="text-align:right">
+                            @context.Price.ToString("C0", vietnameseCulture)
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </div>
+        }
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter] public int _orderId { get; set; }
+    [Parameter] public string _token { get; set; }
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+
+    OrderWithDetailResponse _orderDetail = new OrderWithDetailResponse();
+    private bool _isLoading = false;
+    System.Globalization.CultureInfo vietnameseCulture = new System.Globalization.CultureInfo("vi-VN");
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+        }
+        catch (Exception) { }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var resOrder = await _orderService.GetById(_orderId, _token);
+        if (resOrder.IsSuccess)
+        {
+            _orderDetail = resOrder.Data;
+        }
+    }
+
+    private string GetStatusStyle(int status) => status switch
+    {
+        1 => "text-green-500",
+        2 => "text-white underline decoration-dotted",
+        3 => "text-red-500",
+        _ => "text-gray-400"
+    };
+
+    private string GetStatusName(int status) => status switch
+    {
+        1 => "Hoàn thành",
+        2 => "Chờ thanh toán",
+        3 => "Đã hủy",
+        _ => "Không xác định"
+    };
+
+    private void Cancel() => MudDialog.Cancel();
+}
+
+<style>
+    /* Table trong suốt dành riêng cho Dialog */
+    .transparent-table-dialog {
+        background-color: transparent !important;
+    }
+
+        .transparent-table-dialog th {
+            color: #9ca3af !important; /* text-gray-400 */
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            border-bottom: 2px solid rgba(255,255,255,0.1) !important;
+        }
+
+        .transparent-table-dialog td {
+            color: white !important;
+            border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+            padding: 12px 8px !important;
+        }
+</style>
