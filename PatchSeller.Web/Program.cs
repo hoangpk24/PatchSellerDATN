@@ -41,6 +41,7 @@ builder.Services.AddScoped<AdminGameService>();
 builder.Services.AddScoped<AdminPatchService>();
 builder.Services.AddScoped<AdminPatchVersionService>();
 builder.Services.AddScoped<AdminUploadService>();
+builder.Services.AddScoped<AdminOrderService>();
 
 // Customer Service
 builder.Services.AddScoped<GameService>();

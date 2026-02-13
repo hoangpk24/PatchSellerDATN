@@ -349,7 +349,7 @@
                 return;
             }
 
-            if(_uploadFileResponse.Link != _oldFileLink)
+            if (_uploadFileResponse.LinkDownload != _oldFileLink)
             {
                 if (!string.IsNullOrEmpty(_oldFileLink))
                 {
@@ -358,9 +358,9 @@
             }
 
             _model.VersionName = _model.VersionName.Trim();
-            if(_oldFileLink != _uploadFileResponse.Link)
+            if (_oldFileLink != _uploadFileResponse.LinkDownload)
             {
-                _model.Links = _uploadFileResponse.Link;
+                _model.Links = _uploadFileResponse.LinkDownload;
                 _model.FileSize = _uploadFileResponse?.Size ?? 0;
             }
             if (!string.IsNullOrEmpty(_model.InstallationGuide)) _model.InstallationGuide = _model.InstallationGuide.Trim();

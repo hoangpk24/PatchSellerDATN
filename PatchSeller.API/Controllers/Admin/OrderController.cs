@@ -41,6 +41,12 @@ namespace PatchSeller.API.Controllers.Admin
                 Status = order.Status,
                 UserId = order.UserId,
                 DiscountId = order.DiscountId,
+                User = order.User == null ? null : new UserDetailDTO
+                {
+                    FullName = order.User.FullName ?? string.Empty,
+                    Email = order.User.Email ?? string.Empty,
+                    PhoneNumber = order.User.PhoneNumber ?? string.Empty,
+                },
                 OrderDetails = order.OrderDetails?
                     .Select(od => new OrderDetailItemDTO
                     {

@@ -85,7 +85,7 @@
         var resOrder = await _orderService.GetAll(_token);
         if (resOrder.IsSuccess)
         {
-            _lstOrder = resOrder.Data;
+            _lstOrder = resOrder.Data.OrderByDescending(x => x.OrderDate).ToList();
         }
     }
 

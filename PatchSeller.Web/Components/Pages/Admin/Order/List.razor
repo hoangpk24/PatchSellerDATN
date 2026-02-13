@@ -7,7 +7,122 @@
     <div class="flex items-center justify-between">
         <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách hóa đơn</h1>
     </div>
+
+    <div class="mt-8 rounded bg-white shadow-md">
+        <MudTable Items="@_lstOrder"
+                  Elevation="0"
+                  Loading="@_isLoading"
+                  Hover="true"
+                  Virtualize="true"
+                  FixedHeader="true"
+                  HorizontalScrollbar="true"
+                  Height="calc(100lvh - 233px)">
+            <HeaderContent>
+                <MudTh hidden>ID</MudTh>
+                <MudTh>Mã hóa đơn</MudTh>
+                <MudTh>Thời gian</MudTh>
+                <MudTh>Khách hàng</MudTh>
+                <MudTh Style="text-align:right">Chiết Khấu</MudTh>
+                <MudTh Style="text-align:right">Dùng điểm</MudTh>
+                <MudTh Style="text-align:right">Tổng tiền</MudTh>
+                <MudTh Style="text-align:center">Trạng thái</MudTh>
+                <MudTh>Ghi chú</MudTh>
+                <MudTh>Chi tiết</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="ID" hidden>@context.OrderId</MudTd>
+                <MudTd DataLabel="Mã hóa đơn">@context.OrderCode</MudTd>
+                <MudTd DataLabel="Tài khoản">@context.User.FullName - @context.User.PhoneNumber</MudTd>
+                <MudTd DataLabel="Thời gian">@context.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")</MudTd>
+                <MudTd DataLabel="Chiết Khấu" Style="text-align:right">@context.DiscountAmount.ToString("C0", vietnameseCulture)</MudTd>
+                <MudTd DataLabel="Dùng điểm" Style="text-align:right">@context.UsedRewardPoint.ToString("N0")</MudTd>
+                <MudTd DataLabel="Tổng tiền" Style="text-align:right" Class="font-bold">@context.FinalAmount.ToString("C0", vietnameseCulture)</MudTd>
+                <MudTd DataLabel="Trạng thái" Style="text-align:center">
+                    <span class="@GetStatusStyle(context.Status)">
+                        @GetStatusName(context.Status)
+                    </span>
+                </MudTd>
+                <MudTd DataLabel="Ghi chú">@context.Note</MudTd>
+                <MudTd DataLabel="Ghi chú">
+                    <MudIconButton Icon="@Icons.Material.Filled.Menu" aria-label="detail" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.OrderDetail.Replace(":id", context.OrderId.ToString())))"></MudIconButton>
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText Class="my-4" Color="Color.Inherit">Không có dữ liệu.</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <div class="flex w-full flex-col gap-3 opacity-50">
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        <div class="flex items-center justify-between gap-2 px-2">
+                            <MudSkeleton Width="100%" Height="5rem" />
+                            <MudSkeleton Width="100%" Height="5rem" />
+                            <MudSkeleton Width="100%" Height="5rem" />
+                            <MudSkeleton Width="100%" Height="5rem" />
+                        </div>
+                    }
+                </div>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    </div>
 </section>
 
 @code {
+
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    List<OrderWithDetailResponse> _lstOrder = [];
+    private bool _isLoading = false;
+
+    System.Globalization.CultureInfo vietnameseCulture = new System.Globalization.CultureInfo("vi-VN");
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+        }
+        catch (Exception) { }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var resOrder = await _adminOrderService.GetAll(_token);
+        if (resOrder.IsSuccess)
+        {
+            _lstOrder = resOrder.Data.OrderByDescending(x => x.OrderDate).ToList();
+        }
+    }
+
+    private string GetStatusStyle(int status)
+    {
+        string baseClass = "font-medium uppercase px-2 py-1 rounded-md ";
+        return status switch
+        {
+            1 => baseClass + "text-green-500",      // Hoàn thành
+            2 => baseClass + "text-white",          // Chờ thanh toán
+            3 => baseClass + "text-red-500",        // Huỷ
+            _ => baseClass + "text-gray-400"
+        };
+    }
+
+    private string GetStatusName(int status)
+    {
+        return status switch
+        {
+            1 => "Hoàn thành",
+            2 => "Chờ thanh toán",
+            3 => "Đã hủy",
+            _ => "Không xác định"
+        };
+    }
 }

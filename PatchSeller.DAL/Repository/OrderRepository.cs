@@ -66,6 +66,7 @@ namespace PatchSeller.DAL.Repository
                         .ThenInclude(od => od.Patch)
                             .ThenInclude(p => p!.PatchImages)
                     .Include(o => o.Discount)
+                    .Include(o => o.User)
                     .FirstOrDefaultAsync(o => o.OrderId == id);
             }
             catch (Exception)

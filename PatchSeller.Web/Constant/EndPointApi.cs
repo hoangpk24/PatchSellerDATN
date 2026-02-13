@@ -89,6 +89,10 @@
             public const string PatchVersionCreate = "/admin/patch-version/create";
             public const string PatchVersionUpdate = "/admin/patch-version/update";
             public const string PatchVersionDelete = "/admin/patch-version/delete/:id";
+
+            // Order
+            public const string Orders = "/admin/order/get-all";
+            public const string OrderDetail = "/admin/order/get-order-detail/:id";
         }
 
         public static class Customer

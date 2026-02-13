@@ -1,3 +1,5 @@
+using PatchSeller.DAL.Models;
+
 namespace PatchSeller.API.DTOs
 {
     public class OrderDetailResponseDTO
@@ -16,7 +18,7 @@ namespace PatchSeller.API.DTOs
         public int Status { get; set; }
         public int UserId { get; set; }
         public int? DiscountId { get; set; }
-
+        public UserDetailDTO User { get; set; } = new UserDetailDTO();
         public List<OrderDetailItemDTO> OrderDetails { get; set; } = new List<OrderDetailItemDTO>();
     }
 
