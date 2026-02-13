@@ -16,7 +16,7 @@
         public int Status { get; set; }
         public int UserId { get; set; }
         public int? DiscountId { get; set; }
-
+        public UserDetailResponse User { get; set; } = new UserDetailResponse();
         public List<OrderDetailItemResponse> OrderDetails { get; set; } = new List<OrderDetailItemResponse>();
 
         public class OrderDetailItemResponse

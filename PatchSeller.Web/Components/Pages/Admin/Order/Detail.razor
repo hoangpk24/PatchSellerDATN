@@ -1,13 +1,177 @@
 ﻿@page "/admin/order/{id:int}/detail"
 @layout AdminLayout
 
-<PageTitle>@Constant.PageTitleAdmin Order Detail</PageTitle>
+<PageTitle>@Constant.PageTitleAdmin - Order Detail</PageTitle>
 
-<section class="p-6">
-    <div class="flex items-center justify-between">
-        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Hóa đơn chi tiết</h1>
+<section class="mx-auto max-w-[1200px] p-6">
+    <div class="mb-6 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" OnClick="BackToList" Color="Color.Default" />
+            <h1 class="text-3xl font-bold text-material-default">Hóa đơn chi tiết</h1>
+        </div>
+        <div class="flex gap-2">
+            <MudChip T="string" Color="@GetStatusColor(_orderDetail.Status)" Variant="Variant.Filled" Class="font-bold">
+                @GetStatusName(_orderDetail.Status)
+            </MudChip>
+        </div>
     </div>
+
+    @if (_isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+    }
+    else
+    {
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div class="space-y-6 lg:col-span-2">
+                <div class="rounded bg-white p-6 shadow-md">
+                    <div class="mb-4 flex items-center gap-2 border-b pb-3">
+                        <MudIcon Icon="@Icons.Material.Filled.Receipt" Color="Color.Primary" />
+                        <span class="text-lg font-bold">Thông tin hóa đơn</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500">Mã hóa đơn</p>
+                            <p class="font-medium">@_orderDetail.OrderCode</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Ngày tạo</p>
+                            <p class="font-medium">@_orderDetail.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Trạng thái thanh toán</p>
+                            <p class="font-medium text-blue-600">@_orderDetail.PaymentStatus</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Ghi chú</p>
+                            <p class="font-medium italic">@(_orderDetail.Note ?? "Không có")</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded bg-white shadow-md">
+                    <div class="border-b p-6">
+                        <span class="text-lg font-bold">Danh sách sản phẩm</span>
+                    </div>
+                    <MudTable Items="@_orderDetail.OrderDetails" Elevation="0" Hover="true" Dense="true">
+                        <HeaderContent>
+                            <MudTh>Sản phẩm</MudTh>
+                            <MudTh>Phiên bản</MudTh>
+                            <MudTh Style="text-align:right">Đơn giá</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>
+                                <div class="flex items-center gap-3">
+                                    <MudImage Src="@context.GameThumbnail" Width="80" Height="45" ObjectFit="ObjectFit.Cover" Class="rounded-lg shadow-sm" />
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-gray-700">@context.GameName</span>
+                                    </div>
+                                </div>
+                            </MudTd>
+                            <MudTd>
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Secondary">@context.PatchName</MudChip>
+                            </MudTd>
+                            <MudTd Style="text-align:right" Class="whitespace-nowrap font-medium">
+                                @context.Price.ToString("C0", vietnameseCulture)
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="rounded bg-white p-6 shadow-md">
+                    <div class="mb-4 flex items-center gap-2 border-b pb-3">
+                        <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Primary" />
+                        <span class="text-lg font-bold">Khách hàng</span>
+                    </div>
+                    @if (_orderDetail.User != null)
+                    {
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Tên:</span>
+                                <span class="font-bold">@_orderDetail.User.FullName</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Email:</span>
+                                <span>@_orderDetail.User.Email</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Số điện thoại:</span>
+                                <span>@_orderDetail.User.PhoneNumber</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="rounded bg-white p-6 shadow-md">
+                    <div class="mb-4 flex items-center gap-2 border-b pb-3">
+                        <MudIcon Icon="@Icons.Material.Filled.Payments" Color="Color.Primary" />
+                        <span class="text-lg font-bold">Thanh toán</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-gray-600">
+                            <span>Tạm tính:</span>
+                            <span>@_orderDetail.TotalAmount.ToString("C0", vietnameseCulture)</span>
+                        </div>
+                        <div class="flex justify-between text-red-500">
+                            <span>Chiết khấu:</span>
+                            <span>- @_orderDetail.DiscountAmount.ToString("C0", vietnameseCulture)</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Điểm đã dùng:</span>
+                            <span>@_orderDetail.UsedRewardPoint.ToString("N0") pt</span>
+                        </div>
+                        <div class="flex justify-between border-t pt-3">
+                            <span class="text-lg font-bold">Tổng cộng:</span>
+                            <span class="text-primary text-xl font-bold">@_orderDetail.FinalAmount.ToString("C0", vietnameseCulture)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </section>
 
 @code {
+    [Parameter] public int id { get; set; }
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)] public string _token { get; set; }
+
+    private OrderWithDetailResponse _orderDetail = new();
+    private bool _isLoading = false;
+    private System.Globalization.CultureInfo vietnameseCulture = new("vi-VN");
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        await LoadData();
+        _isLoading = false;
+    }
+
+    async Task LoadData()
+    {
+        var resOrderDetail = await _adminOrderService.GetById(id, _token);
+        if (resOrderDetail.IsSuccess)
+        {
+            _orderDetail = resOrderDetail.Data;
+        }
+    }
+
+    private Color GetStatusColor(int status) => status switch
+    {
+        1 => Color.Success,    // Hoàn thành
+        2 => Color.Warning,    // Chờ thanh toán
+        3 => Color.Error,      // Đã hủy
+        _ => Color.Default
+    };
+
+    private string GetStatusName(int status) => status switch
+    {
+        1 => "HOÀN THÀNH",
+        2 => "CHỜ THANH TOÁN",
+        3 => "ĐÃ HỦY",
+        _ => "KHÔNG XÁC ĐỊNH"
+    };
+
+    private void BackToList() => navigation.NavigateTo("/admin/order");
 }
