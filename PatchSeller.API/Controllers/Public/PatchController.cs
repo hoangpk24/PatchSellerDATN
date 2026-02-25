@@ -20,6 +20,12 @@ namespace PatchSeller.API.Controllers.Public
         private static PatchDetailDTO MapToPatchDetailDTO(Patch patch)
         {
             if (patch == null) return null;
+
+            if (patch.Delete == true)
+            {
+                return null;
+            }
+
             return new PatchDetailDTO
             {
                 PatchId = patch.PatchId,
@@ -41,7 +47,7 @@ namespace PatchSeller.API.Controllers.Public
                         IsThumbnail = pi.IsThumbnail
                     }).ToList() ?? new List<PatchImageBasicDTO>(),
                 PatchVersions = patch.PatchVersions?
-                    .Where(pv => pv.Delete != true)
+                    .Where(pv => pv.Delete != true && pv.Status == 1)
                     .Select(pv => new PatchVersionBasicDTO
                     {
                         PatchVersionId = pv.PatchVersionId,
@@ -67,20 +73,24 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                List<Patch> result = await _patchRepository.GetAll(keyword);
+                List<Patch> result = await _patchRepository.GetAllForPublic(keyword);
                 if (result == null)
                 {
-                    return NoContent();
+                    
+                    return Ok(new List<Patch>());
                 }
                 if (result.Any())
                 {
-                    result = result.OrderByDescending(c => c.CreatedAt).Where(x=>x.Status==1).ToList();
+                    result = result
+                        .Where(x => x.Status == 1 && x.Delete != true)
+                        .OrderByDescending(c => c.CreatedAt)
+                        .ToList();
                 }
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, Constant.ErrorCode.OtherError);
+                return BadRequest();
             }
         }
 
@@ -89,8 +99,8 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                var result = await _patchRepository.GetById(id);
-                if (result == null)
+                var result = await _patchRepository.GetByIdForPublic(id);
+                if (result == null || result.Delete == true || result.Status != 1)
                 {
                     return NotFound(Constant.ErrorCode.NotFound);
                 }
@@ -107,16 +117,22 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                List<Patch> result = await _patchRepository.GetByGameId(gameId);
+                List<Patch> result = await _patchRepository.GetByGameIdForPublic(gameId);
                 if (result == null)
                 {
-                    return NoContent();
+                    return Ok(new List<PatchDetailDTO>());
                 }
                 if (result.Any())
                 {
-                    result = result.OrderByDescending(c => c.CreatedAt).Where(x=>x.Status==1).ToList();
+                    result = result
+                        .Where(x => x.Status == 1 && x.Delete != true)
+                        .OrderByDescending(c => c.CreatedAt)
+                        .ToList();
                 }
-                var dtos = result.Select(MapToPatchDetailDTO).ToList();
+                var dtos = result
+                    .Select(MapToPatchDetailDTO)
+                    .Where(dto => dto != null)
+                    .ToList();
                 return Ok(dtos);
             }
             catch (Exception ex)

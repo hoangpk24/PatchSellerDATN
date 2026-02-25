@@ -42,6 +42,48 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+       
+        public async Task<List<Game>> GetAllDetailForPublic(string? keyword)
+        {
+            try
+            {
+                var query = await _context.Games
+                    .Include(g => g.Publisher)
+                    .Include(g => g.GamePlatforms).ThenInclude(gp => gp.Platform)
+                    .Include(g => g.GameCategories).ThenInclude(gc => gc.Category)
+                    .Include(g => g.Patches).ThenInclude(p => p.PatchVersions)
+                    .Include(g => g.GameImages)
+                    .Where(g => g.Delete != true)
+                    .ToListAsync();
+
+                var filtered = query
+                    .Where(g =>
+                        g.Status == 1 &&
+                        g.Publisher != null &&
+                        g.Publisher.Delete != true &&
+                        g.Publisher.Status == 1 &&
+                        g.GameCategories != null &&
+                        g.GameCategories.Any(gc =>
+                            gc.Delete != true &&
+                            gc.Category != null &&
+                            gc.Category.Delete != true &&
+                            gc.Category.Status == 1));
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    filtered = filtered.Where(x =>
+                        x.Title.Contains(keyword) ||
+                        (x.Description != null && x.Description.Contains(keyword)));
+                }
+
+                return filtered.ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<List<Game>> GetAllDetail(string? keyword)
         {
             try
@@ -95,6 +137,43 @@ namespace PatchSeller.DAL.Repository
                     .Include(g => g.GameImages)
                     .FirstOrDefaultAsync();
                 return game;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Game> GetByIdDetailForPublic(int id)
+        {
+            try
+            {
+                var game = await _context.Games
+                    .Include(g => g.Publisher)
+                    .Include(g => g.GamePlatforms).ThenInclude(gp => gp.Platform)
+                    .Include(g => g.GameCategories).ThenInclude(gc => gc.Category)
+                    .Include(g => g.Patches).ThenInclude(p => p.PatchVersions)
+                    .Include(g => g.GameImages)
+                    .FirstOrDefaultAsync(g => g.GameId == id && g.Delete != true);
+
+                if (game == null)
+                {
+                    return null;
+                }
+
+                var isValid =
+                    game.Status == 1 &&
+                    game.Publisher != null &&
+                    game.Publisher.Delete != true &&
+                    game.Publisher.Status == 1 &&
+                    game.GameCategories != null &&
+                    game.GameCategories.Any(gc =>
+                        gc.Delete != true &&
+                        gc.Category != null &&
+                        gc.Category.Delete != true &&
+                        gc.Category.Status == 1);
+
+                return isValid ? game : null;
             }
             catch (Exception)
             {

@@ -34,6 +34,53 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        private IQueryable<Patch> GetPublicQueryWithIncludes()
+        {
+            return _context.Patches
+                .Include(p => p.Game)!.ThenInclude(g => g.Publisher)
+                .Include(p => p.Game)!.ThenInclude(g => g.GameCategories)!.ThenInclude(gc => gc.Category)
+                .Include(p => p.PatchImages)
+                .Include(p => p.PatchVersions)
+                .Where(p => p.Delete != true);
+        }
+
+        public async Task<List<Patch>> GetAllForPublic(string? keyword)
+        {
+            try
+            {
+                var query = await GetPublicQueryWithIncludes().ToListAsync();
+
+                var filtered = query
+                    .Where(p =>
+                        p.Status == 1 &&
+                        p.Game != null &&
+                        p.Game.Delete != true &&
+                        p.Game.Status == 1 &&
+                        p.Game.Publisher != null &&
+                        p.Game.Publisher.Delete != true &&
+                        p.Game.Publisher.Status == 1 &&
+                        p.Game.GameCategories != null &&
+                        p.Game.GameCategories.Any(gc =>
+                            gc.Delete != true &&
+                            gc.Category != null &&
+                            gc.Category.Delete != true &&
+                            gc.Category.Status == 1));
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    filtered = filtered.Where(x =>
+                        x.Name.Contains(keyword) ||
+                        (x.Description != null && x.Description.Contains(keyword)));
+                }
+
+                return filtered.ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<List<Patch>> GetAllDetail(string? keyword)
         {
             try
@@ -64,6 +111,38 @@ namespace PatchSeller.DAL.Repository
                     .Include(p => p.PatchImages)
                     .Include(p => p.PatchVersions)
                     .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<Patch>> GetByGameIdForPublic(int gameId)
+        {
+            try
+            {
+                var query = await GetPublicQueryWithIncludes()
+                    .Where(p => p.GameId == gameId)
+                    .ToListAsync();
+
+                var filtered = query
+                    .Where(p =>
+                        p.Status == 1 &&
+                        p.Game != null &&
+                        p.Game.Delete != true &&
+                        p.Game.Status == 1 &&
+                        p.Game.Publisher != null &&
+                        p.Game.Publisher.Delete != true &&
+                        p.Game.Publisher.Status == 1 &&
+                        p.Game.GameCategories != null &&
+                        p.Game.GameCategories.Any(gc =>
+                            gc.Delete != true &&
+                            gc.Category != null &&
+                            gc.Category.Delete != true &&
+                            gc.Category.Status == 1));
+
+                return filtered.ToList();
             }
             catch (Exception)
             {
@@ -103,6 +182,41 @@ namespace PatchSeller.DAL.Repository
                 if (patch != null && patch.Delete == true)
                     return null;
                 return patch;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Patch> GetByIdForPublic(int id)
+        {
+            try
+            {
+                var patch = await GetPublicQueryWithIncludes()
+                    .FirstOrDefaultAsync(p => p.PatchId == id);
+
+                if (patch == null)
+                {
+                    return null;
+                }
+
+                var isValid =
+                    patch.Status == 1 &&
+                    patch.Game != null &&
+                    patch.Game.Delete != true &&
+                    patch.Game.Status == 1 &&
+                    patch.Game.Publisher != null &&
+                    patch.Game.Publisher.Delete != true &&
+                    patch.Game.Publisher.Status == 1 &&
+                    patch.Game.GameCategories != null &&
+                    patch.Game.GameCategories.Any(gc =>
+                        gc.Delete != true &&
+                        gc.Category != null &&
+                        gc.Category.Delete != true &&
+                        gc.Category.Status == 1);
+
+                return isValid ? patch : null;
             }
             catch (Exception)
             {
