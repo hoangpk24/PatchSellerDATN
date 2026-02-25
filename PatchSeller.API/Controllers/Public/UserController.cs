@@ -145,6 +145,8 @@ namespace PatchSeller.API.Controllers.Public
                                     {
                                         PatchId = od.PatchId,
                                         GameId = od.Patch.GameId,
+                                        GameThumbnail = od.Patch.Game.Thumbnail,
+                                        PatchThumbnail = od.Patch.ThumbnailLink ?? string.Empty,
                                         GameName = od.Patch.Game.Title,
                                         PatchName = od.Patch.Name,
                                         PurchasedAt = fullOrder.OrderDate
@@ -166,7 +168,8 @@ namespace PatchSeller.API.Controllers.Public
                     RankName = rank?.RankName ?? string.Empty,
                     TotalSpent = totalSpent,
                     Orders = orderDtos,
-                    PurchasedPatches = purchasedPatches
+                    PurchasedPatches = purchasedPatches,
+                    CreateAt = user.CreatedAt,
                 };
 
                 return Ok(response);

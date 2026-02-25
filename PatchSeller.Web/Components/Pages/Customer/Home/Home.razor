@@ -34,13 +34,16 @@
         <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
                 @foreach (var item in _gameForHome.LstCommingSoon)
                 {
-                    <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
-                        <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
-                            <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
+                    @if(item != null)
+                    {
+                        <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                            <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
+                                <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
 
-                            <p class="line-clamp-2 text-base font-medium text-white">@item.Title</p>
-                        </a>
-                    </div>
+                                <p class="line-clamp-2 text-base font-medium text-white">@item.Title</p>
+                            </a>
+                        </div>
+                    }
                 }
         </div>
     </section>
@@ -86,24 +89,27 @@
         {   
             @foreach(var item in _gameForHome.LstNew)
             {
-                <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
-                    <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
-                        <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
+                if(item != null)
+                {
+                    <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                        <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
+                            <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
 
-                        <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
+                            <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
 
-                        <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.Patches)">
-                            @GetPriceDisplay(item.Patches)
-                        </p>
-                    </a>
+                            <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.Patches)">
+                                @GetPriceDisplay(item.Patches)
+                            </p>
+                        </a>
 
-                    <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
-                        <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
-                            <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))" Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
-                            <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
+                        <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
+                            <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
+                                <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))" Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
+                                <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             }
         }
     </div>

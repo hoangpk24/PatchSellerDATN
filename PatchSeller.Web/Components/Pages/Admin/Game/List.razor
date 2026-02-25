@@ -40,7 +40,7 @@
                 <MudTd DataLabel="Id" hidden>@context.GameId</MudTd>
                 <MudTd DataLabel="Tên">
                     <div class="w-[100px]">
-                        <MudImage Src="@context.Thumbnail" Class="aspect-[1/1.6] object-cover" />
+                        <MudImage Src="@(!string.IsNullOrEmpty(context.Thumbnail) ? context.Thumbnail : Constant.DefaultImages)" Class="aspect-[1/1.6] object-cover" />
                     </div>
                 </MudTd>
                 <MudTd DataLabel="Tên">@context.Title</MudTd>

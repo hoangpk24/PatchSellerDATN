@@ -157,6 +157,7 @@ namespace PatchSeller.DAL.Repository
                 var patch = await _context.Patches
                     .Where(x => x.PatchId == id && x.Delete != true)
                     .Include(x => x.PatchVersions)
+                    .Include(x => x.Game)
                     .Include(x => x.UserPurchases)
                     .Include(x => x.PatchImages)
                     .FirstOrDefaultAsync();

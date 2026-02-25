@@ -50,6 +50,7 @@ namespace PatchSeller.API.DTOs
         public double Price { get; set; }
         public string Description { get; set; } = string.Empty;
         public string UpdateBy { get; set; } = string.Empty;
+        public string ThumbnailLink { get; set; } = string.Empty;
         public int Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public List<PatchVersionBasicDTO> PatchVersions { get; set; } = new List<PatchVersionBasicDTO>();

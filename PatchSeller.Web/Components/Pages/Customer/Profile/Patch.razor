@@ -1,5 +1,125 @@
-﻿<h3>Patch</h3>
+﻿<MudTable Items="@_lstPatch"
+Elevation="0"
+          Loading="@_isLoading"
+          Hover="true"
+          Virtualize="true"
+          FixedHeader="true"
+          HorizontalScrollbar="true"
+          Class="transparent-table"
+          Height="calc(100lvh - 357px)">
+    <HeaderContent>
+        <MudTh hidden>ID</MudTh>
+        <MudTh>Ảnh</MudTh>
+        <MudTh>Tên gói</MudTh>
+        <MudTh Style="text-align:right">Thuộc game</MudTh>
+        <MudTh Style="text-align:right">Chi tiết</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="ID" hidden>@context.PatchId</MudTd>
+        <MudTd DataLabel="ID">
+            @{
+                var images = "";
+                if (!string.IsNullOrEmpty(context.GameThumbnail))
+                {
+                    images = context.GameThumbnail;
+                }
+                if (!string.IsNullOrEmpty(context.PatchThumbnail))
+                {
+                    images = context.PatchThumbnail;
+                }
+
+                <div class="w-[100px]">
+                    <MudImage Src="@images" Class="aspect-[1/1.6] object-cover" />
+                </div>
+            }
+        </MudTd>
+        <MudTd DataLabel="Mã hóa đơn">@context.PatchName</MudTd>
+        <MudTd DataLabel="Thời gian">@context.GameName</MudTd>
+        <MudTd DataLabel="Ghi chú">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" aria-label="detail" OnClick="@(() => HandleGameDetail(context.GameId))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="my-4" Color="Color.Inherit">Không có dữ liệu.</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <div class="flex w-full flex-col gap-3 opacity-50">
+            @for (var i = 0; i < 5; i++)
+            {
+                <div class="flex items-center justify-between gap-2 px-2">
+                    <MudSkeleton Width="100%" Height="5rem" />
+                    <MudSkeleton Width="100%" Height="5rem" />
+                    <MudSkeleton Width="100%" Height="5rem" />
+                    <MudSkeleton Width="100%" Height="5rem" />
+                </div>
+            }
+        </div>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
 
 @code {
+    [Parameter]
+    public List<UserPurchasePatchResponse> LstPatch { get; set; } = new List<UserPurchasePatchResponse>();
 
+    List<UserPurchasePatchResponse> _lstPatch = [];
+    private bool _isLoading = true;
+
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+    System.Globalization.CultureInfo vietnameseCulture = new System.Globalization.CultureInfo("vi-VN");
+
+    protected override void OnParametersSet()
+    {
+        if (LstPatch != null)
+        {
+            _lstPatch = LstPatch;
+        }
+        _isLoading = false;
+    }
+
+    async Task HandleGameDetail(int gameId)
+    {
+        navigation.NavigateTo(RouterConfig.Customer.Game.Replace(":id", gameId.ToString()));
+    }
 }
+
+<style>
+    /* Nền bảng trong suốt */
+    .transparent-table {
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .mud-table-head > .mud-table-row > .mud-table-cell {
+        background-color: #212121 !important;
+    }
+
+    .transparent-table th,
+    .transparent-table td,
+    .transparent-table .mud-table-cell,
+    .transparent-table .mud-table-sort-label,
+    .transparent-table .mud-table-pager,
+    .transparent-table .mud-table-pager-info {
+        color: white !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Đổi màu icon phân trang và icon sắp xếp sang trắng */
+    .transparent-table .mud-icon-root.mud-svg-icon,
+    .mud-table-page-number-information,
+    .mud-table-pagination-information,
+    .mud-input-slot {
+        color: white !important;
+    }
+
+    /* Hiệu ứng hover dòng */
+    .transparent-table .mud-table-row:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .mud-table-empty-row {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+</style>

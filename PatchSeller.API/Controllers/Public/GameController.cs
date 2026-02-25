@@ -94,6 +94,7 @@ namespace PatchSeller.API.Controllers.Public
                         PatchId = p.PatchId,
                         Name = p.Name,
                         Price = p.Price,
+                        ThumbnailLink = p.ThumbnailLink,
                         Description = p.Description,
                         UpdateBy = p.UpdateBy ?? string.Empty,
                         Status = p.Status,

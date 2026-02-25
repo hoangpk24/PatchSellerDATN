@@ -7,6 +7,7 @@
         public double Price { get; set; }
         public string Description { get; set; }
         public string UpdateBy { get; set; }
+        public string ThumbnailLink { get; set; } = string.Empty;
         public int Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int GameId { get; set; }

@@ -60,33 +60,22 @@
     [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
     public string _token { get; set; }
 
+    [Parameter]
+    public List<OrderWithDetailResponse> LstOrder { get; set; } = new List<OrderWithDetailResponse>();
+
     List<OrderWithDetailResponse> _lstOrder = [];
-    private bool _isLoading = false;
+    private bool _isLoading = true;
 
     private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
     System.Globalization.CultureInfo vietnameseCulture = new System.Globalization.CultureInfo("vi-VN");
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnParametersSet()
     {
-        try
+        if (LstOrder != null)
         {
-            _isLoading = true;
-            await LoadData();
+            _lstOrder = LstOrder;
         }
-        catch (Exception) { }
-        finally
-        {
-            _isLoading = false;
-        }
-    }
-
-    async Task LoadData()
-    {
-        var resOrder = await _orderService.GetAll(_token);
-        if (resOrder.IsSuccess)
-        {
-            _lstOrder = resOrder.Data.OrderByDescending(x => x.OrderDate).ToList();
-        }
+        _isLoading = false;
     }
 
     private async Task HandleShowOrderDetail(int id)
@@ -157,6 +146,10 @@
 
     /* Hiệu ứng hover dòng */
     .transparent-table .mud-table-row:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .mud-table-empty-row {
         background-color: rgba(255, 255, 255, 0.05) !important;
     }
 </style>

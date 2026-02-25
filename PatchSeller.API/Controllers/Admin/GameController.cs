@@ -67,6 +67,7 @@ namespace PatchSeller.API.Controllers.Admin
                         Name = p.Name,
                         Price = p.Price,
                         Description = p.Description,
+                        ThumbnailLink = p.ThumbnailLink,
                         UpdateBy = p.UpdateBy ?? string.Empty,
                         Status = p.Status,
                         CreatedAt = p.CreatedAt,

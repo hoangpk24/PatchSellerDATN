@@ -8,6 +8,8 @@ namespace PatchSeller.API.DTOs
         public int GameId { get; set; }
         public string GameName { get; set; } = string.Empty;
         public string PatchName { get; set; } = string.Empty;
+        public string PatchThumbnail { get; set; } = string.Empty;
+        public string GameThumbnail { get; set; } = string.Empty;
         public DateTime PurchasedAt { get; set; }
     }
 
@@ -21,6 +23,7 @@ namespace PatchSeller.API.DTOs
         public int? RankId { get; set; }
         public string RankName { get; set; } = string.Empty;
         public double TotalSpent { get; set; }
+        public DateTime? CreateAt { get; set; }
         public List<OrderDetailResponseDTO> Orders { get; set; } = new List<OrderDetailResponseDTO>();
         public List<UserPurchasePatchDTO> PurchasedPatches { get; set; } = new List<UserPurchasePatchDTO>();
     }
