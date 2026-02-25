@@ -26,6 +26,16 @@ namespace PatchSeller.DAL.Repository
                 .Include(pv => pv.PatchImages);
         }
 
+        private IQueryable<PatchVersion> GetPublicQueryWithIncludes()
+        {
+            return _context.PatchVersions
+                .Include(pv => pv.Patch)!.ThenInclude(p => p.Game)!.ThenInclude(g => g.Publisher)
+                .Include(pv => pv.Patch)!.ThenInclude(p => p.Game)!.ThenInclude(g => g.GameCategories)!.ThenInclude(gc => gc.Category)
+                .Include(pv => pv.Staff)
+                .Include(pv => pv.PatchImages)
+                .Where(pv => pv.Delete != true);
+        }
+
         public async Task<List<PatchVersion>> GetAll()
         {
             try
@@ -41,6 +51,40 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<PatchVersion>> GetAllForPublic()
+        {
+            try
+            {
+                var list = await GetPublicQueryWithIncludes()
+                    .OrderByDescending(x => x.CreateAt)
+                    .ToListAsync();
+
+                var filtered = list.Where(pv =>
+                    pv.Status == 1 &&
+                    pv.Patch != null &&
+                    pv.Patch.Delete != true &&
+                    pv.Patch.Status == 1 &&
+                    pv.Patch.Game != null &&
+                    pv.Patch.Game.Delete != true &&
+                    pv.Patch.Game.Status == 1 &&
+                    pv.Patch.Game.Publisher != null &&
+                    pv.Patch.Game.Publisher.Delete != true &&
+                    pv.Patch.Game.Publisher.Status == 1 &&
+                    pv.Patch.Game.GameCategories != null &&
+                    pv.Patch.Game.GameCategories.Any(gc =>
+                        gc.Delete != true &&
+                        gc.Category != null &&
+                        gc.Category.Delete != true &&
+                        gc.Category.Status == 1));
+
+                return filtered.ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<PatchVersion> GetById(int id)
         {
             try
@@ -48,6 +92,44 @@ namespace PatchSeller.DAL.Repository
                 var version = await GetQueryWithIncludes()
                     .FirstOrDefaultAsync(x => x.PatchVersionId == id && x.Delete != true);
                 return version;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<PatchVersion> GetByIdForPublic(int id)
+        {
+            try
+            {
+                var version = await GetPublicQueryWithIncludes()
+                    .FirstOrDefaultAsync(x => x.PatchVersionId == id);
+
+                if (version == null)
+                {
+                    return null;
+                }
+
+                var isValid =
+                    version.Status == 1 &&
+                    version.Patch != null &&
+                    version.Patch.Delete != true &&
+                    version.Patch.Status == 1 &&
+                    version.Patch.Game != null &&
+                    version.Patch.Game.Delete != true &&
+                    version.Patch.Game.Status == 1 &&
+                    version.Patch.Game.Publisher != null &&
+                    version.Patch.Game.Publisher.Delete != true &&
+                    version.Patch.Game.Publisher.Status == 1 &&
+                    version.Patch.Game.GameCategories != null &&
+                    version.Patch.Game.GameCategories.Any(gc =>
+                        gc.Delete != true &&
+                        gc.Category != null &&
+                        gc.Category.Delete != true &&
+                        gc.Category.Status == 1);
+
+                return isValid ? version : null;
             }
             catch (Exception)
             {
@@ -70,6 +152,41 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<PatchVersion>> GetByPatchIdForPublic(int patchId)
+        {
+            try
+            {
+                var list = await GetPublicQueryWithIncludes()
+                    .Where(x => x.PatchId == patchId)
+                    .OrderByDescending(x => x.CreateAt)
+                    .ToListAsync();
+
+                var filtered = list.Where(pv =>
+                    pv.Status == 1 &&
+                    pv.Patch != null &&
+                    pv.Patch.Delete != true &&
+                    pv.Patch.Status == 1 &&
+                    pv.Patch.Game != null &&
+                    pv.Patch.Game.Delete != true &&
+                    pv.Patch.Game.Status == 1 &&
+                    pv.Patch.Game.Publisher != null &&
+                    pv.Patch.Game.Publisher.Delete != true &&
+                    pv.Patch.Game.Publisher.Status == 1 &&
+                    pv.Patch.Game.GameCategories != null &&
+                    pv.Patch.Game.GameCategories.Any(gc =>
+                        gc.Delete != true &&
+                        gc.Category != null &&
+                        gc.Category.Delete != true &&
+                        gc.Category.Status == 1));
+
+                return filtered.ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<List<PatchVersion>> GetByGameId(int gameId)
         {
             try
@@ -78,6 +195,41 @@ namespace PatchSeller.DAL.Repository
                     .Where(x => x.Patch != null && x.Patch.GameId == gameId && x.Delete != true)
                     .OrderByDescending(x => x.CreateAt)
                     .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<PatchVersion>> GetByGameIdForPublic(int gameId)
+        {
+            try
+            {
+                var list = await GetPublicQueryWithIncludes()
+                    .Where(x => x.Patch != null && x.Patch.GameId == gameId)
+                    .OrderByDescending(x => x.CreateAt)
+                    .ToListAsync();
+
+                var filtered = list.Where(pv =>
+                    pv.Status == 1 &&
+                    pv.Patch != null &&
+                    pv.Patch.Delete != true &&
+                    pv.Patch.Status == 1 &&
+                    pv.Patch.Game != null &&
+                    pv.Patch.Game.Delete != true &&
+                    pv.Patch.Game.Status == 1 &&
+                    pv.Patch.Game.Publisher != null &&
+                    pv.Patch.Game.Publisher.Delete != true &&
+                    pv.Patch.Game.Publisher.Status == 1 &&
+                    pv.Patch.Game.GameCategories != null &&
+                    pv.Patch.Game.GameCategories.Any(gc =>
+                        gc.Delete != true &&
+                        gc.Category != null &&
+                        gc.Category.Delete != true &&
+                        gc.Category.Status == 1));
+
+                return filtered.ToList();
             }
             catch (Exception)
             {

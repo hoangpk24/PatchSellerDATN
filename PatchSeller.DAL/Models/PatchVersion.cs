@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PatchSeller.DAL.Models;
 
@@ -25,7 +26,10 @@ public class PatchVersion
     
     [ForeignKey("StaffId")]
     public int StaffId { get; set; }
+    [JsonIgnore]
     public Staff? Staff { get; set; }
+    [JsonIgnore]
     public ICollection<DownloadLog>? DownloadLogs { get; set; }
+    [JsonIgnore]
     public ICollection<PatchImage>? PatchImages { get; set; }
 }

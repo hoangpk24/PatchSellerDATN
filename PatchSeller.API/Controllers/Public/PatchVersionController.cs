@@ -19,7 +19,7 @@ namespace PatchSeller.API.Controllers.Public
 
         private static PatchVersionDetailDTO MapToDetailDTO(PatchVersion? pv)
         {
-            if (pv == null || pv.Delete) return null!;
+            if (pv == null || pv.Delete || pv.Status!=1) return null!;
             return new PatchVersionDetailDTO
             {
                 PatchVersionId = pv.PatchVersionId,
@@ -59,12 +59,14 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                var result = await _patchVersionRepository.GetAll();
+                var result = await _patchVersionRepository.GetAllForPublic();
                 if (result == null)
                 {
-                    return NoContent();
+                    return Ok(new List<PatchVersionDetailDTO>());
                 }
-                var dtos = result.Select(MapToDetailDTO).Where(dto => dto != null).ToList();
+                var dtos = result.Select(MapToDetailDTO)
+                                 .Where(dto => dto != null)
+                                 .ToList();
                 return Ok(dtos);
             }
             catch (Exception)
@@ -78,12 +80,17 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                var result = await _patchVersionRepository.GetById(id);
+                var result = await _patchVersionRepository.GetByIdForPublic(id);
                 if (result == null)
                 {
                     return NotFound(Constant.ErrorCode.NotFound);
                 }
-                return Ok(MapToDetailDTO(result));
+                var dto = MapToDetailDTO(result);
+                if (dto == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+                }
+                return Ok(dto);
             }
             catch (Exception)
             {
@@ -96,12 +103,14 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                var result = await _patchVersionRepository.GetByPatchId(patchId);
+                var result = await _patchVersionRepository.GetByPatchIdForPublic(patchId);
                 if (result == null)
                 {
-                    return NoContent();
+                    return Ok(new List<PatchVersionDetailDTO>());
                 }
-                var dtos = result.Select(MapToDetailDTO).Where(dto => dto != null).ToList();
+                var dtos = result.Select(MapToDetailDTO)
+                                 .Where(dto => dto != null)
+                                 .ToList();
                 return Ok(dtos);
             }
             catch (Exception)
@@ -115,12 +124,14 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                var result = await _patchVersionRepository.GetByGameId(gameId);
+                var result = await _patchVersionRepository.GetByGameIdForPublic(gameId);
                 if (result == null)
                 {
-                    return NoContent();
+                    return Ok(new List<PatchVersionDetailDTO>());
                 }
-                var dtos = result.Select(MapToDetailDTO).Where(dto => dto != null).ToList();
+                var dtos = result.Select(MapToDetailDTO)
+                                 .Where(dto => dto != null)
+                                 .ToList();
                 return Ok(dtos);
             }
             catch (Exception)

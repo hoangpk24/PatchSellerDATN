@@ -24,6 +24,30 @@ namespace PatchSeller.API.Controllers.Public
         private static GameDetailDTO MapToGameDetailDTO(Game game)
         {
             if (game == null) return null;
+
+            
+            if (game.Delete == true || game.Status != 1)
+            {
+                return null;
+            }
+
+            if (game.Publisher == null || game.Publisher.Delete == true || game.Publisher.Status != 1)
+            {
+                return null;
+            }
+
+            var validGameCategories = game.GameCategories?
+                .Where(gc => gc.Delete != true &&
+                             gc.Category != null &&
+                             gc.Category.Delete != true &&
+                             gc.Category.Status == 1)
+                .ToList() ?? new List<GameCategory>();
+
+            if (!validGameCategories.Any())
+            {
+                return null;
+            }
+
             return new GameDetailDTO
             {
                 GameId = game.GameId,
@@ -43,7 +67,9 @@ namespace PatchSeller.API.Controllers.Public
                     Status = game.Publisher.Status
                 },
                 Platforms = game.GamePlatforms?
-                    .Where(gp => gp.Delete != true && gp.Platform != null && gp.Platform.Delete != true)
+                    .Where(gp => gp.Delete != true &&
+                                 gp.Platform != null &&
+                                 gp.Platform.Delete != true)
                     .Select(gp => new PlatformBasicDTO
                     {
                         PlatformId = gp.Platform.PlatformId,
@@ -51,8 +77,7 @@ namespace PatchSeller.API.Controllers.Public
                         Description = gp.Platform.Description,
                         Status = gp.Platform.Status
                     }).ToList() ?? new List<PlatformBasicDTO>(),
-                Categories = game.GameCategories?
-                    .Where(gc => gc.Delete != true && gc.Category != null && gc.Category.Delete != true)
+                Categories = validGameCategories
                     .Select(gc => new CategoryBasicDTO
                     {
                         CategoryId = gc.Category.CategoryId,
@@ -61,7 +86,9 @@ namespace PatchSeller.API.Controllers.Public
                         Status = gc.Category.Status
                     }).ToList() ?? new List<CategoryBasicDTO>(),
                 Patches = game.Patches?
-                    .Where(p => p.Delete != true)
+                    .Where(p =>
+                        p.Delete != true &&
+                        p.Status == 1)
                     .Select(p => new PatchBasicDTO
                     {
                         PatchId = p.PatchId,
@@ -72,7 +99,7 @@ namespace PatchSeller.API.Controllers.Public
                         Status = p.Status,
                         CreatedAt = p.CreatedAt,
                         PatchVersions = p.PatchVersions?
-                            .Where(pv => pv.Delete != true)
+                            .Where(pv => pv.Delete != true && pv.Status == 1)
                             .Select(pv => new PatchVersionBasicDTO
                             {
                                 PatchVersionId = pv.PatchVersionId,
@@ -109,10 +136,10 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                List<Game> result = await _gameRepository.GetAll(keyword);
+                List<Game> result = await _gameRepository.GetAllDetailForPublic(keyword);
                 if (result == null)
                 {
-                    return NoContent();
+                    return Ok(new List<Game>());
                 }
 
                 if (result.Any())
@@ -132,16 +159,19 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                List<Game> result = await _gameRepository.GetAllDetail(keyword);
+                List<Game> result = await _gameRepository.GetAllDetailForPublic(keyword);
                 if (result == null)
                 {
-                    return NoContent();
+                    return Ok(new List<GameDetailDTO>());
                 }
                 if (result.Any())
                 {
                     result = result.OrderByDescending(c => c.CreatedAt).ToList();
                 }
-                var dtos = result.Select(MapToGameDetailDTO).ToList();
+                var dtos = result
+                    .Select(MapToGameDetailDTO)
+                    .Where(dto => dto != null)
+                    .ToList();
                 return Ok(dtos);
             }
             catch (Exception ex)
@@ -155,12 +185,16 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                var result = await _gameRepository.GetByIdDetail(id);
+                var result = await _gameRepository.GetByIdDetailForPublic(id);
                 if (result == null)
                 {
                     return NotFound(Constant.ErrorCode.NotFound);
                 }
                 var dto = MapToGameDetailDTO(result);
+                if (dto == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+                }
                 return Ok(dto);
             }
             catch (Exception ex)
@@ -174,11 +208,17 @@ namespace PatchSeller.API.Controllers.Public
         {
             try
             {
-                List<Game> result = await _gameRepository.GetAllDetail("");
+                List<Game> result = await _gameRepository.GetAllDetailForPublic("");
 
                 if (result == null)
                 {
-                    return NoContent();
+                    var emptyDto = new GameForHomeDTO
+                    {
+                        LstCommingSoon = new List<GameDetailDTO>(),
+                        LstNew = new List<GameDetailDTO>(),
+                        LstHot = new List<GameDetailDTO>()
+                    };
+                    return Ok(emptyDto);
                 }
 
                 var lstCommingSoon = result.Where(x => x.Status == 2).Take(6).ToList();

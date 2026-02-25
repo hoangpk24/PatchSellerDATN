@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace PatchSeller.DAL.Models;
 
@@ -12,5 +13,6 @@ public class Publisher
     public bool Delete { get; set; }
     public DateTime? CreatedAt { get; set; }
 
+    [JsonIgnore]
     public ICollection<Game>? Games { get; set; }
 }
