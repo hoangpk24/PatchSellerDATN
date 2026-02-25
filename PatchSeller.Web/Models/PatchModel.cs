@@ -10,6 +10,7 @@
         public int Status { get; set; }
         public bool Delete { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public string? ThumbnailLink { get; set; }
         public int GameId { get; set; }
     }
 }

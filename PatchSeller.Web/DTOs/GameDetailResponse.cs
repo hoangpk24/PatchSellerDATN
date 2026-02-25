@@ -51,6 +51,7 @@
         public string Description { get; set; } = string.Empty;
         public string UpdateBy { get; set; } = string.Empty;
         public int Status { get; set; }
+        public string ThumbnailLink { get; set; } = string.Empty;
         public DateTime? CreatedAt { get; set; }
         public List<PatchVersionBasicDTO> PatchVersions { get; set; } = new List<PatchVersionBasicDTO>();
     }

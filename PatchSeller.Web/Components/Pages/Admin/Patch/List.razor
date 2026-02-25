@@ -26,6 +26,7 @@
         <MudTable Items="@_lstPatch" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100lvh - 357px)">
             <HeaderContent>
                 <MudTh Class="whitespace-nowrap" hidden><MudTableSortLabel SortLabel="Id" T="string" hidden>STT</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Ảnh</MudTableSortLabel></MudTh>
                 <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên Game" T="string">Thuộc game</MudTableSortLabel></MudTh>
                 <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên gói việt hóa" T="string">tên gói việt hóa</MudTableSortLabel></MudTh>
                 <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Giá tiền" T="string">Giá</MudTableSortLabel></MudTh>
@@ -35,6 +36,11 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Id" hidden>@context.GameId</MudTd>
+                <MudTd DataLabel="Tên">
+                    <div class="w-[100px]">
+                        <MudImage Src="@(!string.IsNullOrEmpty(context.ThumbnailLink) ? context.ThumbnailLink : Constant.DefaultImages)" Class="aspect-[1/1.6] object-cover" />
+                    </div>
+                </MudTd>
                 <MudTd DataLabel="Thuộc game">@(context.Game != null ? context.Game.Title : "Unknow")</MudTd>
                 <MudTd Class="!font-bold" DataLabel="Tên gói việt hóa">@context.Name</MudTd>
                 <MudTd Class="!whitespace-nowrap !font-bold" DataLabel="Giá tiền">@context.Price.ToString("C0", vietnameseCulture)</MudTd>

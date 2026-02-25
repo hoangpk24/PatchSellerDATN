@@ -56,6 +56,33 @@
                 </MudSelect>
             </div>
 
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Ảnh</label> <span class="ml-1 text-red-500">*</span>
+
+                <div class="flex flex-col gap-4">
+                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                        <ActivatorContent>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       ButtonType="ButtonType.Button"
+                                       StartIcon="@Icons.Material.Filled.CloudUpload"
+                                       Disabled="@(_imagesWithUrl != null && !string.IsNullOrEmpty(_imagesWithUrl.Url))">
+                                Thêm Ảnh
+                            </MudButton>
+                        </ActivatorContent>
+                    </MudFileUpload>
+
+                    @if (_imagesWithUrl != null && !string.IsNullOrEmpty(_imagesWithUrl.Url))
+                    {
+                        <div class="relative flex max-w-40 items-center overflow-hidden rounded-lg border-2 border-gray-300">
+                            <MudImage Src="@_imagesWithUrl.Url" Alt="image game" ObjectFit="ObjectFit.Cover" Class="!aspect-[1/1.6]" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error" Size="Size.Small" OnClick="@(() => HandleRemoveImages(_imagesWithUrl.File))"
+                                           Class="absolute top-1 right-1 text-white !p-0" />
+                        </div>
+                    }
+                </div>
+            </div>
+
             <MudDivider Class="mb-8 mt-4 !border-slate-200" />
 
             <div class="flex items-center justify-end gap-3">
@@ -78,6 +105,9 @@
 </section>
 
 @code {
+    [Inject]
+    public IWebHostEnvironment WebHostEnvironment { get; set; }
+
     [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
     public MineResponse _mine { get; set; }
     [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
@@ -87,7 +117,9 @@
     PatchModel _model = new PatchModel();
     List<DAL.Models.Game> _lstGame = new List<DAL.Models.Game>();
     PatchSchema.CreateUpdate _patchSchema = new PatchSchema.CreateUpdate();
+    ImageFileResponse _imagesWithUrl = null;
 
+    private int MaxAllowedSize = 1024 * 1024 * 5;
     private bool _isLoading = false;
 
     CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
@@ -116,6 +148,57 @@
             _model.GameId = resGame.Data.FirstOrDefault()?.GameId ?? 0;
         }
     }
+
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        try
+        {
+            _isLoading = true;
+            if (file.Size > MaxAllowedSize)
+            {
+                _snackbar.Add("Ảnh không được quá 5mb", MudBlazor.Severity.Warning);
+                return;
+            }
+
+            var url = await Task.Run(async () =>
+            {
+                using var stream = file.OpenReadStream(MaxAllowedSize);
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+
+                var base64String = Convert.ToBase64String(memoryStream.ToArray());
+                return $"data:{file.ContentType};base64,{base64String}";
+            });
+
+            _imagesWithUrl = new ImageFileResponse { File = file, Url = url };
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void HandleRemoveImages(IBrowserFile file)
+    {
+        try
+        {
+            _isLoading = true;
+            _imagesWithUrl = new ImageFileResponse();
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
     async Task OnSubmit()
     {
         if (_isLoading) return;
@@ -128,15 +211,41 @@
 
             if (!_form.IsValid) return;
 
+            if (_imagesWithUrl.File == null || (_imagesWithUrl.File != null && string.IsNullOrEmpty(_imagesWithUrl.Url)))
+            {
+                _snackbar.Add("Vui lòng thêm ảnh", MudBlazor.Severity.Warning);
+                return;
+            }
+
             _model.Name = _model.Name.Trim();
             _model.Description = _model.Description.Trim();
             _model.Status = Constant.StatusDefault.InActive;
             _model.UpdateBy = _mine.FullName ?? "";
 
+
+            var fileName = Path.GetFileName(_imagesWithUrl.File.Name);
+            var randomId = Guid.NewGuid().ToString().Substring(0, 8);
+            _model.ThumbnailLink = Constant.MainPatchImages + randomId + "/" + fileName;
+
             var response = await _adminPatchService.CreatePatch(_model, _token);
 
             if (response.IsSuccess)
             {
+                var contentRootPath = WebHostEnvironment.WebRootPath;
+                var productImagesPath = Path.Combine(contentRootPath, "uploads", "images", "patches", randomId);
+
+                if (!Directory.Exists(productImagesPath))
+                {
+                    Directory.CreateDirectory(productImagesPath);
+                }
+
+                var filePath = Path.Combine(productImagesPath, fileName);
+
+                await using Stream fileStream = _imagesWithUrl.File.OpenReadStream(MaxAllowedSize);
+                await using FileStream fs = File.Create(filePath);
+                await fileStream.CopyToAsync(fs);
+                _imagesWithUrl = new ImageFileResponse();
+
                 _snackbar.Add("Tạo thành công!", MudBlazor.Severity.Success);
                 navigation.NavigateTo(RouterConfig.Admin.Patch);
             }

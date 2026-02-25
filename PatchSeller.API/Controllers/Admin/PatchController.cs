@@ -28,6 +28,7 @@ namespace PatchSeller.API.Controllers.Admin
                 Description = patch.Description,
                 UpdateBy = patch.UpdateBy ?? string.Empty,
                 Status = patch.Status,
+                ThumbnailLink = patch.ThumbnailLink,
                 CreatedAt = patch.CreatedAt,
                 Game = patch.Game == null ? null : new GameDTO
                 {
@@ -199,6 +200,7 @@ namespace PatchSeller.API.Controllers.Admin
                     CreatedAt = dto.CreatedAt ?? DateTime.UtcNow,
                     Status = 1,
                     Delete = false,
+                    ThumbnailLink = dto.ThumbnailLink,
                     UpdateBy = dto.UpdateBy ?? userId
                 };
 
@@ -238,6 +240,7 @@ namespace PatchSeller.API.Controllers.Admin
                     GameId = dto.GameId,
                     CreatedAt = dto.CreatedAt,
                     Status = dto.Status,
+                    ThumbnailLink= dto.ThumbnailLink,
                     Delete = dto.Delete,
                     UpdateBy = dto.UpdateBy ?? userId
                 };

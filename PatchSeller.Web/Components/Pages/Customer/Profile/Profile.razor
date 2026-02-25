@@ -20,8 +20,9 @@
                     <div>
                         <p class="text-center text-white/70">@_user.Email</p>
                         <p class="text-center text-white/70">@_user.PhoneNumber</p>
-                        <p class="text-center text-white/70">Ngày đăng ký: @_user.CreatedAt?.ToString("dd/MM/yyyy HH:mm:ss")</p>
-                        <p class="text-center text-white/70">Số gói đã mua: @_isPatchBuyed</p>
+                        <p class="text-center text-white/70">Ngày đăng ký: @_user.CreateAt?.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                        <p class="text-center text-white/70">Số gói đã mua: @_user.TotalSpent</p>
+                        <p class="text-center text-white/70">Cấp bậc: @_user.RankName</p>
                         <p class="text-center text-white/70">Số điểm hiện có: @_user.RewardPoint.ToString("N0")</p>
                     </div>
 
@@ -34,10 +35,10 @@
             <div class="w-full md:w-[calc(100%-354px)] lg:w-[calc(100%-354px)]">
                 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Color="Color.Primary" PanelClass="p-6" TabHeaderClass="!bg-[#9797971c] !text-purple-500">
                     <MudTabPanel Text="Hóa Đơn">
-                        <Order />
+                        <Order LstOrder="@_user.Orders" />
                     </MudTabPanel>
                     <MudTabPanel Text="Gói Đã Mua">
-                        <Patch />
+                        <Patch LstPatch="@_user.PurchasedPatches" />
                     </MudTabPanel>
                     <MudTabPanel Text="Yêu Thích">
                         <Favourites />
@@ -56,9 +57,8 @@
     [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
     public MineResponse _mine { get; set; }
 
-    DAL.Models.User _user = new DAL.Models.User();
+    MeDetailResponse _user = new MeDetailResponse();
 
-    int _isPatchBuyed = 0;
     private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
     protected override async Task OnInitializedAsync()
@@ -68,18 +68,11 @@
 
     async Task LoadData()
     {
-        var resUser = await _mineService.GetById(_mine.Id);
+        var resUser = await _mineService.GetMeDetailById(_mine.Id);
 
         if(resUser.IsSuccess)
         {
             _user = resUser.Data;    
-        }
-
-        var resPurchase = await _userPurchaseService.GetAllByUserId(_mine.Id);
-
-        if(resPurchase.IsSuccess && resPurchase.Data.Any())
-        {
-            _isPatchBuyed = resPurchase.Data.Count();
         }
     }
 

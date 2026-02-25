@@ -408,7 +408,7 @@
                 if(data.IsOrderZero)
                 {
                     _snackbar.Add("Thanh toán thành công", MudBlazor.Severity.Success);
-                    navigation.NavigateTo(RouterConfig.Customer.OrderDetail.Replace(":id", data.OrderId.ToString()));
+                    navigation.NavigateTo(RouterConfig.Customer.Profile);
                 } else
                 {
                     _snackbar.Add("Chuyển hướng đến cổng thanh toán...", MudBlazor.Severity.Info);

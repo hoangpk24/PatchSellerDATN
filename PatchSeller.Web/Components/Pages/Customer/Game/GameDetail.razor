@@ -11,7 +11,7 @@
 <section class="bg-black-default2 px-3 py-10 lg:px-0">
     <div class="mx-auto flex max-w-[1520px] flex-col items-start gap-6 lg:flex-row md:gap-8 lg:gap-10">
         <div class="w-full lg:w-2/5">
-            <img src="@_gameDetail.Thumbnail" alt="game" class="aspect-[1/1.5] rounded-lg object-cover shadow-2xl" />
+            <img src="@_imageDisplay" alt="game" class="aspect-[1/1.5] rounded-lg object-cover shadow-2xl" />
         </div>
 
         <div class="w-full lg:w-3/5">
@@ -268,7 +268,7 @@
         {
             <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
                 <a href="@RouterConfig.Customer.Home" class="flex h-full w-full flex-col gap-4">
-                    <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" class="aspect-[1/1.5] object-cover" />
+                    <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" class="aspect-[1/1.5] w-full object-cover" />
 
                     <p class="line-clamp-2 text-base font-medium text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
 
@@ -300,6 +300,7 @@
     int _patchSelect = 0;
     bool _isOwned = false;
     bool _isLoading = false;
+    string _imageDisplay = Constant.DefaultImages;
 
     CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
     private List<BreadcrumbItem> _itemBreadcrumbs = new();
@@ -328,7 +329,10 @@
         if (response.IsSuccess)
         {
             _gameDetail = response.Data;
-
+            if(_gameDetail.Thumbnail != null && !string.IsNullOrEmpty(_gameDetail.Thumbnail))
+            {
+                _imageDisplay = _gameDetail.Thumbnail;
+            }
             UpdateBreadcrumbs();
 
             if (_gameDetail.Patches.Any()) 
@@ -339,6 +343,11 @@
                 {
                     _patchSelect = obj.PatchId;
                     _patchDetail = obj;
+
+                    if (obj.ThumbnailLink != null && !string.IsNullOrEmpty(obj.ThumbnailLink))
+                    {
+                        _imageDisplay = obj.ThumbnailLink;
+                    }
                     await CheckOwnership(obj.PatchId);
                 }
             };
@@ -423,6 +432,20 @@
             if (obj != null)
             {
                 _patchDetail = obj;
+
+                if (obj.ThumbnailLink != null && !string.IsNullOrEmpty(obj.ThumbnailLink))
+                {
+                    _imageDisplay = obj.ThumbnailLink;
+                } else
+                {
+                    if (_gameDetail.Thumbnail != null && !string.IsNullOrEmpty(_gameDetail.Thumbnail))
+                    {
+                        _imageDisplay = _gameDetail.Thumbnail;
+                    } else
+                    {
+                        _imageDisplay = Constant.DefaultImages;
+                    }
+                }
                 await CheckOwnership(patchId);
             }
         }

@@ -98,6 +98,7 @@
         public static class Customer
         {
             public const string GetUserById = "/user/get-user-by-id/:id";
+            public const string GetMeById = "/user/get-me-detail/:id";
             public const string GameForHome = "/game/get-for-home";
             public const string GameDetail = "/game/get-by-id-detail/:id";
             public const string addCart = "/cart/add-to-cart";

@@ -12,6 +12,7 @@ namespace PatchSeller.API.DTOs
         public string UpdateBy { get; set; }
         public int Status { get; set; }
         public bool Delete { get; set; }
+        public string? ThumbnailLink { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int GameId { get; set; }
     }
