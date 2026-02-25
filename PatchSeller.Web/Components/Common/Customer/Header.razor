@@ -19,10 +19,26 @@
                         Thể Loại
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" />
                     </a>
-                    <div class="absolute left-0 top-full z-50 hidden min-w-[180px] group-hover:block">
-                        <div class="mt-5 border border-gray-800 bg-[#1e1e1e] py-2 shadow-xl">
-                            <a href="@RouterConfig.Customer.Home" class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Category 1</a>
-                            <a href="@RouterConfig.Customer.Home" class="block px-4 py-2 text-sm text-gray-300 hover:bg-purple-600 hover:text-white">Category 2</a>
+                    <div class="absolute left-0 top-full z-50 hidden group-hover:block">
+                        <div class="mt-4 border border-gray-800 bg-[#1e1e1e] p-2 shadow-2xl">
+                            @if (_lstCategory != null && _lstCategory.Any())
+                            {
+                                <div class="grid max-h-[80vh] min-w-[200px] overflow-y-auto p-2"
+                                     style="grid-template-columns: repeat(@(Math.Ceiling(_lstCategory.Count / 10.0)), minmax(180px, 1fr)); gap: 4px;">
+
+                                    @foreach (var cat in _lstCategory)
+                                    {
+                                        <a href="#"
+                                           class="block whitespace-nowrap rounded px-4 py-2 text-sm text-gray-300 transition-all hover:bg-purple-600 hover:text-white">
+                                            @cat.CategoryName
+                                        </a>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="px-4 py-2 text-sm text-gray-500">Đang tải...</div>
+                            }
                         </div>
                     </div>
                 </li>
@@ -31,6 +47,34 @@
                         Nền Tảng
                         <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" />
                     </a>
+
+                    <div class="absolute left-0 top-full z-50 hidden group-hover:block">
+                        <div class="mt-4 border border-gray-800 bg-[#1e1e1e] p-2 shadow-2xl">
+                            @if (_lstPlatform != null && _lstPlatform.Any())
+                            {
+                                <div class="scrollbar-thin scrollbar-thumb-purple-500 grid max-h-[70vh] min-w-[200px] overflow-y-auto p-2"
+                                     style="grid-template-columns: repeat(@(Math.Ceiling(_lstPlatform.Count / 10.0)), minmax(180px, 1fr)); gap: 4px;">
+
+                                    @foreach (var plat in _lstPlatform)
+                                    {
+                                        <a href="#"
+                                           class="block whitespace-nowrap rounded px-4 py-2 text-sm text-gray-300 transition-all hover:bg-purple-600 hover:text-white">
+                                            @plat.Name
+                                        </a>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="w-[180px] px-4 py-3 text-sm italic text-gray-500">
+                                    <div class="flex items-center gap-2">
+                                        <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
+                                        Đang tải...
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </li>
                 <li class="group relative flex-shrink-0 cursor-pointer px-4 py-2">
                     <a class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
@@ -106,12 +150,29 @@
     [Parameter]
     public bool FirstLogin { get; set; }
 
+    List<DAL.Models.Category> _lstCategory = [];
+    List<DAL.Models.Platform> _lstPlatform = [];
+
     protected override async Task OnInitializedAsync()
     {
 
         if(_mine != null)
         {
             await _cartActionService.LoadCartAsync(_mine.Id);
+        }
+
+        var resCategory = await _categoryService.GetAll();
+
+        if(resCategory.IsSuccess)
+        {
+            _lstCategory = resCategory.Data;
+        }
+
+        var resPlatform = await _platformService.GetAll();
+
+        if (resPlatform.IsSuccess)
+        {
+            _lstPlatform = resPlatform.Data;
         }
 
         _cartActionService.OnCountChange += StateHasChanged;
