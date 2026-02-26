@@ -196,6 +196,26 @@ namespace PatchSeller.API.Controllers.Public
                 {
                     return NotFound(Constant.ErrorCode.NotFound);
                 }
+
+                var categoryIds = result.GameCategories?
+                                    .Where(gc => gc.Delete != true && gc.CategoryId > 0)
+                                    .Select(gc => gc.CategoryId)
+                                    .ToList() ?? new List<int>();
+
+                if (categoryIds.Any())
+                {
+                    var allGames = await _gameRepository.GetAllDetail(null);
+
+                    var relatedGames = allGames
+                        .Where(g => g.GameId != id && g.Delete != true)
+                        .Where(g => g.GameCategories != null && g.GameCategories.Any(gc => categoryIds.Contains(gc.CategoryId)))
+                        .OrderByDescending(g => g.CreatedAt)
+                        .Take(6)
+                        .ToList();
+
+                    dto.GameSameCategories = relatedGames.Select(MapToGameDetailDTO).ToList();
+                }
+
                 return Ok(dto);
             }
             catch (Exception ex)
