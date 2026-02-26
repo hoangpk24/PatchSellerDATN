@@ -102,6 +102,7 @@
             public const string PlatformGetAll = "/admin/platform/get-all-platforms";
             public const string GetMeById = "/user/get-me-detail/:id";
             public const string GameForHome = "/game/get-for-home";
+            public const string GameForSearch = "/game/get-for-search";
             public const string GameDetail = "/game/get-by-id-detail/:id";
             public const string addCart = "/cart/add-to-cart";
             public const string getCartByUserId = "/cart/get-cart-item-by-user-id";

@@ -12,7 +12,7 @@
         <nav class="hidden items-center gap-2 lg:flex md:flex">
             <ul class="flex flex-wrap items-center">
                 <li class="flex-shrink-0 px-4 py-2">
-                    <a class="cursor-pointer font-bold text-[15px] text-white transition-colors hover:text-purple-500">Tất Cả</a>
+                    <a href="@RouterConfig.Customer.Search" class="cursor-pointer font-bold text-[15px] text-white transition-colors hover:text-purple-500">Tất Cả</a>
                 </li>
                 <li class="group relative flex-shrink-0 cursor-pointer px-4 py-2">
                     <a class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
@@ -28,7 +28,7 @@
 
                                     @foreach (var cat in _lstCategory)
                                     {
-                                        <a href="#"
+                                        <a href="@(RouterConfig.Customer.Search + "?" + $"cats={cat.CategoryId}")"
                                            class="block whitespace-nowrap rounded px-4 py-2 text-sm text-gray-300 transition-all hover:bg-purple-600 hover:text-white">
                                             @cat.CategoryName
                                         </a>
@@ -57,7 +57,7 @@
 
                                     @foreach (var plat in _lstPlatform)
                                     {
-                                        <a href="#"
+                                        <a href="@(RouterConfig.Customer.Search + "?" + $"cats={plat.PlatformId}")"
                                            class="block whitespace-nowrap rounded px-4 py-2 text-sm text-gray-300 transition-all hover:bg-purple-600 hover:text-white">
                                             @plat.Name
                                         </a>
@@ -87,9 +87,13 @@
         <div class="flex w-full items-center gap-6 md:w-auto lg:w-auto">
             <div class="relative flex w-full max-w-[500px] items-center rounded-full border border-gray-700 bg-[#1e1e1e] p-1 transition-all focus-within:border-purple-500 md:max-w-[300px] lg:max-w-[300px]">
                 <input type="text"
+                       @bind="_searchKeyword"
+                       @onkeyup="HandleKeyUp"
                        placeholder="Tìm games bạn cần"
                        class="w-full bg-transparent py-1.5 pl-4 pr-10 text-sm font-light text-gray-200 placeholder-gray-500 outline-none" />
-                <button class="absolute right-1 flex h-8 w-8 items-center justify-center rounded-full bg-purple-500 text-white transition-transform hover:scale-105 active:scale-95">
+
+                <button @onclick="ExecuteSearch"
+                        class="absolute right-1 flex h-8 w-8 items-center justify-center rounded-full bg-purple-500 text-white transition-transform hover:scale-105 active:scale-95">
                     <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
                 </button>
             </div>
@@ -153,6 +157,8 @@
     List<DAL.Models.Category> _lstCategory = [];
     List<DAL.Models.Platform> _lstPlatform = [];
 
+    private string _searchKeyword = "";
+
     protected override async Task OnInitializedAsync()
     {
 
@@ -193,6 +199,24 @@
             return;
         }
         await OnOpenCartDrawer.InvokeAsync();
+    }
+
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            ExecuteSearch();
+        }
+    }
+
+    private void ExecuteSearch()
+    {
+        var url = string.IsNullOrWhiteSpace(_searchKeyword)
+            ? RouterConfig.Customer.Search
+            : $"{RouterConfig.Customer.Search}?q={Uri.EscapeDataString(_searchKeyword)}";
+
+        navigation.NavigateTo(url);
     }
 
     async Task OpenHeaderDrawer()

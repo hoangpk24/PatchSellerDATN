@@ -1,0 +1,326 @@
+﻿@page "/search"
+@using System.Globalization
+@layout MainLayout
+
+<section>
+    <div class="w-full bg-[#9797971c] py-6">
+        <div class="mx-auto w-full max-w-[1520px] px-6">
+            <h1 class="mb-2.5 font-medium leading-tight text-[44px] text-white">Tìm Kiếm</h1>
+            <MudBreadcrumbs Class="custom-breadcrumb !p-0 !text-xs" Items="_itemBreadcrumbs" Separator="/" />
+        </div>
+    </div>
+
+    <div class="mx-auto my-10 max-w-[1520px] px-2">
+        <div class="flex justify-between lg:flex-row sm:flex-col md:flex-col lg:gap-8 md:gap-4 sm:gap-6">
+
+            <div class="h-fit w-1/3 rounded-md bg-[#9797971c] p-7 md:w-full sm:w-full">
+                <div class="mb-4 flex items-center justify-between">
+                    <h5 class="text-xl font-bold uppercase text-purple-500">Bộ lọc</h5>
+                    <button @onclick="ResetFilter" class="text-xs text-gray-400 underline hover:text-white">Thiết lập lại</button>
+                </div>
+
+                <div class="mb-4">
+                    <label class="mb-2 text-base font-medium text-white">Thể loại</label>
+                    <div class="grid grid-cols-2 gap-x-4">
+                        @foreach (var cat in _lstCategory)
+                        {
+                            <MudCheckBox T="bool"
+                                         Value="@(_categoryIds.Contains(cat.CategoryId))"
+                                         ValueChanged="@((bool val) => OnMudCheckChanged(_categoryIds, cat.CategoryId, val))"
+                                         Label="@cat.CategoryName"
+                                         Color="Color.Primary"
+                                         Class="!text-white custom-mud-checkbox" />
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="mb-2 text-base font-medium text-white">Nền tảng</label>
+                    <div class="grid grid-cols-2 gap-x-4">
+                        @foreach (var plat in _lstPlatform)
+                        {
+                            <MudCheckBox T="bool"
+                                         Value="@(_platformIds.Contains(plat.PlatformId))"
+                                         ValueChanged="@((bool val) => OnMudCheckChanged(_platformIds, plat.PlatformId, val))"
+                                         Label="@plat.Name"
+                                         Color="Color.Primary"
+                                         Class="!text-white custom-mud-checkbox" />
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="mb-2 text-base font-medium text-white">Khoảng giá</label>
+                    <div class="flex items-center gap-4">
+                        <MudNumericField Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@_startMoney" Placeholder="Từ" T="double?" />
+                        <span class="text-base text-white">~</span>
+                        <MudNumericField Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="@_endMoney" Placeholder="Đến" T="double?" />
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <MudButton Variant="Variant.Filled" FullWidth="true"
+                               OnClick="ApplyFilter" Class="!bg-purple-500 py-2 !text-white hover:!bg-purple-600">
+                        Tìm Kiếm
+                    </MudButton>
+                </div>
+            </div>
+
+            <div class="lg:w-2/3 md:w-full sm:w-full">
+                <div class="flex items-center justify-between">
+                    <div class="font-bold text-white">
+                        ĐÃ TÌM THẤY <span class="!text-purple-500">@(_searchResult?.TotalItems ?? 0)</span> KẾT QUẢ
+                    </div>
+                    <div class="w-44">
+                        <MudSelect T="string" Value="@_sort" ValueChanged="OnSortChanged" Variant="Variant.Outlined" Margin="Margin.Dense">
+                            <MudSelectItem Value="@("")">Mặc định</MudSelectItem>
+                            <MudSelectItem Value="@("name_asc")">Tên (A-Z)</MudSelectItem>
+                            <MudSelectItem Value="@("name_desc")">Tên (Z-A)</MudSelectItem>
+                            <MudSelectItem Value="@("price_asc")">Giá (Thấp - Cao)</MudSelectItem>
+                            <MudSelectItem Value="@("price_desc")">Giá (Cao - Thấp)</MudSelectItem>
+                        </MudSelect>
+                    </div>
+                </div>
+
+                <MudDivider Class="my-4 border-2 !border-white/15" />
+
+                @if (isLoading)
+                {
+                    <p class="py-5 text-center text-white">Đang tải dữ liệu...</p>
+                }
+                else
+                {
+                    @if (_searchResult?.Games != null && _searchResult.Games.Any())
+                    {
+                        <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3 lg:flex-wrap">
+                            @foreach (var item in _searchResult.Games)
+                            {
+                                <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/4-1rem)] md:w-[327px] sm:w-[327px]">
+                                    <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
+                                        <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] rounded-lg object-cover" />
+                                        <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
+                                        <p class="truncate text-base font-bold text-purple-500">
+                                            @GetPriceDisplay(item.Patches)
+                                        </p>
+                                    </a>
+                                    <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
+                                        <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2 shadow-lg">
+                                            <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))" Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
+                                            <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mt-8 flex justify-center">
+                            <MudPagination Count="@(_searchResult?.TotalPages ?? 1)" Selected="@_currentPage" SelectedChanged="OnPageChanged" />
+                        </div>
+                    } else
+                    {
+                        <p class="py-5 text-center text-white">Không có kết quả.</p>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)] public MineResponse _mine { get; set; }
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)] public string _token { get; set; }
+
+    // --- QUERY PARAMETERS ---
+    [SupplyParameterFromQuery(Name = "q")] public string? Q { get; set; }
+    [SupplyParameterFromQuery(Name = "min")] public double? Min { get; set; }
+    [SupplyParameterFromQuery(Name = "max")] public double? Max { get; set; }
+    [SupplyParameterFromQuery(Name = "sort")] public string? Sort { get; set; }
+    [SupplyParameterFromQuery(Name = "page")] public int? Page { get; set; }
+    [SupplyParameterFromQuery(Name = "cats")] public string? Cats { get; set; }
+    [SupplyParameterFromQuery(Name = "plats")] public string? Plats { get; set; }
+
+    private bool isLoading = true;
+    private GameSearchResponse? _searchResult;
+    private List<DAL.Models.Category> _lstCategory = [];
+    private List<DAL.Models.Platform> _lstPlatform = [];
+
+    private string? _keyword;
+    private double? _startMoney;
+    private double? _endMoney;
+    private string _sort = "";
+    private int _currentPage = 1;
+    private int _perPage = 12;
+    private List<int> _categoryIds = new();
+    private List<int> _platformIds = new();
+
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var catTask = _categoryService.GetAll();
+        var platTask = _platformService.GetAll();
+        await Task.WhenAll(catTask, platTask);
+
+        if (catTask.Result.IsSuccess) _lstCategory = catTask.Result.Data;
+        if (platTask.Result.IsSuccess) _lstPlatform = platTask.Result.Data;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _keyword = Q;
+        _startMoney = Min;
+        _endMoney = Max;
+        _sort = Sort ?? "";
+        _currentPage = Page ?? 1;
+        _categoryIds = string.IsNullOrEmpty(Cats) ? new() : Cats.Split(',').Select(int.Parse).ToList();
+        _platformIds = string.IsNullOrEmpty(Plats) ? new() : Plats.Split(',').Select(int.Parse).ToList();
+
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        var result = await _gameService.SearchGames(_keyword, _categoryIds, _platformIds, _startMoney, _endMoney, _sort, _currentPage, _perPage);
+        if (result.IsSuccess) _searchResult = result.Data;
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private void ApplyFilter() { _currentPage = 1; Navigate(); }
+    private void OnSortChanged(string val) { _sort = val; _currentPage = 1; Navigate(); }
+    private void OnPageChanged(int page) { _currentPage = page; Navigate(); }
+
+    private void ResetFilter()
+    {
+        _startMoney = null;
+        _endMoney = null;
+        _categoryIds.Clear();
+        _platformIds.Clear();
+        _sort = string.Empty;
+        _currentPage = 1;
+        _keyword = string.Empty;
+        Navigate();
+    }
+
+    private void Navigate()
+    {
+        var queryParams = new Dictionary<string, object?>
+        {
+            ["q"] = string.IsNullOrEmpty(_keyword) ? null : _keyword,
+            ["min"] = _startMoney,
+            ["max"] = _endMoney,
+            ["sort"] = string.IsNullOrEmpty(_sort) ? null : _sort,
+            ["page"] = _currentPage > 1 ? _currentPage : null,
+            ["cats"] = _categoryIds.Any() ? string.Join(",", _categoryIds) : null,
+            ["plats"] = _platformIds.Any() ? string.Join(",", _platformIds) : null
+        };
+        navigation.NavigateTo(navigation.GetUriWithQueryParameters(queryParams));
+    }
+
+    private void OnMudCheckChanged(List<int> list, int id, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (!list.Contains(id)) list.Add(id);
+        }
+        else
+        {
+            list.Remove(id);
+        }
+    }
+
+    private string GetPriceDisplay(List<PatchBasicDTO> patches)
+    {
+        if (patches == null || !patches.Any()) return "Liên hệ";
+        var prices = patches.Select(p => p.Price).OrderBy(p => p).ToList();
+        double minPrice = prices.First();
+        double maxPrice = prices.Last();
+        string format = "C0";
+
+        if (minPrice == maxPrice)
+            return minPrice <= 0 ? "Miễn phí" : minPrice.ToString(format, vietnameseCulture);
+
+        return $"{minPrice.ToString(format, vietnameseCulture)} - {maxPrice.ToString(format, vietnameseCulture)}";
+    }
+
+    async Task OpenDialogFastAddCart(int gameId)
+    {
+        var parameters = new DialogParameters<Components.Common.Customer.FastAddCart>
+        {
+            {x => x.gameId, gameId},
+            {x => x.cartId, _mine.cartId},
+            {x => x.userId, _mine.Id},
+            {x => x.token, _token}
+        };
+
+        var dialog = await _dialogService.ShowAsync<Components.Common.Customer.FastAddCart>("Options Dialog", parameters, _dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+            await _cartActionService.LoadCartAsync(_mine.Id);
+            StateHasChanged();
+        }
+    }
+
+    private List<BreadcrumbItem> _itemBreadcrumbs = [
+        new("TRANG CHỦ", href: "/"),
+        new("TÌM KIẾM", href: null, disabled: true),
+    ];
+}
+
+<style>
+    .custom-mud-checkbox .mud-checkbox-content-text {
+        color: white !important;
+        font-size: 0.875rem;
+    }
+
+    .custom-mud-checkbox .mud-button-root {
+        color: rgba(255,255,255,0.7) !important;
+    }
+
+    .custom-mud-checkbox.mud-checked .mud-button-root {
+        color: #a855f7 !important;
+    }
+
+    .mud-input-outlined-border {
+        border-color: rgba(156, 163, 175, 0.3) !important;
+    }
+
+    .mud-input-outlined {
+        background-color: #242424 !important;
+        color: white !important;
+    }
+
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .mud-pagination-item:first-child button span svg {
+        color: #FFFFFF !important;
+    }
+
+    .mud-pagination-item:last-child button span svg {
+        color: #FFFFFF !important;
+    }
+
+    .mud-pagination-item span {
+        color: #FFFFFF !important;
+    }
+
+    .mud-pagination-item .mud-typography {
+        color: #FFFFFF !important;
+    }
+
+    .mud-pagination-item-selected button {
+        background-color: #a855f7 !important;
+    }
+</style>

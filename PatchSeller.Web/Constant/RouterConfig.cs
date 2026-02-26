@@ -11,6 +11,9 @@
             // Home
             public const string Home = "/";
 
+            // Search
+            public const string Search = "/search";
+
             // Auth
             public const string SignUp = "/register";
             public const string Login = "/login";
