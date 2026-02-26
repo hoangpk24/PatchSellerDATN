@@ -47,7 +47,7 @@
                     @if(_isOwned)
                     {
                         <div class="mt-6">
-                            <MudSelect T="int" Variant="Variant.Outlined" Label="Patch Version" Value="_patchVersionSelect" ValueChanged="async (int id) => await HandleChangePatchVersion(id)">
+                            <MudSelect T="int" Variant="Variant.Outlined" Label="Patch Version" Value="_patchVersionSelect" ValueChanged="HandleChangePatchVersion">
                                 @if (_patchDetail != null && _patchDetail.PatchVersions.Any())
                                 {
                                     foreach (var item in _patchDetail.PatchVersions)
@@ -191,14 +191,10 @@
 <section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
     <div class="bg-[#9797971c] p-5">
         <h3 class="text-2xl font-semibold text-white">Đánh giá</h3>
+        <span class="text-base text-white/70">(@_totalReviews reviews)</span>
 
         <div class="mt-4 flex flex-col items-start gap-6 md:flex-row lg:flex-row md:gap-8 lg:gap-10">
             <div class="flex w-full flex-col items-center justify-center gap-4 md:w-1/2 lg:w-1/2">
-                <div class="flex flex-col items-center justify-center gap-2">
-                    <MudRating  SelectedValue="2" />
-                    <span class="text-lg text-white/70">0 reviews</span>
-                </div>    
-
                 <div class="flex w-full flex-col gap-3">
                     @for (int i = 5; i >= 1; i--)
                     {
@@ -218,56 +214,131 @@
                             </div>
 
                             <div class="relative h-2.5 flex-1 rounded-full bg-white/5">
-                                <div class="absolute inset-y-0 left-0 rounded-full bg-yellow-500" style="width: 0%"></div>
+                                <div class="absolute inset-y-0 left-0 rounded-full bg-yellow-500"
+                                     style="width: @(_totalReviews > 0 ? (_ratingCounts[i] * 100 / _totalReviews) : 0)%">
+                                </div>
                             </div>
-
-                            <span class="min-w-[10px] text-right text-base font-medium text-white/60">0</span>
+                            <span class="min-w-[20px] text-right text-base font-medium text-white/60">@_ratingCounts[i]</span>
                         </div>
                     }
                 </div>
             </div>
             <div class="w-full md:w-1/2 lg:w-1/2">
-                <MudForm>
-                    <div class="mb-5 flex items-center gap-2">
-                        <label class="block text-sm font-medium text-white">
-                            Đánh giá của bạn <span class="text-xs text-red-600">*</span>
-                        </label>
-                        <MudRating />
-                    </div>
-                    <div class="mb-5">
-                        <label class="mb-2 block text-sm font-medium text-white">
-                            Họ và tên <span class="text-xs text-red-600">*</span>
-                        </label>
-                        <MudTextField T="string"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      Class="custom-text-field" />
-                    </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-white">
-                            Nhận xét của bạn
-                        </label>
-                        <MudTextField T="string"
-                                      Variant="Variant.Outlined"
-                                      Lines="5"
-                                      Margin="Margin.Dense"
-                                      Class="custom-textarea"
-                                      Placeholder="Viết đánh giá của bạn tại đây..." />
-                    </div>
-                </MudForm>
+                <div class="relative rounded-2xl border border-white/5 bg-white/5 p-6">
 
-                <MudButton Class="mt-5 !rounded-full !bg-purple-500 px-6 py-2 !text-white" Variant="Variant.Filled">
-                    Gửi đánh giá
-                </MudButton>
+                    @if (!_isOwned || _isReviewed)
+                    {
+                        <div class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-black/60 p-6 text-center backdrop-blur-[2px]">
+                            <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/20 text-purple-500">
+                                @if (!_isOwned)
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.Lock" />
+                                }
+                                else
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.Check" />
+                                }
+                        </div>
+
+                        <h4 class="text-lg font-bold text-white">
+                            @(!_isOwned ? "Chưa thể đánh giá" : "Cảm ơn bạn đã đánh giá!")
+                        </h4>
+
+                        <p class="mt-2 text-sm text-white/70">
+                            @(!_isOwned
+                                                        ? "Bạn cần sở hữu gói Việt hóa này để có thể gửi nhận xét."
+                                                        : "Hệ thống đã ghi nhận đánh giá của bạn cho bản Patch này.")
+                        </p>
+
+                        @if (!_isOwned)
+                            {
+                                <button @onclick="BuyNow" class="mt-4 rounded-full bg-purple-600 px-6 py-2 text-sm font-bold text-white transition-all hover:bg-purple-700">
+                                    MUA NGAY ĐỂ MỞ KHÓA
+                                </button>
+                            }
+                        </div>
+                    }
+
+                    <div class="@((!_isOwned || _isReviewed) ? "opacity-30 pointer-events-none select-none" : "")">
+                        <MudForm>
+                            <div class="mb-5 flex items-center gap-2">
+                                <label class="block text-sm font-medium text-white">Đánh giá của bạn <span class="text-xs text-red-600">*</span></label>
+                                <MudRating @bind-SelectedValue="@_reviewModel.Overall" />
+                            </div>
+
+                            <div class="mb-5">
+                                <label class="mb-2 block text-sm font-medium text-white">Họ và tên <span class="text-xs text-red-600">*</span></label>
+                                <MudTextField T="string" @bind-Value="@_reviewModel.UserName" Variant="Variant.Outlined" Margin="Margin.Dense" Class="custom-text-field" />
+                            </div>
+
+                            <div class="mb-5">
+                                <label class="mb-2 block text-sm font-medium text-white">Tiêu đề</label>
+                                <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@_reviewModel.Title" Margin="Margin.Dense" Class="custom-textarea" Placeholder="Tóm tắt cảm nhận..." />
+                            </div>
+
+                            <div class="mb-5">
+                                <label class="mb-2 block text-sm font-medium text-white">Nhận xét của bạn</label>
+                                <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@_reviewModel.Content" Lines="4" Margin="Margin.Dense" Class="custom-textarea" Placeholder="Bản dịch rất tốt, font chữ đẹp..." />
+                            </div>
+
+                            <MudButton Class="!rounded-full !bg-purple-500 px-8 py-2 !text-white" Variant="Variant.Filled" OnClick="HandleSubmitReview">
+                                Gửi đánh giá
+                            </MudButton>
+                        </MudForm>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="mt-6">
             <h4 class="text-lg font-medium text-white">Đánh giá của mọi người</h4>
 
-            <div class="mt-4">
-                <p class="text-white">Chưa có đánh giá nào.</p>
-            </div>
+            @if (_lstReview.Any())
+            {
+                <div class="mt-6 flex flex-col gap-4">
+                    @foreach (var review in _lstReview)
+                    {
+                        <div class="rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:bg-white/[0.08]">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 font-bold text-white">
+                                        @(string.IsNullOrEmpty(review.UserName) ? "U" : review.UserName[0].ToString().ToUpper())
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-white">@review.UserName</h5>
+                                        <div class="flex items-center gap-2">
+                                            <div class="relative">
+                                                <div class="absolute bottom-0 left-0 right-0 top-0 z-10"></div>
+                                                <MudRating SelectedValue="@review.Overall" ReadOnly="true" Size="Size.Small" />
+                                            </div>
+                                            <span class="uppercase tracking-tighter text-[10px] text-white/40">
+                                                @review.CreatedAt?.ToString("dd/MM/yyyy")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (_mine != null && review.UserId == _mine.Id)
+                                {
+                                    <span class="rounded-full bg-purple-500/10 px-3 py-1 font-bold text-[10px] text-purple-400">ĐÁNH GIÁ CỦA BẠN</span>
+                                }
+                            </div>
+
+                            <div class="mt-4">
+                                <p class="text-sm font-semibold text-purple-300">@review.Title</p>
+                                <p class="mt-1 text-sm leading-relaxed text-white/70">
+                                    @review.Content
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            } else
+            {
+                <div class="mt-4">
+                    <p class="text-white">Chưa có đánh giá nào.</p>
+                </div>
+            }
         </div>
     </div>
 </section>
@@ -317,15 +388,21 @@
     [Parameter]
     public int id { get; set; }
 
+    List<DAL.Models.Review> _lstReview = new List<DAL.Models.Review>();
     GameDetailResponse _gameDetail = new GameDetailResponse();
     PatchBasicDTO _patchDetail = new PatchBasicDTO();
     PatchVersionBasicDTO _patchVersionDetail = new PatchVersionBasicDTO();
+    ReviewModel _reviewModel = new ReviewModel();
 
     int _patchSelect = 0;
+    bool _isReviewed = false;
     int _patchVersionSelect = 0;
     bool _isOwned = false;
     bool _isLoading = false;
-    string _imageDisplay = Constant.DefaultImages;
+    string _imageDisplay = Constant.DefaultImages; 
+    double _averageRating = 0;
+    int _totalReviews = 0;
+    int[] _ratingCounts = new int[6];
 
     CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
     private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
@@ -337,7 +414,8 @@
         try
         {
             _isLoading = true;
-            await LoadData();
+            await LoadData(); 
+            SyncUserToReviewModel();
         }
         catch (Exception ex)
         {
@@ -355,7 +433,8 @@
         try
         {        
             _isLoading = true;
-            await LoadData();
+            await LoadData(); 
+            SyncUserToReviewModel();
         } 
         catch (Exception ex)
         {
@@ -388,6 +467,8 @@
                 {
                     _patchSelect = obj.PatchId;
                     _patchDetail = obj;
+
+                    await LoadReview(obj.PatchId);
 
                     if(obj.PatchVersions != null && obj.PatchVersions.Any())
                     {
@@ -487,6 +568,14 @@
             if (obj != null)
             {
                 _patchDetail = obj;
+                _reviewModel.PatchId = obj.PatchId;
+                _reviewModel = new ReviewModel
+                {
+                    PatchId = patchId,
+                    UserId = _mine?.Id ?? 0,
+                    UserName = _mine?.FullName ?? ""
+                };
+                await LoadReview(obj.PatchId);
 
                 if(obj.PatchVersions != null && obj.PatchVersions.Any())
                 {
@@ -525,7 +614,7 @@
         }
     }
 
-    async Task HandleChangePatchVersion(int patchVersionId)
+    void HandleChangePatchVersion(int patchVersionId)
     {
         try
         {
@@ -557,6 +646,29 @@
         if (checkPatch.IsSuccess)
         {
             _isOwned = checkPatch.Data;
+        }
+    }
+
+    async Task HandleSubmitReview()
+    {
+        if (string.IsNullOrEmpty(_reviewModel.UserName) || string.IsNullOrEmpty(_reviewModel.Title) || string.IsNullOrEmpty(_reviewModel.Content) || _reviewModel.Overall <= 0)
+        {
+            _snackbar.Add("Vui lòng điền đủ thông tin đánh giá", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        _reviewModel.PatchId = _patchDetail.PatchId;
+        var result = await _reviewService.CreateReview(_reviewModel);
+
+        if(result.IsSuccess)
+        {
+            _snackbar.Add("Đã gửi đánh giá!", MudBlazor.Severity.Success);
+            _isReviewed = true;
+            await LoadReview(_patchDetail.PatchId);
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng thử lại!", MudBlazor.Severity.Error);   
         }
     }
 
@@ -611,6 +723,33 @@
         return $"{minPrice.ToString(format, vietnameseCulture)} - {maxPrice.ToString(format, vietnameseCulture)}";
     }
 
+    async Task LoadReview(int patchId)
+    {
+        var resReview = await _reviewService.GetAllByPatchId(patchId);
+        if (resReview.IsSuccess)
+        {
+            _lstReview = resReview.Data;
+            _totalReviews = _lstReview.Count;
+
+            for (int i = 1; i <= 5; i++) _ratingCounts[i] = 0;
+
+            if (_totalReviews > 0)
+            {
+                _averageRating = Math.Round(_lstReview.Average(x => x.Overall), 1);
+                foreach (var r in _lstReview)
+                {
+                    if (r.Overall >= 1 && r.Overall <= 5) _ratingCounts[r.Overall]++;
+                }
+            }
+            else
+            {
+                _averageRating = 0;
+            }
+
+            _isReviewed = _mine != null && _lstReview.Any(x => x.UserId == _mine.Id);
+        }
+    }
+
     void ResetState()
     {
         _gameDetail = new GameDetailResponse();
@@ -619,6 +758,15 @@
         _isOwned = false;
         _patchSelect = 0;
         _patchVersionSelect = 0;
+    }
+
+    private void SyncUserToReviewModel()
+    {
+        if (_mine != null)
+        {
+            _reviewModel.UserId = _mine.Id;
+            _reviewModel.UserName = _mine.FullName;
+        }
     }
 }
 

@@ -28,11 +28,67 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<Review>> GetAllDetail(string? keyword)
+        {
+            try
+            {
+                var query = _context.Reviews
+                        .Include(x => x.User)
+                        .Include(x => x.Patch)
+                        .ToList();
+
+                if (query == null)
+                {
+                    return new List<Review>();
+                }
+
+                if (keyword != null || (keyword != null && !string.IsNullOrEmpty(keyword)))
+                {
+                    query.Where(x => x.Patch.Name.ToLower().Contains(keyword.ToLower()) || x.User.FullName.ToLower().Contains(keyword.ToLower()) || x.UserName.ToLower().Contains(keyword.ToLower()) || x.User.Email.ToLower().Contains(keyword.ToLower())).ToList();
+                }
+
+                return query;
+            }
+            catch (Exception)
+            {
+                return new List<Review>();
+            }
+        }
+
+        public async Task<List<Review>> GetAllByPatchId(int patchId)
+        {
+            try
+            {
+                var result = await _context.Reviews.Where(x => x.PatchId == patchId && x.Status == 1).ToListAsync();
+
+                if(result == null)
+                {
+                    return new List<Review>();
+                }
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<Review> GetById(int id)
         {
             try
             {
-                return await _context.Reviews.FindAsync(id);
+                var obj = await _context.Reviews.FindAsync(id);
+                if(obj == null || (obj != null && obj.Status != 1))
+                {
+                    throw new InvalidOperationException("NOT_FOUND");
+                }
+
+                return obj;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {
@@ -44,6 +100,8 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
+                review.Status = 1;
+                review.CreatedAt = DateTime.Now;
                 var added = _context.Reviews.Add(review).Entity;
                 await _context.SaveChangesAsync();
                 return added;
@@ -58,9 +116,28 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
-                _context.Reviews.Update(review);
+                var obj = await _context.Reviews.FindAsync(review.ReviewId);
+                if (obj == null)
+                {
+                    throw new InvalidOperationException("NOT_FOUND");
+                }
+
+                obj.Title = review.Title;
+                obj.Content = review.Content;
+                obj.Overall = review.Overall;
+                obj.PatchId = review.PatchId;
+                obj.ReviewId = review.ReviewId;
+                obj.UserId = review.UserId;
+                obj.UserName = review.UserName;
+                obj.Status = review.Status;
+
+                _context.Reviews.Update(obj);
                 await _context.SaveChangesAsync();
                 return review;
+            }
+            catch(InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {
@@ -72,13 +149,19 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
-                var review = await _context.Reviews.FindAsync(id);
-                if (review == null)
-                    return false;
+                var obj = await _context.Reviews.FindAsync(id);
+                if (obj == null || (obj != null && obj.Status != 1))
+                {
+                    throw new InvalidOperationException("NOT_FOUND");
+                }
 
-                _context.Reviews.Remove(review);
+                _context.Reviews.Remove(obj);
                 await _context.SaveChangesAsync();
                 return true;
+            }
+            catch(InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception)
             {

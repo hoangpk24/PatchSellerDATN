@@ -1,0 +1,168 @@
+﻿@page "/admin/review"
+@layout AdminLayout
+
+<PageTitle>@Constant.PageTitleAdmin Review</PageTitle>
+
+<section class="p-6">
+    <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách đánh giá</h1>
+
+    <div class="mt-8 rounded bg-white p-6 shadow-md">
+        <div class="grid w-full grid-cols-3 gap-x-6 gap-y-4">
+            <div>
+                <MudTextField T="string" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Value="@_searchValue"
+                              AdornmentIcon="@Icons.Material.Filled.Search" Variant="Variant.Outlined" IconSize="Size.Medium" Class="mt-0" Style="height: 44px" ValueChanged="onChangeSearch" Immediate=true></MudTextField>
+            </div>
+            <div class="flex items-center gap-2">
+                <MudButton Variant="Variant.Outlined" OnClick="OnSearch" Class="h-11 w-full"><MudIcon Icon="@Icons.Material.Filled.Search" Class="mr-2" /> Tìm kiếm</MudButton>
+                <MudButton Variant="Variant.Outlined" OnClick="OnReset" Class="h-11 w-full"><MudIcon Icon="@Icons.Material.Filled.Filter" Class="mr-2" /> Đặt lại</MudButton>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 rounded bg-white shadow-md">
+        <MudTable Items="@_lstReview" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100lvh - 357px)">
+            <HeaderContent>
+                <MudTh hidden><MudTableSortLabel SortLabel="Id" T="string" hidden>STT</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Điểm</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Thời gian đánh giá</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Người đánh giá</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Đánh giá gói</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Tiêu đề</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Nội dung</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id" hidden>@context.ReviewId</MudTd>
+                <MudTd DataLabel="Tên">@context.Overall</MudTd>
+                <MudTd DataLabel="Tên">@context.CreatedAt?.ToString("dd/MM/yyyy HH:mm:ss")</MudTd>
+                <MudTd DataLabel="Tên">@context.UserName</MudTd>
+                <MudTd DataLabel="Tên">@context.PatchName</MudTd>
+                <MudTd DataLabel="Tên">@context.Title</MudTd>
+                <MudTd DataLabel="Tên">@context.Content</MudTd>
+                <MudTd DataLabel="Tên">@(context.Status == 1 ? "Công khai" : "Đã bị ẩn")</MudTd>
+                <MudTd Class="!flex-nowrap" DataLabel="Thao tác">
+                    @if(context.Status == 1)
+                    {
+                        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@(() => UpdateStatus(context, true))">Ẩn</MudButton>
+                    } else
+                    {
+                        <MudButton Variant="Variant.Text" OnClick="@(() => UpdateStatus(context, false))">Hiện</MudButton>
+                    }
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText Class="my-4">Không có dữ liệu.</MudText>
+            </NoRecordsContent>            
+            <LoadingContent>
+                <div class="flex w-full flex-col gap-3">
+                    @{
+                        for (var i = 0; i < 5; i++)
+                        {
+                            <div class="flex items-center justify-between gap-2 px-2">
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                            </div>
+                        }
+                    }
+                </div>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    </div>
+</section>
+
+@code {
+    List<ReviewDetailResponse> _lstReview = [];
+
+    private string _searchValue = string.Empty;
+    private bool _isLoading = true;
+
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadData();
+        }
+        catch (Exception)
+        {
+            _isLoading = false;    
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var res = await _adminReviewService.GetAll(_searchValue);
+        var data = res.Data;
+        if (res.IsSuccess && data != null)
+        {
+            _lstReview = data;
+        }
+        else if (res.IsSuccess == false && res.StatusCode == "NotFound")
+        {
+            _snackbar.Add("Không tìm thấy trang này.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.NotFound);
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho quản trị viên.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.Admin.Category);
+        }
+        StateHasChanged();
+    }
+
+    private void onChangeSearch(string value)
+    {
+        _searchValue = value.Trim();
+    }
+
+    private async Task OnSearch()
+    {
+        await LoadData();
+    }
+
+    private async Task OnReset()
+    {
+        _searchValue = string.Empty;
+        await LoadData();
+    }
+
+    private async Task UpdateStatus(ReviewDetailResponse review, bool isHidden)
+    {
+
+        var payload = new ReviewModel
+        {
+            Content = review.Content,
+            PatchId = review.PatchId,
+            Overall = review.Overall,
+            ReviewId = review.ReviewId,
+            Title = review.Title,
+            UserId = review.UserId,
+            UserName = review.UserName,
+            Status = isHidden ? 0 : 1,
+        };
+        var result = await _adminReviewService.UpdateReview(payload);
+
+        if (result.IsSuccess)
+        {
+            _snackbar.Add("Đã ẩn bình luận này", MudBlazor.Severity.Success);
+            await LoadData();
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra, vui lòng thử lại", MudBlazor.Severity.Error);
+        }
+    }
+}
