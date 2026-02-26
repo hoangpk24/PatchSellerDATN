@@ -17,6 +17,7 @@ namespace PatchSeller.API.DTOs
         public List<CategoryBasicDTO> Categories { get; set; } = new List<CategoryBasicDTO>();
         public List<PatchBasicDTO> Patches { get; set; } = new List<PatchBasicDTO>();
         public List<GameImageBasicDTO> GameImages { get; set; } = new List<GameImageBasicDTO>();
+        public List<GameDetailDTO> GameSameCategories { get; set; } = new List<GameDetailDTO>();
     }
 
     public class PublisherBasicDTO

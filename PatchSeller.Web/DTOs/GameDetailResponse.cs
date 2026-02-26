@@ -17,6 +17,7 @@
         public List<CategoryBasicDTO> Categories { get; set; } = new List<CategoryBasicDTO>();
         public List<PatchBasicDTO> Patches { get; set; } = new List<PatchBasicDTO>();
         public List<GameImageBasicDTO> GameImages { get; set; } = new List<GameImageBasicDTO>();
+        public List<GameDetailResponse> GameSameCategories { get; set; } = new List<GameDetailResponse>();
     }
 
     public class PublisherBasicDTO
