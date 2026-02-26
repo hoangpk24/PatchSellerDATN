@@ -42,6 +42,7 @@ builder.Services.AddScoped<AdminPatchService>();
 builder.Services.AddScoped<AdminPatchVersionService>();
 builder.Services.AddScoped<AdminUploadService>();
 builder.Services.AddScoped<AdminOrderService>();
+builder.Services.AddScoped<AdminReviewService>();
 
 // Customer Service
 builder.Services.AddScoped<GameService>();
@@ -54,6 +55,7 @@ builder.Services.AddScoped<MineService>();
 builder.Services.AddScoped<UserPurchaseService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<PlatformService>();
+builder.Services.AddScoped<ReviewService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {

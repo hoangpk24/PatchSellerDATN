@@ -93,28 +93,56 @@
             // Order
             public const string Orders = "/admin/order/get-all";
             public const string OrderDetail = "/admin/order/get-order-detail/:id";
+
+            // Review
+            public const string GetAllReview = "/admin/review/get-all-review";
+            public const string UpdateReview = "/admin/review/update";
         }
 
         public static class Customer
         {
+            // Get Mine
             public const string GetUserById = "/user/get-user-by-id/:id";
+            public const string GetMeById = "/user/get-me-detail/:id";
+
+            // Search
             public const string CategoryGetAll = "/admin/category/get-all-categories";
             public const string PlatformGetAll = "/admin/platform/get-all-platforms";
-            public const string GetMeById = "/user/get-me-detail/:id";
-            public const string GameForHome = "/game/get-for-home";
             public const string GameForSearch = "/game/get-for-search";
+
+            // Home
+            public const string GameForHome = "/game/get-for-home";
+
+            // Game Detail
             public const string GameDetail = "/game/get-by-id-detail/:id";
+
+            // Cart
             public const string addCart = "/cart/add-to-cart";
             public const string getCartByUserId = "/cart/get-cart-item-by-user-id";
             public const string DeleteCartItem = "/cart-item/delete/:id";
+
+            // Checkout
             public const string Checkout = "/order/checkout";
-            public const string ApplyDiscountCode = "/discount/ApplyDiscountCodeValue";
             public const string PaymentSuccess = "/order/payment-success";
             public const string PaymentCancelled = "/order/payment-cancelled";
+
+            // Discount Code
+            public const string ApplyDiscountCode = "/discount/ApplyDiscountCodeValue";
+
+            // Order
             public const string GetAllOrder = "/order/get-all";
             public const string GetOrderDetail = "/order/get-order-detail/:id";
+
+            // User Purchase
             public const string GetAllUserPurchase = "/user-purchase/get-purchase-by-user-id/:id";
             public const string CheckPatchPurchased = "/user-purchase/check-patch-purchased/:id";
+
+            // Review
+            public const string GetAllReview = "/review/get-all-review";
+            public const string GetAllReviewByPatch = "/review/get-all-review-by-patch-id/:id";
+            public const string CreateReview = "/review/create";
+            public const string UpdateReview = "/review/update";
+            public const string DeleteReview = "/review/delete/:id";
         }
     }
 }
