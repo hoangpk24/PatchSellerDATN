@@ -239,5 +239,54 @@ namespace PatchSeller.API.Controllers.Public
                 return StatusCode(500, Constant.ErrorCode.OtherError);
             }
         }
+        [HttpGet("get-for-search")]
+        public async Task<ActionResult<GameSearchDTO>> GetAllForSearch(
+            [FromQuery] string? keyword,
+            [FromQuery] string? categoryIds,
+            [FromQuery] string? platformIds,
+            [FromQuery] double? startMoney,
+            [FromQuery] double? endMoney,
+            [FromQuery] string? sort,
+            [FromQuery] int page = 1,
+            [FromQuery] int perPage = 12)
+        {
+            try
+            {
+                var catList = string.IsNullOrEmpty(categoryIds)
+                    ? null
+                    : categoryIds.Split(',').Select(int.Parse).ToList();
+
+                var platList = string.IsNullOrEmpty(platformIds)
+                    ? null
+                    : platformIds.Split(',').Select(int.Parse).ToList();
+
+                var (games, totalCount) = await _gameRepository.SearchGamesForPublic(
+                    keyword, catList, platList, startMoney, endMoney, sort, page, perPage);
+
+                if (games == null)
+                {
+                    return Ok(new { data = new List<GameDetailDTO>(), total = 0 });
+                }
+
+                var result = games.Select(MapToGameDetailDTO)
+                                .Where(d => d != null)
+                                .ToList();
+
+                return Ok(new GameSearchDTO
+                {
+                    TotalItems = totalCount,
+                    CurrentPage = page,
+                    PerPage = perPage,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)perPage),
+                    Games = result
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
     }
+
+
 }

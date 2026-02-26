@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PatchSeller.DAL.Context;
 using PatchSeller.DAL.Models;
 using System;
@@ -265,6 +265,81 @@ namespace PatchSeller.DAL.Repository
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        public async Task<(List<Game> Data, int TotalCount)> SearchGamesForPublic(
+            string? keyword,
+            List<int>? categoryIds,
+            List<int>? platformIds,
+            double? startMoney,
+            double? endMoney,
+            string? sort,
+            int page,
+            int perPage)
+        {
+            try
+            {
+                var query = _context.Games
+                    .Include(g => g.Publisher)
+                    .Include(g => g.GamePlatforms).ThenInclude(gp => gp.Platform)
+                    .Include(g => g.GameCategories).ThenInclude(gc => gc.Category)
+                    .Include(g => g.Patches).ThenInclude(p => p.PatchVersions)
+                    .Include(g => g.GameImages)
+                    .Where(g => g.Delete != true && g.Status == 1) 
+                    .AsQueryable();
+
+                query = query.Where(g =>
+                    g.Publisher != null && g.Publisher.Delete != true && g.Publisher.Status == 1 &&
+                    g.GameCategories.Any(gc => gc.Delete != true && gc.Category != null &&
+                                               gc.Category.Delete != true && gc.Category.Status == 1));
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(g => g.Title.Contains(keyword) ||
+                                            (g.Description != null && g.Description.Contains(keyword)));
+                }
+
+                if (categoryIds != null && categoryIds.Any())
+                {
+                    query = query.Where(g => g.GameCategories != null && g.GameCategories.Any(gc => categoryIds.Contains(gc.CategoryId)));
+                }
+
+                if (platformIds != null && platformIds.Any())
+                {
+                    query = query.Where(g => g.GamePlatforms != null && g.GamePlatforms.Any(gp => platformIds.Contains(gp.PlatformId)));
+                }
+
+                if (startMoney.HasValue)
+                {
+                    query = query.Where(g => g.Patches != null && g.Patches.Any(p => p.Price >= startMoney.Value && p.Status == 1 && p.Delete != true));
+                }
+                if (endMoney.HasValue)
+                {
+                    query = query.Where(g => g.Patches != null && g.Patches.Any(p => p.Price <= endMoney.Value && p.Status == 1 && p.Delete != true));
+                }
+
+                query = sort?.ToLower() switch
+                {
+                    "name_asc" => query.OrderBy(g => g.Title),
+                    "name_desc" => query.OrderByDescending(g => g.Title),
+                    "price_asc" => query.OrderBy(g => g.Patches.Where(p => p.Status == 1 && p.Delete != true).Min(p => p.Price)),
+                    "price_desc" => query.OrderByDescending(g => g.Patches.Where(p => p.Status == 1 && p.Delete != true).Max(p => p.Price)),
+                    _ => query.OrderByDescending(g => g.CreatedAt)
+                };
+
+                int totalCount = await query.CountAsync();
+
+                var data = await query
+                    .Skip((page - 1) * perPage)
+                    .Take(perPage)
+                    .ToListAsync();
+
+                return (data, totalCount);
+            }
+            catch (Exception)
+            {
+                return (null, 0);
             }
         }
     }
