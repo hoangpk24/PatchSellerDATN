@@ -33,21 +33,22 @@ namespace PatchSeller.DAL.Repository
             try
             {
                 var query = _context.Reviews
-                        .Include(x => x.User)
-                        .Include(x => x.Patch)
-                        .ToList();
+                            .Include(x => x.User)
+                            .Include(x => x.Patch)
+                            .AsQueryable();
 
-                if (query == null)
+                if (!string.IsNullOrWhiteSpace(keyword))
                 {
-                    return new List<Review>();
+                    var k = keyword.ToLower(); 
+
+                    query = query.Where(x =>
+                        x.Patch.Name.ToLower().Contains(k) ||
+                        x.User.FullName.ToLower().Contains(k) ||
+                        x.UserName.ToLower().Contains(k) ||
+                        x.User.Email.ToLower().Contains(k));
                 }
 
-                if (keyword != null || (keyword != null && !string.IsNullOrEmpty(keyword)))
-                {
-                    query.Where(x => x.Patch.Name.ToLower().Contains(keyword.ToLower()) || x.User.FullName.ToLower().Contains(keyword.ToLower()) || x.UserName.ToLower().Contains(keyword.ToLower()) || x.User.Email.ToLower().Contains(keyword.ToLower())).ToList();
-                }
-
-                return query;
+                return await query.ToListAsync();
             }
             catch (Exception)
             {
@@ -59,7 +60,7 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
-                var result = await _context.Reviews.Where(x => x.PatchId == patchId && x.Status == 1).ToListAsync();
+                var result = await _context.Reviews.Where(x => x.PatchId == patchId).ToListAsync();
 
                 if(result == null)
                 {

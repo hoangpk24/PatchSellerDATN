@@ -57,7 +57,7 @@
 
                                     @foreach (var plat in _lstPlatform)
                                     {
-                                        <a href="@(RouterConfig.Customer.Search + "?" + $"cats={plat.PlatformId}")"
+                                        <a href="@(RouterConfig.Customer.Search + "?" + $"plats={plat.PlatformId}")"
                                            class="block whitespace-nowrap rounded px-4 py-2 text-sm text-gray-300 transition-all hover:bg-purple-600 hover:text-white">
                                             @plat.Name
                                         </a>

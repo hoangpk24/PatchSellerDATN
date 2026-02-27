@@ -110,7 +110,7 @@ namespace PatchSeller.Web.Schema
             };
         }
 
-        public class ResetPassword : AbstractValidator<ChangePasswordModel>
+        public class ResetPassword : AbstractValidator<CustomerChangePasswordModel>
         {
             public ResetPassword()
             {
@@ -123,11 +123,16 @@ namespace PatchSeller.Web.Schema
                     .NotEmpty().WithMessage("Mật khẩu không được để trống")
                     .Matches(Constant.Constant.Regex.Password).WithMessage("Mật khẩu phải có từ 8 đến 16 ký tự chữ và số, bao gồm cả chữ hoa, chữ thường, số và ký hiệu")
                     .Length(2, 255).WithMessage("Mật khẩu có đội dài tối đa 255 ký tự");
+
+                RuleFor(x => x.ConfirmNewPassword)
+                    .NotEmpty().WithMessage("Mật khẩu không được để trống")
+                    .Matches(Constant.Constant.Regex.Password).WithMessage("Mật khẩu phải có từ 8 đến 16 ký tự chữ và số, bao gồm cả chữ hoa, chữ thường, số và ký hiệu")
+                    .Length(2, 255).WithMessage("Mật khẩu có đội dài tối đa 255 ký tự");
             }
 
             public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
             {
-                var result = await ValidateAsync(ValidationContext<ChangePasswordModel>.CreateWithOptions((ChangePasswordModel)model, x => x.IncludeProperties(propertyName)));
+                var result = await ValidateAsync(ValidationContext<CustomerChangePasswordModel>.CreateWithOptions((CustomerChangePasswordModel)model, x => x.IncludeProperties(propertyName)));
                 if (result.IsValid)
                     return Array.Empty<string>();
                 return result.Errors.Select(e => e.ErrorMessage);

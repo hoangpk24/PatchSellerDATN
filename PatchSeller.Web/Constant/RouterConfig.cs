@@ -116,6 +116,9 @@
             public const string Rank = "/admin/rank";
             public const string CreateRank = "/admin/rank/create";
             public const string EditRank = "/admin/rank/:id/edit";
+
+            // Review
+            public const string Review = "/admin/review";
         }
     }
 }

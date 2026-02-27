@@ -21,7 +21,7 @@
                         <p class="text-center text-white/70">@_user.Email</p>
                         <p class="text-center text-white/70">@_user.PhoneNumber</p>
                         <p class="text-center text-white/70">Ngày đăng ký: @_user.CreateAt?.ToString("dd/MM/yyyy HH:mm:ss")</p>
-                        <p class="text-center text-white/70">Số gói đã mua: @_user.TotalSpent</p>
+                        <p class="text-center text-white/70">Số gói đã mua: @(_user.PurchasedPatches != null && _user.PurchasedPatches.Any() ? _user.PurchasedPatches.Count() : 0)</p>
                         <p class="text-center text-white/70">Cấp bậc: @_user.RankName</p>
                         <p class="text-center text-white/70">Số điểm hiện có: @_user.RewardPoint.ToString("N0")</p>
                     </div>

@@ -92,11 +92,22 @@
         if (!string.IsNullOrEmpty(FirstLogin))
         {
             _firstLogin = bool.Parse(FirstLogin);
-            if (_firstLogin == true && !navigation.ToBaseRelativePath(navigation.Uri).Equals(RouterConfig.Customer.ChangePassword.Replace("/", "")))
+            if (_firstLogin)
             {
-                navigation.NavigateTo(RouterConfig.Customer.ChangePassword, true);
-                _isLoading = false;
-                return;
+                var currentUrl = navigation.ToBaseRelativePath(navigation.Uri).Split('?')[0];
+                var targetUrl = RouterConfig.Customer.ChangePassword.TrimStart('/');
+
+                if (!currentUrl.Equals(targetUrl, StringComparison.OrdinalIgnoreCase))
+                {
+                    navigation.NavigateTo(RouterConfig.Customer.ChangePassword, false);
+                    _isLoading = false;
+                    return;
+                }
+                else
+                {
+                    _isLoading = false;
+                    return;
+                }
             }
         }
 

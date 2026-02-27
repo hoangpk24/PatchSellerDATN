@@ -44,7 +44,7 @@
 
             <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Thuộc game</label> <span class="ml-1 text-red-500">*</span>
-                <MudSelect class="mt-0" Margin="Margin.Dense" Variant="Variant.Outlined" @bind-Value="@_model.GameId">
+                <MudSelect class="mt-0" Margin="Margin.Dense" Variant="Variant.Outlined" @bind-Value="@_model.GameId" Disabled>
                     <MudSelectItem Value="0">UnKnow</MudSelectItem>
                     @if (_lstGame.Any())
                     {

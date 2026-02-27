@@ -728,9 +728,9 @@
     async Task LoadReview(int patchId)
     {
         var resReview = await _reviewService.GetAllByPatchId(patchId);
-        if (resReview.IsSuccess)
+        if (resReview.IsSuccess && resReview.Data.Any())
         {
-            _lstReview = resReview.Data;
+            _lstReview = resReview.Data.Where(x => x.Status == 1).ToList();
             _totalReviews = _lstReview.Count;
 
             for (int i = 1; i <= 5; i++) _ratingCounts[i] = 0;
@@ -748,7 +748,7 @@
                 _averageRating = 0;
             }
 
-            _isReviewed = _mine != null && _lstReview.Any(x => x.UserId == _mine.Id);
+            _isReviewed = _mine != null && resReview.Data.Any(x => x.UserId == _mine.Id);
         }
     }
 
