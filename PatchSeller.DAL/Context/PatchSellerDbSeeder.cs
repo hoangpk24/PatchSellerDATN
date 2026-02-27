@@ -941,7 +941,7 @@ public static class PatchSellerDbSeeder
                 UserName = "tranthib",
                 Title = "Preset nhìn rõ, FPS ổn",
                 Content = "Áp dụng theo hướng dẫn là ổn, game đỡ mờ và FPS mượt hơn. Nên có thêm preset cho GPU yếu.",
-                Overall = 4.5,
+                Overall = 4,
                 Status = 1
             },
             new Review
@@ -952,7 +952,7 @@ public static class PatchSellerDbSeeder
                 UserName = "nguyenvana",
                 Title = "Việt hóa dễ cài",
                 Content = "Copy là chạy, có file restore nên yên tâm. Thuật ngữ dịch ổn.",
-                Overall = 4.2,
+                Overall = 4,
                 CreatedAt = new DateTime(2020, 1, 1),
                 Status = 1
             },
@@ -964,7 +964,7 @@ public static class PatchSellerDbSeeder
                 UserName = "hoangnam",
                 Title = "Bài tập aim ok",
                 Content = "Routine 20 phút hợp lý, kiên trì 1 tuần thấy aim ổn hơn trong DM.",
-                Overall = 4.0,
+                Overall = 4,
                 CreatedAt = new DateTime(2020, 1, 1),
                 Status = 1
             }

@@ -61,7 +61,7 @@
             <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Thuộc gói</label> <span class="ml-1 text-red-500">*</span>
 
-                <MudSelect T="int" @bind-Value="_model.PatchId" For="@(() => _model.PatchId)" Variant="Variant.Outlined" Placeholder="Riot Games" Margin="Margin.Dense">
+                <MudSelect T="int" @bind-Value="_model.PatchId" For="@(() => _model.PatchId)" Variant="Variant.Outlined" Placeholder="Riot Games" Margin="Margin.Dense" Disabled>
                     <MudSelectItem Value="0">- Vui lòng chọn -</MudSelectItem>
                     @if (_lstPatch.Any())
                     {
