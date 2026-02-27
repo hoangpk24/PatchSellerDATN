@@ -198,7 +198,7 @@ namespace PatchSeller.API.Controllers.Admin
                     Description = dto.Description,
                     GameId = dto.GameId,
                     CreatedAt = dto.CreatedAt ?? DateTime.UtcNow,
-                    Status = 1,
+                    Status = dto.Status,
                     Delete = false,
                     ThumbnailLink = dto.ThumbnailLink,
                     UpdateBy = dto.UpdateBy ?? userId

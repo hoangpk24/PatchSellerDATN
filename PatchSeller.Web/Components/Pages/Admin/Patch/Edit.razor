@@ -85,7 +85,8 @@
 
             <div class="mb-6">
                 <label class="mb-2 block text-sm font-bold uppercase tracking-wider text-slate-700">Trạng thái hiển thị</label>
-                <MudRadioGroup Disabled="@(_patchDetail.PatchVersions == null || (_patchDetail.PatchVersions != null && !_patchDetail.PatchVersions.Any()))" T="int" @bind-Value="_model.Status" For="@(() => _model.Status)">
+
+                <MudRadioGroup Disabled="_isDisableStatus" T="int" @bind-Value="_model.Status" For="@(() => _model.Status)">
                     <div class="flex gap-6">
                         <MudRadio Value="1" Color="Color.Primary" Class="!ml-0">
                             <span class="text-sm font-medium text-slate-600">Hoạt động</span>
@@ -95,6 +96,13 @@
                         </MudRadio>
                     </div>
                 </MudRadioGroup>
+
+                @if (_isDisableStatus)
+                {
+                    <p class="mt-1 text-xs italic text-red-500">
+                        * Không thể chuyển trạng thái "Hoạt động" vì gói này chưa có phiên bản (Patch Version) nào.
+                    </p>
+                }
             </div>
 
             <MudDivider Class="mb-8 mt-4 !border-slate-200" />
@@ -139,7 +147,9 @@
 
     private string _oldImageUrl = string.Empty;
     private bool _isLoading = false;
-    private int MaxAllowedSize = 1024 * 1024 * 5;
+    private int MaxAllowedSize = 1024 * 1024 * 5; 
+    private bool _isDisableStatus = false; 
+    private bool _isImageRemoved = false;
 
     CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
 
@@ -170,7 +180,8 @@
         var resPatch = await _adminPatchService.GetDetailById(id);
         if (resPatch.IsSuccess && resPatch.Data != null)
         {
-            _patchDetail = resPatch.Data;
+            _patchDetail = resPatch.Data; 
+            _isDisableStatus = _patchDetail.PatchVersions == null || !_patchDetail.PatchVersions.Any();
             _model = new PatchModel             
             {
                 PatchId = resPatch.Data.PatchId,
@@ -187,6 +198,8 @@
                 Url = resPatch.Data.ThumbnailLink,
             };
             _oldImageUrl = resPatch.Data.ThumbnailLink;
+
+            _isImageRemoved = false;
         }
         else if (resPatch.IsSuccess == false && resPatch.StatusCode == "NotFound")
         {
@@ -221,7 +234,7 @@
                 var base64String = Convert.ToBase64String(memoryStream.ToArray());
                 return $"data:{file.ContentType};base64,{base64String}";
             });
-
+            _isImageRemoved = false;
             _imagesWithUrl = new ImageFileResponse { File = file, Url = url };
             StateHasChanged();
         }
@@ -239,6 +252,7 @@
         try
         {
             _isLoading = true;
+            _isImageRemoved = true;
             _imagesWithUrl = new ImageFileResponse();
             StateHasChanged();
         }
@@ -263,12 +277,6 @@
 
             if (!_form.IsValid) return;
 
-            if (string.IsNullOrEmpty(_imagesWithUrl.Url))
-            {
-                _snackbar.Add("Vui lòng thêm ảnh", MudBlazor.Severity.Warning);
-                return;
-            }
-
             _model.Name = _model.Name.Trim();
             _model.Description = _model.Description.Trim();
             _model.UpdateBy = _mine.FullName ?? "";
@@ -280,6 +288,10 @@
             {
                 var fileName = Path.GetFileName(_imagesWithUrl.File.Name);
                 _model.ThumbnailLink = Constant.MainPatchImages + randomId + "/" + fileName;
+            }
+            else if (_isImageRemoved)
+            {
+                _model.ThumbnailLink = string.Empty;
             }
             else
             {
@@ -293,6 +305,10 @@
                 if (isNewImages)
                 {
                     await SaveFileToDisk(randomId);
+                    DeleteOldImageFolder(_oldImageUrl);
+                }
+                else if (_isImageRemoved)
+                {
                     DeleteOldImageFolder(_oldImageUrl);
                 }
                 _imagesWithUrl = new ImageFileResponse();

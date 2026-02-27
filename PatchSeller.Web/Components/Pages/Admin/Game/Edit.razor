@@ -114,8 +114,11 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-bold uppercase tracking-wider text-slate-700">Trạng thái hiển thị</label>
-                <MudRadioGroup T="int" @bind-Value="_model.Status" For="@(() => _model.Status)">
+                <label class="mb-2 block text-sm font-bold uppercase tracking-wider text-slate-700">
+                    Trạng thái hiển thị
+                </label>
+
+                <MudRadioGroup Disabled="_isDisableStatus" T="int" @bind-Value="_model.Status" For="@(() => _model.Status)">
                     <div class="flex gap-6">
                         <MudRadio Value="1" Color="Color.Primary" Class="!ml-0">
                             <span class="text-sm font-medium text-slate-600">Hoạt động</span>
@@ -125,6 +128,13 @@
                         </MudRadio>
                     </div>
                 </MudRadioGroup>
+
+                @if (_isDisableStatus)
+                {
+                    <p class="mt-1 text-xs italic text-red-400">
+                        * Cần ít nhất một Patch có Version để thay đổi trạng thái.
+                    </p>
+                }
             </div>
 
             <MudDivider Class="mb-8 mt-4 !border-slate-200" />
@@ -170,6 +180,7 @@
     private int MaxAllowedSize = 1024 * 1024 * 5;
     private bool _isSubmitting = false;
     string _content = string.Empty;
+    bool _isDisableStatus = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -193,6 +204,11 @@
         if (resGame.IsSuccess && resGame.Data != null)
         {
             var data = resGame.Data;
+
+            _isDisableStatus = data.Patches == null ||
+                           !data.Patches.Any() ||
+                           data.Patches.All(p => p.PatchVersions == null || !p.PatchVersions.Any());
+
             _model = new GameModel
             {
                 GameId = data.GameId,
