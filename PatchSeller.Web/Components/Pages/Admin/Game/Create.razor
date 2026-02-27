@@ -271,7 +271,7 @@
             _model.Developer = _model.Developer.Trim();
             _model.CategoryIds = _categoryIds.ToList();
             _model.Platforms = lstPlatform;
-            _model.Status = Constant.StatusDefault.CommingSoon;
+            _model.Status = Constant.StatusDefault.InActive;
 
             var fileName = Path.GetFileName(_imagesWithUrl.File.Name);
             var randomId = Guid.NewGuid().ToString().Substring(0, 8);

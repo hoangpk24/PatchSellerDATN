@@ -38,7 +38,13 @@
                 <MudTd DataLabel="Id" hidden>@context.GameId</MudTd>
                 <MudTd DataLabel="Tên">
                     <div class="w-[100px]">
-                        <MudImage Src="@(!string.IsNullOrEmpty(context.ThumbnailLink) ? context.ThumbnailLink : Constant.DefaultImages)" Class="aspect-[1/1.6] object-cover" />
+                        @if(context.ThumbnailLink != null && !string.IsNullOrEmpty(context.ThumbnailLink))
+                        {
+                            <MudImage Src="@context.ThumbnailLink" Class="aspect-[1/1.6] object-cover" />
+                        } else
+                        {
+                            <span>Không có ảnh</span>
+                        }
                     </div>
                 </MudTd>
                 <MudTd DataLabel="Thuộc game">@(context.Game != null ? context.Game.Title : "Unknow")</MudTd>

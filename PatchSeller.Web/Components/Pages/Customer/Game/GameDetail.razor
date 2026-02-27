@@ -21,10 +21,12 @@
                 <div class="flex justify-between gap-6">
                     <h2 class="max-w-[calc(100%-196px)] whitespace-pre-wrap break-words font-semibold leading-tight text-[32px] text-white">@_gameDetail.Title</h2>
 
-                    <div class="flex h-fit w-fit items-center gap-3 rounded-full border border-green-500/20 bg-green-500/10 px-6 py-3 shadow-sm">
-                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="text-green-500" />
-                        <span class="text-sm font-bold uppercase tracking-widest text-green-500">Đã sở hữu</span>
-                    </div>
+                    @if(_isOwned) {
+                        <div class="flex h-fit w-fit items-center gap-3 rounded-full border border-green-500/20 bg-green-500/10 px-6 py-3 shadow-sm">
+                            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="text-green-500" />
+                            <span class="text-sm font-bold uppercase tracking-widest text-green-500">Đã sở hữu</span>
+                        </div>
+                    }
                 </div>
 
                 @if(_gameDetail.Status != 2)

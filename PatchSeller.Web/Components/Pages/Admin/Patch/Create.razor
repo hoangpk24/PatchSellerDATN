@@ -211,39 +211,39 @@
 
             if (!_form.IsValid) return;
 
-            if (_imagesWithUrl.File == null || (_imagesWithUrl.File != null && string.IsNullOrEmpty(_imagesWithUrl.Url)))
-            {
-                _snackbar.Add("Vui lòng thêm ảnh", MudBlazor.Severity.Warning);
-                return;
-            }
-
             _model.Name = _model.Name.Trim();
             _model.Description = _model.Description.Trim();
             _model.Status = Constant.StatusDefault.InActive;
             _model.UpdateBy = _mine.FullName ?? "";
 
-
-            var fileName = Path.GetFileName(_imagesWithUrl.File.Name);
+            var fileName = string.Empty;
             var randomId = Guid.NewGuid().ToString().Substring(0, 8);
-            _model.ThumbnailLink = Constant.MainPatchImages + randomId + "/" + fileName;
+            if(_imagesWithUrl != null && _imagesWithUrl.File != null)
+            {
+                 fileName = Path.GetFileName(_imagesWithUrl.File.Name);
+                _model.ThumbnailLink = Constant.MainPatchImages + randomId + "/" + fileName;
+            }
 
             var response = await _adminPatchService.CreatePatch(_model, _token);
 
             if (response.IsSuccess)
             {
-                var contentRootPath = WebHostEnvironment.WebRootPath;
-                var productImagesPath = Path.Combine(contentRootPath, "uploads", "images", "patches", randomId);
-
-                if (!Directory.Exists(productImagesPath))
+                if(_imagesWithUrl != null && _imagesWithUrl.File != null)
                 {
-                    Directory.CreateDirectory(productImagesPath);
+                    var contentRootPath = WebHostEnvironment.WebRootPath;
+                    var productImagesPath = Path.Combine(contentRootPath, "uploads", "images", "patches", randomId);
+
+                    if (!Directory.Exists(productImagesPath))
+                    {
+                        Directory.CreateDirectory(productImagesPath);
+                    }
+
+                    var filePath = Path.Combine(productImagesPath, fileName);
+
+                    await using Stream fileStream = _imagesWithUrl.File.OpenReadStream(MaxAllowedSize);
+                    await using FileStream fs = File.Create(filePath);
+                    await fileStream.CopyToAsync(fs);
                 }
-
-                var filePath = Path.Combine(productImagesPath, fileName);
-
-                await using Stream fileStream = _imagesWithUrl.File.OpenReadStream(MaxAllowedSize);
-                await using FileStream fs = File.Create(filePath);
-                await fileStream.CopyToAsync(fs);
                 _imagesWithUrl = new ImageFileResponse();
 
                 _snackbar.Add("Tạo thành công!", MudBlazor.Severity.Success);
