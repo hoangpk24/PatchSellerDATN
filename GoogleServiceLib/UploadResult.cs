@@ -2,6 +2,7 @@
 {
     public class UploadResult
     {
+        public string FileName { get; set; }
         public string LinkDownload { get; set; }
         public string Link { get; set; }
         public long? Size { get; set; }

@@ -39,6 +39,15 @@ namespace PatchSeller.API.Controllers
             return false;
         }
 
+        [HttpGet("move-to-trash")]
+        public async Task<bool> MoveToTashFileOrFolder(string folderOrFileId)
+        {
+            var result = await _googleDriveService.MoveToTrashAsync(folderOrFileId);
+            if (result == true)
+                return true;
+            return false;
+        }
+
         [HttpGet("check-file")]
         public async Task<IActionResult> CheckFile(string url)
         {
@@ -57,6 +66,32 @@ namespace PatchSeller.API.Controllers
             });
         }
 
+        [HttpGet("get-list-files")]
+        public async Task<IActionResult> GetAllFilesInfo()
+        {
+            var files = await _googleDriveService.GetAllFilesAsync();
+
+            return Ok(files);
+        }
+
+        [HttpGet("get-drive-tree")]
+        public async Task<IActionResult> GetTree()
+        {
+            var tree = await _googleDriveService.GetDriveTreeAsync();
+            return Ok(tree);
+        }
+
+        [HttpPost("upload-with-folder")]
+        public async Task<IActionResult> UploadPatch(IFormFile file, string gameName, string version)
+        {
+            using var stream = file.OpenReadStream();
+
+            string subPath = $"{gameName}/{version}";
+
+            var result = await _googleDriveService.UploadFileWithFolderPathAsync(stream, file.FileName, subPath);
+
+            return Ok(result);
+        }
 
 
         [HttpPost("upload-file-to-server")]
