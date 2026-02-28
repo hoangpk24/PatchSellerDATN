@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PatchSeller.API.DTOs;
+using PatchSeller.DAL.Models;
 using PatchSeller.DAL.Repository;
 using System.Security.Claims;
 
@@ -126,5 +127,29 @@ namespace PatchSeller.API.Controllers.Public
                 return StatusCode(500, Constant.ErrorCode.OtherError);
             }
         }
+        [HttpGet("discount-available")]
+        public async Task<ActionResult<List<Discount>>> GetDiscountsAvailableBaseOnUser()
+        {
+
+            var userIdClaim = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
+
+            if (userIdClaim == null)
+            {
+                return BadRequest(Constant.ErrorCode.DataNotFound);
+            }
+            UserRepository userRepository = new UserRepository();
+            var user = await userRepository.GetById(int.Parse(userIdClaim));
+            if (user == null)
+            {
+                return BadRequest(Constant.ErrorCode.DataNotFound);
+            }
+
+            DiscountRepository discountRepository = new DiscountRepository();
+            var listDiscount = await discountCodeRepository.GetAllListDiscount();
+            listDiscount = listDiscount.Where(x=>x.RankId==null || x.RankId<=user.RankId).ToList();
+            return Ok(listDiscount);
+
+        }
+
     }
 }

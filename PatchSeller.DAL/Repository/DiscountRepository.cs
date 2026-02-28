@@ -203,6 +203,25 @@ namespace PatchSeller.DAL.Repository
                 return false;
             }
         }
+
+        public async Task<List<Discount>> GetAllListDiscount()
+        {
+            try
+            {
+                var query = _context.Discounts
+                            .Where(x => x.Delete != true)
+                            .AsQueryable();
+                query = query.Where(x => x.StartDate.Date >= DateTime.Now.AddMinutes(10));
+                var discountCodes = await query.ToListAsync();
+                return discountCodes;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+
+        }
     }
 }
 

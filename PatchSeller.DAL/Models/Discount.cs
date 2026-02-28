@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PatchSeller.DAL.Models;
 
@@ -23,6 +24,8 @@ public class Discount
 
     [ForeignKey("RankId")]
     public int? RankId { get; set; }
+    [JsonIgnore]
     public Rank? Rank { get; set; }
+    [JsonIgnore]
     public ICollection<Order>? Orders { get; set; }
 }
