@@ -39,6 +39,25 @@ namespace PatchSeller.API.Controllers
             return false;
         }
 
+        private string GetIdFromUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url)) return null;
+
+            if (url.Contains("id="))
+            {
+                var parts = url.Split(new[] { "id=" }, StringSplitOptions.None);
+                return parts[1].Split('&')[0];
+            }
+
+            if (url.Contains("/d/"))
+            {
+                var parts = url.Split(new[] { "/d/" }, StringSplitOptions.None);
+                return parts[1].Split('/')[0];
+            }
+
+            return null;
+        }
+
         [HttpGet("move-to-trash")]
         public async Task<bool> MoveToTashFileOrFolder(string folderOrFileId)
         {
@@ -82,15 +101,30 @@ namespace PatchSeller.API.Controllers
         }
 
         [HttpPost("upload-with-folder")]
-        public async Task<IActionResult> UploadPatch(IFormFile file, string gameName, string version)
+        public async Task<IActionResult> UploadPatch(IFormFile file, string gameName, string patchName, string version)
         {
             using var stream = file.OpenReadStream();
 
-            string subPath = $"{gameName}/{version}";
+            string subPath = $"{gameName}/{patchName}/{version}";
 
             var result = await _googleDriveService.UploadFileWithFolderPathAsync(stream, file.FileName, subPath);
 
             return Ok(result);
+        }
+
+        [HttpGet("scan")]
+        public async Task<IActionResult> ScanPatch(string url)
+        {
+            try
+            {
+                string id = GetIdFromUrl(url);
+                var result = await _googleDriveService.ScanFileByIdAsync(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 

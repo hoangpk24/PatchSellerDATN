@@ -16,5 +16,6 @@ namespace GoogleServiceLib
         public Task<UploadResult> UploadFileWithFolderPathAsync(Stream fileStream, string fileName, string subPath = null);
         public  Task<DriveNode> GetDriveTreeAsync(string rootFolderId = null);
         public Task<bool> MoveToTrashAsync(string fileOrFolderId);
+        public Task<VirusScanReport> ScanFileByIdAsync(string fileId);
     }
 }

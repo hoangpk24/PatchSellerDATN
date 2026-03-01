@@ -3,18 +3,18 @@ using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Auth.OAuth2.Responses;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading; // Cần thêm cái này cho CancellationToken
+using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GoogleServiceLib
 {
     public class GoogleDriveService : IGoogleDriveService
-    {
-
-
+    {      
 
         private string GetIdFromUrl(string url)
         {
@@ -311,6 +311,68 @@ namespace GoogleServiceLib
             {
                 return null;
             }
+        }
+
+        public async Task<VirusScanReport> ScanFileByIdAsync(string fileId)
+        {
+            var driveService = await GetServiceAsync();
+            using var stream = new MemoryStream();
+            var request = driveService.Files.Get(fileId);
+            await request.DownloadAsync(stream);
+            stream.Position = 0;
+
+            using var sha256 = SHA256.Create();
+            byte[] hashBytes = sha256.ComputeHash(stream);
+            string fileHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            stream.Position = 0; 
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("x-apikey", "1e601b33a6910f8c5f6a644cf154040d7692cd65596ba3556358af2782b335c1");
+
+            var response = await client.GetAsync($"https://www.virustotal.com/api/v3/files/{fileHash}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ParseVtReport(await response.Content.ReadAsStringAsync(), fileHash);
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                var content = new MultipartFormDataContent();
+                var fileContent = new StreamContent(stream);
+                content.Add(fileContent, "file", "game_patch.abc");
+
+                var uploadResponse = await client.PostAsync("https://www.virustotal.com/api/v3/files", content);
+
+                if (uploadResponse.IsSuccessStatusCode)
+                {
+                    var uploadJson = await uploadResponse.Content.ReadAsStringAsync();
+                    dynamic result = JObject.Parse(uploadJson);
+                    string analysisId = result.data.id; 
+
+                    return new VirusScanReport
+                    {
+                        Status = "Đang phân tích (Queued)",
+                        DetailedUrl = $"https://www.virustotal.com/gui/file/{fileHash}"
+                    };
+                }
+            }
+
+            return new VirusScanReport { Status = "Lỗi hệ thống khi quét" };
+        }
+
+        private VirusScanReport ParseVtReport(string jsonContent, string fileHash)
+        {
+            dynamic json = JObject.Parse(jsonContent);
+            var stats = json.data.attributes.last_analysis_stats;
+            return new VirusScanReport
+            {
+                Malicious = (int)stats.malicious,
+                Harmless = (int)stats.harmless,
+                Undetected = (int)stats.undetected,
+                DetailedUrl = $"https://www.virustotal.com/gui/file/{fileHash}",
+                Status = (int)stats.malicious > 0 ? "Malicious" : "Clean"
+            };
         }
     }
 
