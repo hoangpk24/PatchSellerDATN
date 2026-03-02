@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
 using PatchSeller.Web.DTOs;
+using System;
 
 namespace PatchSeller.Web.Services.Customer
 {
@@ -10,6 +11,37 @@ namespace PatchSeller.Web.Services.Customer
         public DiscountCodeService(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public async Task<ServiceResult<List<DAL.Models.Discount>>> GetDiscountCodes(string token)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Customer.GetAllDiscountCode);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                var formatToken = token.Trim('"');
+                request.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", formatToken);
+            }
+
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var discountValue = await response.Content.ReadFromJsonAsync<List<DAL.Models.Discount>>();
+                return ServiceResult<List<DAL.Models.Discount>>.Success(discountValue);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                    ? Constant.Constant.Errors[errorCode ?? ""]
+                                    : result;
+                return ServiceResult<List<DAL.Models.Discount>>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
         }
 
         public async Task<ServiceResult<DiscountResponse>> ApplyDiscountCode(string discountCode, double totalAmount, string token)

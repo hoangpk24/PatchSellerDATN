@@ -1,0 +1,112 @@
+﻿@page "/discount-code"
+@layout MainLayout
+
+<section>
+    <div class="w-full bg-[#9797971c] py-6">
+        <div class="mx-auto w-full max-w-[1520px] px-6">
+            <h1 class="mb-2.5 font-medium leading-tight text-[44px] text-white">Mã Giảm Giá</h1>
+            <MudBreadcrumbs Class="custom-breadcrumb !p-0 !text-xs" Items="_itemBreadcrumbs" Separator="/" />
+        </div>
+    </div>
+
+    <div class="mx-auto my-10 w-full max-w-[1520px] px-6">
+        @if (_lstDiscount == null || !_lstDiscount.Any())
+        {
+            <div class="flex flex-col items-center justify-center py-20 text-gray-500">
+                <MudIcon Icon="@Icons.Material.Filled.ConfirmationNumber" Size="Size.Large" Class="mb-4 opacity-20" Style="font-size: 80px;" />
+                <p>Hiện tại không có mã giảm giá nào dành cho bạn.</p>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                @foreach (var item in _lstDiscount)
+                {
+                    <div class="relative flex min-h-[140px] overflow-hidden rounded-xl border border-white/5 bg-[#1e1e1e] transition-transform hover:-translate-y-1">
+                        <div class="flex w-32 flex-col items-center justify-center bg-purple-600 p-4 text-white">
+                            <span class="text-xs font-medium uppercase opacity-80">Giảm</span>
+                            <div class="flex items-baseline">
+                                <span class="text-2xl font-bold">
+                                    @(item.DiscountType == Constant.DiscountTypePercent ? $"{item.Value}%" : item.Value.ToString("N0"))
+                                </span>
+                                @if (item.DiscountType != Constant.DiscountTypePercent)
+                                {
+                                    <span class="ml-0.5 text-xs">đ</span>
+                                }
+                            </div>
+                            <div class="mt-2 h-[1px] w-8 bg-white/30"></div>
+                        </div>
+
+                        <div class="absolute -top-3 left-[120px] h-6 w-6 rounded-full bg-[#121212]"></div>
+                        <div class="absolute -bottom-3 left-[120px] h-6 w-6 rounded-full bg-[#121212]"></div>
+
+                        <div class="flex flex-1 flex-col justify-between p-4 pl-6">
+                            <div>
+                                <h3 class="line-clamp-1 font-bold text-white">Mã: @item.Code</h3>
+                                <div class="mt-1 space-y-1 text-xs text-gray-400">
+                                    <p>• Đơn tối thiểu: <span class="text-white">@(item.MinOrderValue?.ToString("N0") ?? "0")đ</span></p>
+                                    @if (item.MaxDiscount.HasValue)
+                                    {
+                                        <p>• Giảm tối đa: <span class="text-white">@item.MaxDiscount.Value.ToString("N0")đ</span></p>
+                                    }
+                                    <p>• Hạn dùng: <span class="text-purple-400">@item.EndDate.ToString("dd/MM/yyyy")</span></p>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
+                                <div class="flex flex-col">
+                                    <span class="uppercase text-[10px] text-gray-500">Đã dùng</span>
+                                    <div class="h-1.5 w-24 overflow-hidden rounded-full bg-gray-800">
+                                        <div class="h-full bg-purple-500" style="width: @(CalculateUsage(item))%"></div>
+                                    </div>
+                                </div>
+                                <button @onclick="() => CopyToClipboard(item.Code)"
+                                        class="rounded-lg bg-white/5 px-4 py-1.5 text-xs font-bold text-white transition-all hover:bg-purple-500">
+                                    SAO CHÉP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
+    List<DAL.Models.Discount> _lstDiscount = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        var resDiscount = await _discountService.GetDiscountCodes(_token);
+        if (resDiscount.IsSuccess && resDiscount.Data != null)
+        {
+            _lstDiscount = resDiscount.Data;
+        }
+    }
+
+    private double CalculateUsage(DAL.Models.Discount discount)
+    {
+        if (discount.UsageLimit <= 0) return 0;
+        return ((double)discount.UsedCount / discount.UsageLimit) * 100;
+    }
+
+    private async Task CopyToClipboard(string code)
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", code);
+        _snackbar.Add($"Đã sao chép mã {code}", MudBlazor.Severity.Success);
+    }
+
+    private List<BreadcrumbItem> _itemBreadcrumbs = [
+        new("TRANG CHỦ", href: RouterConfig.Customer.Home),
+        new("MÃ GIẢM GIÁ", href: null, disabled: true),
+    ];
+}

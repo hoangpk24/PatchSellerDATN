@@ -76,11 +76,14 @@
                         </div>
                     </div>
                 </li>
-                <li class="group relative flex-shrink-0 cursor-pointer px-4 py-2">
-                    <a class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
-                        Mã Giảm Giá
-                    </a>
-                </li>
+                @if (_mine != null)
+                {
+                    <li class="group relative flex-shrink-0 cursor-pointer px-4 py-2">
+                        <a href="@RouterConfig.Customer.DiscountCode" class="flex items-center gap-1 font-bold text-[15px] text-white transition-colors group-hover:text-purple-500">
+                            Mã Giảm Giá
+                        </a>
+                    </li>
+                }
             </ul>
         </nav>
 

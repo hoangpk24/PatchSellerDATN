@@ -128,6 +128,7 @@
 
             // Discount Code
             public const string ApplyDiscountCode = "/discount/ApplyDiscountCodeValue";
+            public const string GetAllDiscountCode = "/discount/discount-available";
 
             // Order
             public const string GetAllOrder = "/order/get-all";

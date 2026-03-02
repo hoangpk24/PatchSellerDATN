@@ -12,9 +12,12 @@ namespace PatchSeller.API.Controllers.Public
     {
 
         DiscountRepository discountCodeRepository;
+        RankRepository rankRepository;
+
         public DiscountController()
         {
             discountCodeRepository = new DiscountRepository();
+            rankRepository = new RankRepository();
         }
 
         [HttpGet("ApplyDiscountCodeValue")]
@@ -143,13 +146,17 @@ namespace PatchSeller.API.Controllers.Public
             {
                 return BadRequest(Constant.ErrorCode.DataNotFound);
             }
+            var rankByUser = await rankRepository.GetById(user.RankId ?? -1);
+
+            if(rankByUser == null)
+            {     
+                return BadRequest(Constant.ErrorCode.DataNotFound);
+            }
 
             DiscountRepository discountRepository = new DiscountRepository();
             var listDiscount = await discountCodeRepository.GetAllListDiscount();
-            listDiscount = listDiscount.Where(x=>x.RankId==null || x.RankId<=user.RankId).ToList();
+            listDiscount = listDiscount.Where(x => x.RankId == null || (x.RankId != null && x.Rank != null && x.Rank.MiniumSpend <= rankByUser.MiniumSpend)).ToList();
             return Ok(listDiscount);
-
         }
-
     }
 }

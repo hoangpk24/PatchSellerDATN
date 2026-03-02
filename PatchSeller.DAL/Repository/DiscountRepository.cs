@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PatchSeller.DAL.Context;
 using PatchSeller.DAL.Models;
 using System;
@@ -208,19 +208,24 @@ namespace PatchSeller.DAL.Repository
         {
             try
             {
-                var query = _context.Discounts
-                            .Where(x => x.Delete != true)
-                            .AsQueryable();
-                query = query.Where(x => x.StartDate.Date >= DateTime.Now.AddMinutes(10));
-                var discountCodes = await query.ToListAsync();
-                return discountCodes;
+                var now = DateTime.Now;
+
+                var discountCodes = await _context.Discounts
+                            .Include(x => x.Rank)
+                            .Where(x => x.Delete != true            
+                                        && x.Status == 1            
+                                        && x.StartDate <= now       
+                                        && x.EndDate >= now         
+                                        && x.UsedCount < x.UsageLimit)
+                            .OrderByDescending(x => x.CreatedAt)
+                            .ToListAsync();
+
+                return discountCodes ?? new List<Discount>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                return new List<Discount>();
             }
-
-
         }
     }
 }
