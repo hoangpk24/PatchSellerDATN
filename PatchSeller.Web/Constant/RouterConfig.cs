@@ -20,8 +20,8 @@
             public const string ForgotPassword = "/forgot-password";
             public const string ChangePassword = "/change-password";
 
-            // Voucher
-            public const string voucher = "/voucher";
+            // Discount Code
+            public const string DiscountCode = "/discount-code";
 
             // Profile
             public const string Profile = "/profile";

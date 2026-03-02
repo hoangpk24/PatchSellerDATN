@@ -108,10 +108,26 @@
                                         </div>
                                     </div>
 
-                                    <a href="@_patchVersionDetail.Links" target="_blank"
-                                        class="flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-purple-700 active:scale-95">
-                                        DOWNLOAD <MudIcon Icon="@Icons.Material.Filled.Download" Size="Size.Small" />
-                                    </a>
+                                    <div class="flex items-center gap-3">
+                                        <button @onclick="HandleCheckVirus" disabled="@_isCheckingVirus"
+                                                class="flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-4 py-2 text-xs font-bold text-green-500 transition-all hover:bg-green-500/20 active:scale-95 disabled:opacity-50">
+                                            @if (_isCheckingVirus)
+                                            {
+                                                <MudProgressCircular Color="Color.Success" Size="Size.Small" Indeterminate="true" />
+                                                <span>ĐANG QUÉT...</span>
+                                            }
+                                            else
+                                            {
+                                                <MudIcon Icon="@Icons.Material.Filled.Shield" Size="Size.Small" />
+                                                <span>CHECK VIRUS</span>
+                                            }
+                                        </button>
+
+                                        <a href="@_patchVersionDetail.Links" target="_blank"
+                                            class="flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-purple-700 active:scale-95">
+                                            DOWNLOAD <MudIcon Icon="@Icons.Material.Filled.Download" Size="Size.Small" />
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <div class="grid grid-cols-1 gap-6 border-t border-white/5 bg-black/20 p-6 md:grid-cols-3">
@@ -143,6 +159,26 @@
                                         <div class="text-sm italic leading-relaxed text-white/50">
                                             @_patchVersionDetail.Note
                                         </div>
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <div class="flex items-center gap-2 text-red-400">
+                                            <MudIcon Icon="@Icons.Material.Filled.VpnKey" Size="Size.Small" />
+                                            <span class="text-xs font-bold uppercase tracking-wider">Mật khẩu giải nén</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex-1 truncate rounded border border-white/10 bg-white/5 px-3 py-2 font-mono text-sm text-white/90">
+                                                @(!string.IsNullOrEmpty(_patchVersionDetail.ExtractionPassword) ? _patchVersionDetail.ExtractionPassword : "Không có")
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(_patchVersionDetail.ExtractionPassword))
+                                            {
+                                                <button @onclick="@(() => CopyToClipboard(_patchVersionDetail.ExtractionPassword))"
+                                                        class="flex h-9 w-9 items-center justify-center rounded bg-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-all">
+                                                    <MudIcon Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" />
+                                                </button>
+                                            }
+                                        </div>
+                                        <p class="italic text-[10px] text-white/30">* Vui lòng dùng WinRAR/7-Zip mới nhất</p>
                                     </div>
                                 </div>
                             </div>
@@ -403,7 +439,8 @@
     bool _isLoading = false;
     string _imageDisplay = Constant.DefaultImages; 
     double _averageRating = 0;
-    int _totalReviews = 0;
+    int _totalReviews = 0; 
+    bool _isCheckingVirus = false;
     int[] _ratingCounts = new int[6];
 
     CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
@@ -768,6 +805,32 @@
         {
             _reviewModel.UserId = _mine.Id;
             _reviewModel.UserName = _mine.FullName;
+        }
+    }
+
+    async Task CopyToClipboard(string text)
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
+        _snackbar.Add("Đã sao chép mật khẩu!", MudBlazor.Severity.Info);
+    }
+
+    async Task HandleCheckVirus()
+    {
+        if (_patchVersionDetail == null || _patchVersionDetail.PatchVersionId == 0) return;
+
+        try 
+        {
+            _isCheckingVirus = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add("Lỗi hệ thống khi kiểm tra virus", MudBlazor.Severity.Error);
+        }
+        finally 
+        {
+            _isCheckingVirus = false;
+            StateHasChanged();
         }
     }
 }
