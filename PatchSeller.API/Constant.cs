@@ -50,6 +50,7 @@ namespace PatchSeller.API
             public const int OrderWaitingForPayment = 2; // Chờ thanh toán
             public const int OrderCanceled = 3; // Huỷ
             public const int OrderDone = 1; // 
+            public const int OrderPaymentExpired = 4; // Hết thời gian chờ thanh toán
 
         }
 

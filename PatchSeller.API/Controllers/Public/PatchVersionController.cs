@@ -19,7 +19,7 @@ namespace PatchSeller.API.Controllers.Public
 
         private static PatchVersionDetailDTO MapToDetailDTO(PatchVersion? pv)
         {
-            if (pv == null || pv.Delete || pv.Status!=1) return null!;
+            if (pv == null || pv.Delete || pv.Status != 1) return null!;
             return new PatchVersionDetailDTO
             {
                 PatchVersionId = pv.PatchVersionId,
@@ -73,6 +73,73 @@ namespace PatchSeller.API.Controllers.Public
             {
                 return StatusCode(500, Constant.ErrorCode.OtherError);
             }
+        }
+        [HttpGet("download/{id}")]
+        public async Task<ActionResult<string>> DownloadPatchVersion(int id)
+        {
+
+            try
+            {
+                var patchVersion = await _patchVersionRepository.GetById(id);
+                if (patchVersion == null)
+                {
+                    return BadRequest("Unavailable");
+                }
+                UserPurchaseRepository userPurchaseRepository = new UserPurchaseRepository();
+                bool isValid = true;
+
+                var userIdClaim = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
+                if (userIdClaim == null)
+                {
+                    return Unauthorized();
+                }
+
+                var listRecord = await userPurchaseRepository.GetPurchaseByUserId(int.Parse(userIdClaim));
+                if (listRecord == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+
+                }
+
+                var foundRecord = listRecord.FirstOrDefault(x => x.PatchId == patchVersion.PatchId);
+
+                if (foundRecord == null)
+                {
+                    isValid = false;
+                }
+                else
+                {
+                    if (foundRecord.UserId != int.Parse(userIdClaim))
+                    {
+                        isValid = false;
+                    }
+
+                    if (isValid)
+                    {
+
+                        DownloadLogRepository downloadLogRepository = new DownloadLogRepository();
+                        DownloadLog downloadLog = new DownloadLog();
+                        downloadLog.PatchVersionId = patchVersion.PatchId;
+                        downloadLog.UserId = foundRecord.UserId;
+                        downloadLog.DownloadedAt = DateTime.UtcNow;
+                        await downloadLogRepository.Create(downloadLog);
+
+                        return patchVersion.Links;
+                    }
+                   
+                }
+                return NotFound();
+
+
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+
+
+
         }
 
         [HttpGet("get-by-id/{id}")]
@@ -139,6 +206,6 @@ namespace PatchSeller.API.Controllers.Public
                 return StatusCode(500, Constant.ErrorCode.OtherError);
             }
         }
-        
+
     }
 }

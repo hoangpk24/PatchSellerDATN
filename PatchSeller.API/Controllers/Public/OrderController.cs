@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Net.payOS;
 using Net.payOS.Types;
 using PatchSeller.API.DTOs;
+using PatchSeller.API.Utilities;
 using PatchSeller.DAL.Models;
 using PatchSeller.DAL.Repository;
 using System.Security.Claims;
@@ -17,9 +18,11 @@ namespace PatchSeller.API.Controllers.Public
     {
 
         OrderRepository _orderRepository;
-        public OrderController()
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        public OrderController(IBackgroundJobClient backgroundJobClient)
         {
             _orderRepository = new OrderRepository();
+            _backgroundJobClient = backgroundJobClient;
         }
 
         private static OrderDetailResponseDTO MapToOrderDetailResponse(Order order)
@@ -169,7 +172,7 @@ namespace PatchSeller.API.Controllers.Public
                     await userRepository.Update(user);
                 }
             }
-            if(finalAmount<0)
+            if (finalAmount < 0)
                 finalAmount = 0;
 
             int ordCode = new Random().Next(1, int.MaxValue);
@@ -225,7 +228,7 @@ namespace PatchSeller.API.Controllers.Public
 
                     }
                 }
-                if(finalAmount>0)
+                if (finalAmount > 0)
                 {
                     DateTimeOffset utcNow = DateTimeOffset.UtcNow;
                     DateTimeOffset expirationTime = utcNow.AddMinutes(15);
@@ -243,6 +246,12 @@ namespace PatchSeller.API.Controllers.Public
                         checkoutDTO.OrderCode = tempOrder.OrderCode;
                         checkoutDTO.OrderId = tempOrder.OrderId;
                         checkoutDTO.PaymentLink = createPayment.checkoutUrl;
+                        _backgroundJobClient.Schedule<OrderManagerService>(
+           x => x.CancelExpiredOrderAsync(checkoutDTO.OrderId),
+           TimeSpan.FromMinutes(15));
+
+
+
                         return Ok(checkoutDTO);
                     }
                     else
@@ -263,7 +272,7 @@ namespace PatchSeller.API.Controllers.Public
                     await PaymentSuccess(tempOrder.OrderId);
                     return Ok(checkoutDTO);
 
-                }                    
+                }
 
             }
 
