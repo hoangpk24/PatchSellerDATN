@@ -137,7 +137,7 @@
                                             <span class="text-xs font-bold uppercase tracking-wider">Tóm tắt thay đổi</span>
                                         </div>
                                         <div class="text-sm leading-relaxed text-white/70">
-                                            @_patchVersionDetail.Changelog
+                                            @(!string.IsNullOrEmpty(_patchVersionDetail.Changelog) ? _patchVersionDetail.Changelog : "Không có")
                                         </div>
                                     </div>
 
@@ -156,8 +156,8 @@
                                             <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
                                             <span class="text-xs font-bold uppercase tracking-wider">Lưu ý quan trọng</span>
                                         </div>
-                                        <div class="text-sm italic leading-relaxed text-white/50">
-                                            @_patchVersionDetail.Note
+                                        <div class="text-sm italic leading-relaxed text-white/70">
+                                            @(!string.IsNullOrEmpty(_patchVersionDetail.Note) ? _patchVersionDetail.Note : "Không có")
                                         </div>
                                     </div>
 
@@ -167,7 +167,7 @@
                                             <span class="text-xs font-bold uppercase tracking-wider">Mật khẩu giải nén</span>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <div class="flex-1 truncate rounded border border-white/10 bg-white/5 px-3 py-2 font-mono text-sm text-white/90">
+                                            <div class="flex-1 truncate rounded border border-white/10 bg-white/5 px-3 py-2 font-mono text-sm italic text-white/70">
                                                 @(!string.IsNullOrEmpty(_patchVersionDetail.ExtractionPassword) ? _patchVersionDetail.ExtractionPassword : "Không có")
                                             </div>
                                             @if (!string.IsNullOrEmpty(_patchVersionDetail.ExtractionPassword))
@@ -822,6 +822,18 @@
         {
             _isCheckingVirus = true;
             StateHasChanged();
+
+            var res = await _uploadService.ScanFile(_patchVersionDetail.Links);
+
+            if(res.IsSuccess)
+            {
+                _snackbar.Add("Đang điều hướng đến link quét viruss...", MudBlazor.Severity.Info);
+                await JS.InvokeVoidAsync("open", res.Data.DetailedUrl, "_blank");
+            }
+            else
+            {
+                _snackbar.Add("Lỗi hệ thống khi kiểm tra virus", MudBlazor.Severity.Error);   
+            }
         }
         catch (Exception ex)
         {

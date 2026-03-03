@@ -18,7 +18,7 @@ namespace PatchSeller.Web.Schema
                     .NotEmpty().WithMessage("Mô tả không được để trống");
 
                 RuleFor(x => x.ExtractionPassword)
-                    .Length(2, 255).WithMessage("Tên phiên bản có độ dài từ 2 đến 255 ký tự");
+                    .Length(0, 255).WithMessage("Mật khẩu có độ dài tối đa 255 ký tự");
 
                 RuleFor(x => x.VersionName)
                     .NotEmpty().WithMessage("Tên phiên bản không được để trống")
@@ -28,7 +28,7 @@ namespace PatchSeller.Web.Schema
                     .NotEmpty().WithMessage("Các bước cài đặt không được để trống");
 
                 RuleFor(x => x.Note)
-                    .Length(2, 500).WithMessage("Tên phiên bản có độ dài từ 2 đến 500 ký tự");
+                    .Length(0, 500).WithMessage("Ghi chú có độ dài tối đa đến 500 ký tự");
 
                 RuleFor(x => x.PatchId)
                     .GreaterThan(0).WithMessage("Vui lòng chọn gói");
