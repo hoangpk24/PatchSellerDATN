@@ -144,6 +144,9 @@
             public const string CreateReview = "/review/create";
             public const string UpdateReview = "/review/update";
             public const string DeleteReview = "/review/delete/:id";
+
+            // File
+            public const string ScanFile = "/WeatherForecast/scan";
         }
     }
 }
