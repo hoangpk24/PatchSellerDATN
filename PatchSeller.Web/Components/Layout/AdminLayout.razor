@@ -403,6 +403,18 @@
         { RouterConfig.Admin.Statistical, new List<BreadcrumbItem> {
             new("Trang Chủ", href: RouterConfig.Admin.Home),
             new("Thống Kê", href: null, disabled: true)
+        }},
+
+        // --- Review ---
+        { RouterConfig.Admin.Review, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Đánh Giá", href: null, disabled: true)
+        }},
+
+        // --- FILE ---
+        { RouterConfig.Admin.File, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("File Upload", href: null, disabled: true)
         }}
     };
 }

@@ -97,6 +97,9 @@
             // Review
             public const string GetAllReview = "/admin/review/get-all-review";
             public const string UpdateReview = "/admin/review/update";
+
+            // File
+            public const string GetAllFile = "/WeatherForecast/get-drive-tree";
         }
 
         public static class Customer
@@ -147,6 +150,9 @@
 
             // File
             public const string ScanFile = "/WeatherForecast/scan";
+
+            //Patch
+            public const string PatchVersionDownload = "/patch-version/download/:id";
         }
     }
 }

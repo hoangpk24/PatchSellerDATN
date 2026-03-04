@@ -106,5 +106,32 @@ namespace PatchSeller.Web.Services.Customer
                 return ServiceResult<GameSearchResponse>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
+
+        public async Task<ServiceResult<string>> DownloadPatch(int id, string token)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Customer.PatchVersionDownload.Replace(":id", id.ToString()));
+            if (!string.IsNullOrEmpty(token))
+            {
+                var formatToken = token.Trim('"');
+                request.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", formatToken);
+            }
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                return ServiceResult<string>.Success(result);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                ? Constant.Constant.Errors[errorCode ?? ""]
+                                : result;
+                return ServiceResult<string>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
     }
 }
