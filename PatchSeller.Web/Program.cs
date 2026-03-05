@@ -57,6 +57,7 @@ builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<PlatformService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<UploadService>();
+builder.Services.AddScoped<ReportService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {
