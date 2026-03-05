@@ -123,10 +123,10 @@
                                             }
                                         </button>
 
-                                        <a href="@_patchVersionDetail.Links" target="_blank"
+                                        <button @onclick="HandleDownload"
                                             class="flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-purple-700 active:scale-95">
                                             DOWNLOAD <MudIcon Icon="@Icons.Material.Filled.Download" Size="Size.Small" />
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
 
@@ -843,6 +843,21 @@
         {
             _isCheckingVirus = false;
             StateHasChanged();
+        }
+    }
+
+    async Task HandleDownload()
+    {
+        if (_patchVersionDetail == null) return;
+
+        var res = await _gameService.DownloadPatch(_patchVersionDetail.PatchVersionId, _token);
+
+        if(res.IsSuccess)
+        {
+            await JS.InvokeVoidAsync("open", res.Data, "_blank");
+        } else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng thử lại!", MudBlazor.Severity.Error);
         }
     }
 }

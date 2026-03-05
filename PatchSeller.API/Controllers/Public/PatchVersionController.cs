@@ -129,17 +129,11 @@ namespace PatchSeller.API.Controllers.Public
                    
                 }
                 return NotFound();
-
-
-
             }
             catch (Exception)
             {
                 return StatusCode(500, Constant.ErrorCode.OtherError);
             }
-
-
-
         }
 
         [HttpGet("get-by-id/{id}")]
