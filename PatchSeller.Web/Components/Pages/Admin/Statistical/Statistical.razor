@@ -1,11 +1,395 @@
 ﻿@page "/admin/statistical"
 @layout AdminLayout
+@using System.Globalization
 
 <section class="p-6">
     <div class="flex items-center justify-between">
         <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Thống kê</h1>
     </div>
+
+    <div class="mt-6 grid grid-cols-4 gap-4">
+        <MudDatePicker Label="Bắt đầu"
+                       Style="background-color: #FFFFFF"
+                       Date="@_startDate"
+                       DateChanged="OnChangeStartDate"
+                       Variant="Variant.Outlined"
+                       OpenTo="@_openTo"
+                       FixMonth="@_fixStartMonth"
+                       FixDay="@_fixStartDay"
+                       DateFormat="@_dateFormat"
+                       MinDate="@_minDateStart"
+                       MaxDate="@_maxDateStart" />
+
+        <MudDatePicker Label="Kết thúc"
+                       Style="background-color: #FFFFFF"
+                       Date="@_endDate"
+                       DateChanged="OnChangeEndDate"
+                       Variant="Variant.Outlined"
+                       OpenTo="@_openTo"
+                       FixMonth="@_fixEndMonth"
+                       FixDay="@_fixEndDay"
+                       DateFormat="@_dateFormat"
+                       MinDate="@_minDateEnd"
+                       MaxDate="@_maxDateEnd" />
+
+        <MudSelect T="string" Value="@_dateType" Style="background-color: #FFFFFF" ValueChanged="OnChangeDateType" Label="Lọc theo" Variant="Variant.Outlined">
+            <MudSelectItem T="string" Value="@("month")">Tháng</MudSelectItem>
+            <MudSelectItem T="string" Value="@("year")">Năm</MudSelectItem>
+        </MudSelect>
+
+        <MudSelect T="string" Value="@_chartTypeView" ValueChanged="OnChartTypeViewChanged" Style="background-color: #FFFFFF" Label="Hiển thị biểu đồ theo" Variant="Variant.Outlined">
+            <MudSelectItem T="string" Value="@("Revenue")">Doanh thu</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Orders")">Đơn hàng (Tổng/Thành công/Hủy)</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Patch")">Số gói bán ra</MudSelectItem>
+            <MudSelectItem T="string" Value="@("Download")">Số lượt tải</MudSelectItem>
+        </MudSelect>
+    </div>
+
+    <div class="mt-6 grid grid-cols-4 gap-4">
+        <div class="flex w-full flex-col items-center gap-3 rounded-lg border border-solid border-slate-300 bg-white p-4">
+            <p class="font-mediun text-xl">Doanh thu</p>
+            <p class="text-2xl font-bold">@_data.TotalRevenue.ToString("C0", vietnameseCulture)</p>
+        </div>
+
+        <div class="flex w-full flex-col items-center gap-3 rounded-lg border border-solid border-slate-300 bg-white p-4">
+            <p class="font-mediun text-xl">Tổng gói bán ra</p>
+            <p class="text-2xl font-bold">@_data.TotalPatchSold</p>
+        </div>
+
+        <div class="flex w-full flex-col items-center gap-3 rounded-lg border border-solid border-slate-300 bg-white p-4">
+            <p class="font-mediun text-xl">Đơn hoàn thành / hủy</p>
+            <p class="text-2xl font-bold">@_data.OrderSuccess / @_data.OrderCanceled</p>
+        </div>
+
+        <div class="flex w-full flex-col items-center gap-3 rounded-lg border border-solid border-slate-300 bg-white p-4">
+            <p class="font-mediun text-xl">Tổng số lượt tải</p>
+            <p class="text-2xl font-bold">@_data.DownloadCount</p>
+        </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-2 gap-4">
+        <div class="flex w-full flex-col items-center gap-3 rounded-lg border border-solid border-slate-300 bg-white p-4">
+            <p class="font-mediun text-xl">Gói có doanh thu cao nhất</p>
+            @if (_patchBestSale != null)
+            {
+                <p class="text-2xl font-bold">@_patchBestSale.PatchName</p>
+                <p class="text-lg">thuộc game: @_patchBestSale.GameName</p>
+            }
+            else
+            {
+
+                <p>Cập nhật</p>
+            }
+        </div>
+        <div class="flex w-full flex-col items-center gap-3 rounded-lg border border-solid border-slate-300 bg-white p-4">
+            <p class="font-mediun text-xl">Mặt hàng bán chạy nhất</p>
+            <p class="text-2xl font-bold">
+                @if (_categoryBestSale != null)
+                {
+                    @(_categoryBestSale.CategoryName + " - " + _categoryBestSale.Value.ToString("C0", vietnameseCulture))
+                }
+                else
+                {
+
+                    @("Cập nhật")
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="doc-section-component-container mt-6 w-full rounded-xl border border-slate-200 bg-white px-2 py-8 shadow-sm">
+        <h3 class="mb-4 text-center text-2xl font-semibold tracking-tight">@ChartTitle</h3>
+        @if (_dataCharts != null && _dataCharts.Any())
+        {
+            <MudChart ChartType="ChartType.Line" ChartSeries="@_dataCharts" XAxisLabels="@_xAxisLabels" Width="100%" Height="700px" ChartOptions="@_options" AxisChartOptions="@_axisChartOptions" />
+        }
+        else
+        {
+            <div class="flex justify-center rounded-lg border-2 border-dashed border-slate-200 p-10">
+                <p class="text-slate-400">Không có dữ liệu hiển thị cho khoảng thời gian này</p>
+            </div>
+        }
+
+        <MudDivider Class="my-6 !border-slate-300" />
+
+        @* --- TOP 10 MẶT HÀNG --- *@
+        <div class="w-full">
+            <h3 class="mb-4 text-center text-2xl font-semibold tracking-tight">Top 10 mặt hàng bán chạy</h3>
+            <div class="w-full">
+                @if (_data.CategorySoldTop10 != null && _data.CategorySoldTop10.Any())
+                {
+                    <MudTable Bordered Items="@_data.CategorySoldTop10" Elevation="0" Class="w-full" Dense="true" Hover="true">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Tên</MudTh>
+                            <MudTh>Tổng tiền bán</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(_data.CategorySoldTop10.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.CategoryName</MudTd>
+                            <MudTd>@context.Value.ToString("C0", vietnameseCulture)</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+                else
+                {
+
+                    <p class="mt-4 text-center text-lg">Cập nhật</p>
+                }
+            </div>
+        </div>
+
+        @* --- TOP 10 GÓI --- *@
+        <div class="mt-10 w-full">
+            <h3 class="mb-4 text-center text-2xl font-semibold tracking-tight">Top 10 gói bán chạy</h3>
+            <div>
+                @if (_data.PatchSold != null && _data.PatchSold.Any())
+                {
+                    <MudTable Bordered Items="@_data.PatchSold" Elevation="0" Class="w-full" Dense="true" Hover="true">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Tên</MudTh>
+                            <MudTh>Thuộc game</MudTh>
+                            <MudTh>Tổng tiền bán</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(_data.PatchSold.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.PatchName</MudTd>
+                            <MudTd>@context.GameName</MudTd>
+                            <MudTd>@context.Revenue.ToString("C0", vietnameseCulture)</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+                else
+                {
+
+                    <p class="mt-4 text-center text-lg">Cập nhật</p>
+                }
+            </div>
+        </div>
+
+        @* --- TOP 10 LƯỢT TẢI --- *@
+        <div class="mt-10 w-full">
+            <h3 class="mb-4 text-center text-2xl font-semibold tracking-tight">Top 10 lượt tải</h3>
+            <div>
+                @if (_data.Top10Download != null && _data.Top10Download.Any())
+                {
+                    <MudTable Bordered Items="@_data.Top10Download" Elevation="0" Class="w-full" Dense="true" Hover="true">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Tên</MudTh>
+                            <MudTh>Thuộc game</MudTh>
+                            <MudTh>Tổng số lượt tải</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(_data.Top10Download.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.PatchName</MudTd>
+                            <MudTd>@context.GameName</MudTd>
+                            <MudTd>@context.DownloadCount</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+                else
+                {
+
+                    <p class="mt-4 text-center text-lg">Cập nhật</p>
+                }
+            </div>
+        </div>
+    </div>
 </section>
 
 @code {
+    [SupplyParameterFromQuery(Name = "type")] public string? TypeUrl { get; set; }
+    [SupplyParameterFromQuery(Name = "chart")] public string? ChartUrl { get; set; }
+    [SupplyParameterFromQuery(Name = "start")] public string? StartUrl { get; set; }
+    [SupplyParameterFromQuery(Name = "end")] public string? EndUrl { get; set; }
+
+    private StatisticResponse _data = new StatisticResponse();
+    private CategorySoldItemResponse? _categoryBestSale = null;
+    private PatchSoldItemResponse? _patchBestSale = null;
+    public List<ChartSeries> _dataCharts = new List<ChartSeries>();
+    private ChartOptions _options = new ChartOptions();
+    private AxisChartOptions _axisChartOptions = new AxisChartOptions();
+    public string[] _xAxisLabels = [];
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+
+    private string _dateType = "month";
+    private string _chartTypeView = "Revenue";
+    private DateTime _dateNow = DateTime.Now;
+    private DateTime? _startDate = null;
+    private DateTime? _endDate = null;
+
+    private DateTime _minDateStart = new DateTime(DateTime.Now.Year - 4, 1, 1);
+    private DateTime _maxDateStart = DateTime.Now;
+    private DateTime _minDateEnd = new DateTime(DateTime.Now.Year - 4, 1, 1);
+    private DateTime _maxDateEnd = DateTime.Now;
+    private int? _fixStartDay, _fixEndDay, _fixStartMonth, _fixEndMonth;
+    private string _dateFormat = string.Empty;
+    private OpenTo _openTo = OpenTo.Month;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _dateType = TypeUrl ?? "month";
+        _chartTypeView = ChartUrl ?? "Revenue";
+
+        if (DateTime.TryParse(StartUrl, out var s)) _startDate = s;
+        if (DateTime.TryParse(EndUrl, out var e)) _endDate = e;
+
+        if (_startDate == null || _endDate == null)
+        {
+            var sixMonthsAgo = _dateNow.AddMonths(-11);
+            _startDate = new DateTime(sixMonthsAgo.Year, sixMonthsAgo.Month, 1);
+            _endDate = new DateTime(_dateNow.Year, _dateNow.Month, 1).AddMonths(1).AddDays(-1);
+        }
+
+        ApplyPickerFormat();
+        await LoadData();
+    }
+
+    private void ApplyPickerFormat()
+    {
+        if (_dateType == "month")
+        {
+            _fixStartDay = 1; _fixEndDay = 28;
+            _fixStartMonth = _fixEndMonth = null;
+            _dateFormat = "MM/yyyy"; _openTo = OpenTo.Month;
+            _axisChartOptions.XAxisLabelRotation = 30;
+        }
+        else if (_dateType == "year")
+        {
+            _fixStartDay = _startDate?.Day; _fixEndDay = _endDate?.Day;
+            _fixStartMonth = _startDate?.Month; _fixEndMonth = _endDate?.Month;
+            _dateFormat = "yyyy"; _openTo = OpenTo.Year;
+            _axisChartOptions.XAxisLabelRotation = 0;
+        }
+        _options.LineStrokeWidth = 2;
+        UpdateDateBoundaries();
+    }
+
+    private void SyncUrl()
+    {
+        var paramsDict = new Dictionary<string, object?>
+        {
+            ["type"] = _dateType,
+            ["chart"] = _chartTypeView,
+            ["start"] = _startDate?.ToString("yyyy-MM-dd"),
+            ["end"] = _endDate?.ToString("yyyy-MM-dd")
+        };
+        navigation.NavigateTo(navigation.GetUriWithQueryParameters(paramsDict));
+    }
+
+    private async Task LoadData()
+    {
+        var resStatistic = await _statisticalService.GetStatistics(_startDate, _endDate, _dateType);
+        if (resStatistic.IsSuccess && resStatistic.Data != null)
+        {
+            _data = resStatistic.Data;
+            _categoryBestSale = _data.CategorySoldTop10?.OrderByDescending(x => x.Value).FirstOrDefault();
+            _patchBestSale = _data.PatchSold?.OrderByDescending(x => x.Unit).FirstOrDefault();
+            UpdateChartSeries();
+        }
+        StateHasChanged();
+    }
+
+    private void UpdateChartSeries()
+    {
+        if (_data.DataSplited == null || !_data.DataSplited.Any())
+        {
+            _dataCharts.Clear(); _xAxisLabels = Array.Empty<string>(); return;
+        }
+
+        _xAxisLabels = _data.DataSplited.Select(x => x.Date).ToArray();
+        _dataCharts.Clear();
+
+        switch (_chartTypeView)
+        {
+            case "Revenue":
+                _dataCharts.Add(new ChartSeries() { Name = "Doanh thu (VNĐ)", Data = _data.DataSplited.Select(x => (double)x.TotalRevenue).ToArray() });
+                break;
+            case "Orders":
+                _dataCharts.Add(new ChartSeries() { Name = "Tổng đơn hàng", Data = _data.DataSplited.Select(x => (double)x.TotalOrder).ToArray() });
+                _dataCharts.Add(new ChartSeries() { Name = "Thành công", Data = _data.DataSplited.Select(x => (double)x.OrderSuccess).ToArray() });
+                _dataCharts.Add(new ChartSeries() { Name = "Đã hủy", Data = _data.DataSplited.Select(x => (double)x.OrderCanceled).ToArray() });
+                break;
+            case "Patch":
+                _dataCharts.Add(new ChartSeries() { Name = "Số gói đã bán", Data = _data.DataSplited.Select(x => (double)x.TotalPatchSold).ToArray() });
+                break;
+            case "Download":
+                _dataCharts.Add(new ChartSeries() { Name = "Số lượt đã tải", Data = _data.DataSplited.Select(x => (double)x.DownloadCount).ToArray() });
+                break;
+        }
+    }
+
+    private void OnChartTypeViewChanged(string value) { _chartTypeView = value; SyncUrl(); }
+
+    private async Task OnChangeDateType(string value)
+    {
+        _dateType = value;
+        if (value == "month")
+        {
+            var s = _dateNow.AddMonths(-11); _startDate = new DateTime(s.Year, s.Month, 1);
+            _endDate = new DateTime(_dateNow.Year, _dateNow.Month, 1).AddMonths(1).AddDays(-1);
+        }
+        else
+        {
+            _startDate = new DateTime(_dateNow.Year - 1, 1, 1); _endDate = new DateTime(_dateNow.Year, 12, 31);
+        }
+        SyncUrl();
+    }
+
+    private async Task OnChangeStartDate(DateTime? date)
+    {
+        if (date == null) return;
+        _startDate = (_dateType == "month") ? new DateTime(date.Value.Year, date.Value.Month, 1) : date;
+        SyncUrl();
+    }
+
+    private async Task OnChangeEndDate(DateTime? date)
+    {
+        if (date == null) return;
+        if (_dateType == "month")
+        {
+            var lastDay = DateTime.DaysInMonth(date.Value.Year, date.Value.Month);
+            _endDate = new DateTime(date.Value.Year, date.Value.Month, lastDay);
+        }
+        else _endDate = date;
+        SyncUrl();
+    }
+
+    private void UpdateDateBoundaries()
+    {
+        if (_startDate == null || _endDate == null) return;
+        var now = DateTime.Now;
+        if (_dateType == "month")
+        {
+            _minDateStart = _endDate.Value.AddYears(-1); _maxDateStart = _endDate.Value > now ? now : _endDate.Value;
+            _minDateEnd = _startDate.Value; var calcMax = _startDate.Value.AddYears(1); _maxDateEnd = calcMax > now ? now : calcMax;
+        }
+        else
+        {
+            _minDateStart = _endDate.Value.AddYears(-4); _maxDateStart = _endDate.Value;
+            _minDateEnd = _startDate.Value; _maxDateEnd = now;
+        }
+    }
+
+    private string ChartTitle => _chartTypeView switch
+    {
+        "Revenue" => "Doanh Thu",
+        "Orders" => "Thống Kê Đơn Hàng",
+        "Patch" => "Số gói bán ra",
+        "Download" => "Số lượt tải",
+        _ => "Biểu Đồ Thống Kê"
+    };
 }
+
+<style>
+    .mud-charts-xaxis text, .mud-charts-yaxis text {
+        font-size: 0.5rem !important;
+        fill: #94a3b8 !important;
+    }
+
+    .mud-chart-legend-item text {
+        font-size: 0.5rem !important;
+    }
+</style>
