@@ -100,6 +100,10 @@
 
             // File
             public const string GetAllFile = "/WeatherForecast/get-drive-tree";
+            public const string RenameFile = "/WeatherForecast/rename/:id";
+
+            //Statistic
+            public const string Statistic = "/admin/report/overview";
         }
 
         public static class Customer

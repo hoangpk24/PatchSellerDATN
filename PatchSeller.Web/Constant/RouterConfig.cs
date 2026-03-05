@@ -119,6 +119,9 @@
 
             // Review
             public const string Review = "/admin/review";
+
+            // File
+            public const string File = "/admin/file";
         }
     }
 }
