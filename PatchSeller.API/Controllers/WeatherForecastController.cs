@@ -93,6 +93,22 @@ namespace PatchSeller.API.Controllers
             return Ok(files);
         }
 
+        [HttpPatch("rename/{id}")]
+        public async Task<IActionResult> Rename(string id, [FromBody] string newName)
+        {
+            if (string.IsNullOrEmpty(newName))
+                return BadRequest("Tên mới không được để trống.");
+
+            var result = await _googleDriveService.RenameNodeAsync(id, newName);
+
+            if (result)
+            {
+                return Ok(new { message = "Đổi tên thành công!" });
+            }
+
+            return BadRequest("Không thể đổi tên. Vui lòng kiểm tra lại ID.");
+        }
+
         [HttpGet("get-drive-tree")]
         public async Task<IActionResult> GetTree()
         {

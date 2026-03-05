@@ -17,5 +17,6 @@ namespace GoogleServiceLib
         public  Task<DriveNode> GetDriveTreeAsync(string rootFolderId = null);
         public Task<bool> MoveToTrashAsync(string fileOrFolderId);
         public Task<VirusScanReport> ScanFileByIdAsync(string fileId);
+        public Task<bool> RenameNodeAsync(string id, string newName);
     }
 }

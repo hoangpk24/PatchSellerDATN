@@ -14,7 +14,10 @@ using System.Threading.Tasks;
 namespace GoogleServiceLib
 {
     public class GoogleDriveService : IGoogleDriveService
-    {      
+    {
+
+
+     
 
         private string GetIdFromUrl(string url)
         {
@@ -190,6 +193,29 @@ namespace GoogleServiceLib
             }
 
             return new UploadResult { Link = file.WebViewLink, LinkDownload = file.WebContentLink, Size = file.Size, SizeMb = mbSize,FileName = file.Name };
+        }
+
+        public async Task<bool> RenameNodeAsync(string id, string newName)
+        {
+            try
+            {
+                var service = await GetServiceAsync();
+
+                var updateFile = new Google.Apis.Drive.v3.Data.File
+                {
+                    Name = newName
+                };
+
+                var request = service.Files.Update(updateFile, id);
+                await request.ExecuteAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi đổi tên: {ex.Message}");
+                return false;
+            }
         }
 
         private async Task<string> GetOrCreateFolderPathAsync(DriveService service, string subPath)
