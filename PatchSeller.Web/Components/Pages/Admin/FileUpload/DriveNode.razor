@@ -42,6 +42,7 @@
                                Color="Color.Info" href="@Item.LinkDownload" Target="_blank" />
             }
 
+            <MudIconButton Icon="@Icons.Material.Filled.DriveFileRenameOutline" Size="Size.Small" Color="Color.Warning" OnClick="@(() => OpenRenameDialog(Item))" />
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" OnClick="@(() => DeleteItem(Item.Id))" />
         </div>
     </div>
@@ -72,6 +73,24 @@
     private void CopyLink()
     {
         _snackbar.Add($"Đã copy link: {Item.Name}", MudBlazor.Severity.Success);
+    }
+
+    private async Task OpenRenameDialog(GetDriveResponse item)
+    {
+        var parameters = new DialogParameters<RenameDialog>
+    {
+        { x => x.Item, item }
+    };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall, FullWidth = true };
+
+        var dialog = await _dialogService.ShowAsync<RenameDialog>("Đổi tên", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await HandleRefresh();
+        }
     }
 
     private async Task DeleteItem(string id)

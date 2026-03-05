@@ -113,5 +113,32 @@ namespace PatchSeller.Web.Services.Admin
                 return ServiceResult<CheckFileResponse>.Failure(result, errorMess, response.StatusCode.ToString());
             }
         }
+
+        public async Task<ServiceResult<string>> Rename(string id, string name)
+        {
+            var url = Constant.EndPointApi.Admin.RenameFile.Replace(":id", id);
+
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), url);
+
+            var json = System.Text.Json.JsonSerializer.Serialize(name);
+            request.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                return ServiceResult<string>.Success(result);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                ? Constant.Constant.Errors[errorCode ?? ""]
+                                : result;
+                return ServiceResult<string>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
     }
 }

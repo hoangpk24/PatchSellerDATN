@@ -1,0 +1,93 @@
+﻿@using PatchSeller.Web.DTOs
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mb-n1 mr-2" /> Đổi tên mục
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string"
+                      @bind-Value="_newName"
+                      Label="Tên mới"
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      RequiredError="Tên không được để trống"
+                      Disabled="_processing"
+                      AutoFocus="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel"
+                   Disabled="_processing">
+            Hủy
+        </MudButton>
+
+        <MudButton Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="Submit"
+                   Disabled="_processing">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Đang lưu...</MudText>
+            }
+            else
+            {
+                <MudText>Xác nhận</MudText>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public GetDriveResponse Item { get; set; }
+
+    private string _newName = string.Empty;
+    private bool _processing = false;
+
+    protected override void OnInitialized()
+    {
+        _newName = Item?.Name ?? string.Empty;
+    }
+
+    private async Task Submit()
+    {
+        if (string.IsNullOrWhiteSpace(_newName)) return;
+
+        if (_newName == Item.Name)
+        {
+            MudDialog.Cancel();
+            return;
+        }
+
+        _processing = true;
+
+        try
+        {
+            var response = await _adminUploadService.Rename(Item.Id, _newName);
+
+            if (response.IsSuccess)
+            {
+                _snackbar.Add("Đổi tên thành công!", MudBlazor.Severity.Success);
+
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                _snackbar.Add($"Lỗi: {response.ErrorMessage}", MudBlazor.Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add("Đã xảy ra lỗi hệ thống: " + ex.Message, MudBlazor.Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}
