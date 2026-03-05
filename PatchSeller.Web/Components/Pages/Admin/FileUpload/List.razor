@@ -1,0 +1,67 @@
+﻿@page "/admin/file"
+@layout AdminLayout
+@using PatchSeller.Web.DTOs
+
+<PageTitle>@Constant.PageTitleAdmin File Drive</PageTitle>
+
+<section class="p-6">
+    <div class="mb-6 flex items-center justify-between">
+        <h1 class="text-3xl font-bold text-material-default">Danh sách file Drive</h1>
+    </div>
+
+    <div class="rounded-xl bg-white p-6 shadow-sm">
+        @if (_isLoading)
+        {
+            <div class="flex flex-col items-center py-10">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                <MudText Class="mt-4">Đang đồng bộ dữ liệu...</MudText>
+            </div>
+        }
+        else if (_data != null)
+        {
+            @if (_data.Name.Equals("Patch", StringComparison.OrdinalIgnoreCase))
+            {
+                @if (_data.Children != null && _data.Children.Any())
+                {
+                    @foreach (var child in _data.Children)
+                    {
+                        <DriveNode Item="child" OnRefreshRequired="LoadData" />
+                    }
+                }
+                else
+                {
+                    <MudAlert Severity="MudBlazor.Severity.Info">Thư mục Patch trống.</MudAlert>
+                }
+            }
+            else
+            {
+                <DriveNode Item="_data" OnRefreshRequired="LoadData" />
+            }
+        }
+        else
+        {
+            <MudAlert Severity="MudBlazor.Severity.Info">Không tìm thấy dữ liệu file.</MudAlert>
+        }
+    </div>
+</section>
+
+@code {
+    private GetDriveResponse _data;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _isLoading = true;
+        var res = await _adminUploadService.GetAllFile();
+        if (res.IsSuccess)
+        {
+            _data = res.Data;
+        }
+        _isLoading = false;
+    }
+}

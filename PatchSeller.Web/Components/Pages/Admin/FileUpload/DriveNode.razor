@@ -1,0 +1,99 @@
+﻿@using PatchSeller.Web.DTOs
+
+<div class="border-l-1 my-1 border-gray-200 pl-4">
+    <div class="group flex cursor-pointer items-center rounded-lg p-2 transition-all hover:bg-gray-50"
+         @onclick="Toggle">
+
+        <MudIcon Icon="@GetIcon()"
+                 Color="@GetIconColor()"
+                 Class="mr-3"
+                 Size="Size.Small" />
+
+        <div class="flex flex-grow items-center justify-between overflow-hidden">
+            <div class="flex flex-col overflow-hidden">
+                <MudText Typo="Typo.body1" Class="@(Item.Type == "folder" ? "font-bold" : "text-gray-700")">
+                    @Item.Name
+                </MudText>
+
+                @if (Item.Type == "file" && !string.IsNullOrEmpty(Item.Link))
+                {
+                    <MudLink href="@Item.Link" Target="_blank" Underline="Underline.Hover"
+                             Class="max-w-[300px] truncate text-[10px] text-blue-500" @onclick:stopPropagation="true">
+                        @Item.Link
+                    </MudLink>
+                }
+            </div>
+
+            @if (Item.Type == "file")
+            {
+                <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ml-4 whitespace-nowrap">
+                    @Item.SizeMb.ToString("N2") MB
+                </MudText>
+            }
+        </div>
+
+        <div class="ml-4 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100" @onclick:stopPropagation="true">
+            @if (Item.Type == "file")
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small"
+                               Color="Color.Default" OnClick="CopyLink" />
+
+                <MudIconButton Icon="@Icons.Material.Filled.Download" Size="Size.Small"
+                               Color="Color.Info" href="@Item.LinkDownload" Target="_blank" />
+            }
+
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" OnClick="@(() => DeleteItem(Item.Id))" />
+        </div>
+    </div>
+
+    @if (_isExpanded && Item.Children != null && Item.Children.Any())
+    {
+        @foreach (var child in Item.Children)
+        {
+            <DriveNode Item="child" OnRefreshRequired="HandleRefresh" />
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public GetDriveResponse Item { get; set; }
+    [Parameter] public EventCallback OnRefreshRequired { get; set; }
+
+    private bool _isExpanded = false;
+
+    private void Toggle() { if (Item.Type == "folder") _isExpanded = !_isExpanded; }
+
+    private string GetIcon() => Item.Type == "folder"
+        ? (_isExpanded ? Icons.Material.Filled.FolderOpen : Icons.Material.Filled.Folder)
+        : Icons.Material.Filled.InsertDriveFile;
+
+    private Color GetIconColor() => Item.Type == "folder" ? Color.Warning : Color.Default;
+
+    private void CopyLink()
+    {
+        _snackbar.Add($"Đã copy link: {Item.Name}", MudBlazor.Severity.Success);
+    }
+
+    private async Task DeleteItem(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return;
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var result = await _dialogService.ShowMessageBox(
+            "Xác nhận",
+            "Bạn có chắc chắn muốn xóa mục này không?",
+            yesText: "Xóa", cancelText: "Hủy");
+
+        if (result == true)
+        {
+            var res = await _adminUploadService.MoveToTrash(id);
+            if (res)
+            {
+                _snackbar.Add("Xóa thành công!", MudBlazor.Severity.Success);
+                await HandleRefresh();
+            }
+        }
+    }
+
+    private async Task HandleRefresh() => await OnRefreshRequired.InvokeAsync();
+}

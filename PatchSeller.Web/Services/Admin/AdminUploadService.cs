@@ -1,5 +1,6 @@
 ﻿using PatchSeller.DAL.Models;
 using PatchSeller.Web.DTOs;
+using System;
 
 namespace PatchSeller.Web.Services.Admin
 {
@@ -10,6 +11,28 @@ namespace PatchSeller.Web.Services.Admin
         public AdminUploadService(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public async Task<ServiceResult<GetDriveResponse>> GetAllFile()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.GetAllFile);
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<GetDriveResponse>();
+                return ServiceResult<GetDriveResponse>.Success(result);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                ? Constant.Constant.Errors[errorCode ?? ""]
+                                : result;
+                return ServiceResult<GetDriveResponse>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
         }
 
         public async Task<ServiceResult<UploadFileResponse>> UploadFileAsync(Stream fileStream, string fileName)
@@ -56,6 +79,19 @@ namespace PatchSeller.Web.Services.Admin
                                 ? Constant.Constant.Errors[errorCode ?? ""]
                                 : result;
                 return ServiceResult<bool>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
+
+        public async Task<bool> MoveToTrash(string id)
+        {
+            var response = await _httpClient.GetAsync($"/WeatherForecast/move-to-trash?folderOrFileId={id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
