@@ -98,14 +98,19 @@
                             <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
 
                             <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.Patches)">
-                                @GetPriceDisplay(item.Patches)
+                                @GetPriceDisplay(item?.Patches ?? [])
                             </p>
                         </a>
 
                         <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
                             <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
-                                <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))" Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
-                                <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
+                                <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))"
+                                         Class="cursor-pointer !text-white transition-colors hover:!text-purple-500"
+                                         Icon="@Icons.Material.Filled.Search" />
+
+                                <MudIcon @onclick="@(() => HandleToggleWishlist(item.GameId))"
+                                         Class="@(_wishlistedGameIds.Contains(item.GameId) ? "cursor-pointer !text-red-500" : "cursor-pointer !text-white hover:!text-purple-500")"
+                                         Icon="@(_wishlistedGameIds.Contains(item.GameId) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" />
                             </div>
                         </div>
                     </div>
@@ -207,7 +212,40 @@
 
         if(resGame.IsSuccess)
         {
-            _gameForHome = resGame.Data;
+            _gameForHome = resGame.Data; 
+            await LoadUserWishlist();
+        }
+    }
+
+    private HashSet<int> _wishlistedGameIds = new HashSet<int>();
+
+    async Task LoadUserWishlist()
+    {
+        if (_mine != null)
+        {
+            var res = await _wishlistService.GetAllWishListByUserId(_mine.Id);
+            if (res.IsSuccess && res.Data != null)
+            {
+                _wishlistedGameIds = res.Data.Select(x => x.GameId).ToHashSet();
+            }
+        }
+    }
+
+    async Task HandleToggleWishlist(int gameId)
+    {
+        if (string.IsNullOrEmpty(_token) || _mine == null)
+        {
+            _snackbar.Add("Vui lòng đăng nhập để thực hiện", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        var res = await _wishlistService.ToggleWishlist(_mine.Id, gameId, _token);
+        if (res.IsSuccess)
+        {
+            if (res.Data) _wishlistedGameIds.Add(gameId);
+            else _wishlistedGameIds.Remove(gameId);
+            
+            StateHasChanged();
         }
     }
 

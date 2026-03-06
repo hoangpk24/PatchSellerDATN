@@ -1,5 +1,94 @@
-﻿<h3>Favourites</h3>
+﻿<MudTable Items="@_lstWishlist"
+          Elevation="0"
+          Loading="@_isLoading"
+          Hover="true"
+          Virtualize="true"
+          FixedHeader="true"
+          HorizontalScrollbar="true"
+          Class="transparent-table"
+          Height="calc(100lvh - 357px)">
+    <HeaderContent>
+        <MudTh hidden>ID</MudTh>
+        <MudTh>Ảnh</MudTh>
+        <MudTh>Tên Game</MudTh>
+        <MudTh Style="text-align:right">Chi tiết</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="ID" hidden>@context.GameId</MudTd>
+        <MudTd DataLabel="Ảnh">
+            <div class="w-[80px]">
+                <MudImage Src="@context.Thumbnail" Class="aspect-[1/1.5] rounded object-cover" />
+            </div>
+        </MudTd>
+        <MudTd DataLabel="Tên Game">
+            @context.Title
+        </MudTd>
+        <MudTd DataLabel="Chi tiết" Style="text-align:right">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowForward"
+                           Color="Color.Primary"
+                           OnClick="@(() => HandleGameDetail(context.GameId))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="my-4" Color="Color.Inherit">Bạn chưa có game yêu thích nào.</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <div class="flex w-full flex-col gap-3 opacity-50">
+            @for (var i = 0; i < 5; i++)
+            {
+                <div class="flex items-center justify-between gap-2 px-2">
+                    <MudSkeleton Width="100%" Height="5rem" />
+                </div>
+            }
+        </div>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
 
 @code {
+    [Parameter]
+    public List<GameDetailResponse> LstWishlist { get; set; } = new();
 
+    [Parameter]
+    public bool IsLoading { get; set; } = true;
+
+    private List<GameDetailResponse> _lstWishlist = new();
+    private bool _isLoading = true;
+
+    protected override void OnParametersSet()
+    {
+        _lstWishlist = LstWishlist ?? new();
+        _isLoading = IsLoading;
+    }
+
+    void HandleGameDetail(int gameId)
+    {
+        navigation.NavigateTo(RouterConfig.Customer.Game.Replace(":id", gameId.ToString()));
+    }
 }
+
+<style>
+    .transparent-table {
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .mud-table-head > .mud-table-row > .mud-table-cell {
+        background-color: #212121 !important;
+    }
+
+    .transparent-table th, .transparent-table td, .transparent-table .mud-table-cell {
+        color: white !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .transparent-table .mud-icon-root.mud-svg-icon {
+        color: white !important;
+    }
+
+    .transparent-table .mud-table-row:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+</style>
