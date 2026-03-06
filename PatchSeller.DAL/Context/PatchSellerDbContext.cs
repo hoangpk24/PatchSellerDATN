@@ -41,7 +41,8 @@ namespace PatchSeller.DAL.Context
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Platform> Platforms { get; set; }
         public DbSet<ActionLog> ActionLogs { get; set; }
-        
+        public DbSet<Wishlist> Wishlists { get; set; }
+
 
 
 
