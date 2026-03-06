@@ -29,6 +29,21 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<Wishlist> GetWishlistByCustomerAndGame(int customerId, int gameId)
+        {
+            try
+            {
+                var wishlist = await _context.Wishlists
+                    .FirstOrDefaultAsync(x => x.GameId == gameId
+                        && x.UserId == customerId);
+                return wishlist;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<List<Wishlist>> GetAllByUserId(int userId)
         {
             try

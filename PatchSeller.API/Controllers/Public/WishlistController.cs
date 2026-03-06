@@ -57,6 +57,25 @@ namespace PatchSeller.API.Controllers.Public
             }
         }
 
+        [HttpGet("get-by-customer-and-game/{customerId}/{gameId}")]
+        public async Task<ActionResult<Wishlist>> GetWishlistByCustomerAndGame(int customerId, int gameId)
+        {
+            try
+            {
+                var result = await _wishlistRepository.GetWishlistByCustomerAndGame(customerId, gameId);
+                if (result == null)
+                {
+                    return NotFound(Constant.ErrorCode.DataNotFound);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
+
+
         [HttpGet("get-game-detail-by-user-id")]
         public async Task<ActionResult<List<GameDetailDTO>>> GetGameDetailsByUserId(int userId)
         {

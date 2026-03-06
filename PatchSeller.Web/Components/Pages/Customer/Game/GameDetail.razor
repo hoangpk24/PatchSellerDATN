@@ -19,14 +19,26 @@
 
             <div class="w-full">
                 <div class="flex justify-between gap-6">
-                    <h2 class="max-w-[calc(100%-196px)] whitespace-pre-wrap break-words font-semibold leading-tight text-[32px] text-white">@_gameDetail.Title</h2>
+                    <h2 class="max-w-[calc(100%-250px)] whitespace-pre-wrap break-words font-semibold leading-tight text-[32px] text-white">
+                        @_gameDetail.Title
+                    </h2>
 
-                    @if(_isOwned) {
-                        <div class="flex h-fit w-fit items-center gap-3 rounded-full border border-green-500/20 bg-green-500/10 px-6 py-3 shadow-sm">
-                            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="text-green-500" />
-                            <span class="text-sm font-bold uppercase tracking-widest text-green-500">Đã sở hữu</span>
-                        </div>
-                    }
+                    <div class="flex items-center gap-3">
+                        <button @onclick="@(() => HandleToggleWishlist(id))"
+                                class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-all hover:border-purple-500/50 hover:bg-white/10">
+                            <MudIcon Icon="@(_wishlistedGameIds.Contains(id) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)"
+                                     Class="@(_wishlistedGameIds.Contains(id) ? "!text-red-500" : "!text-white/70")"
+                                     Size="Size.Medium" />
+                        </button>
+
+                        @if (_isOwned)
+                        {
+                            <div class="flex h-fit w-fit flex-shrink-0 items-center gap-3 rounded-full border border-green-500/20 bg-green-500/10 px-6 py-3 shadow-sm">
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="text-green-500" />
+                                <span class="text-sm font-bold uppercase tracking-widest text-green-500">Đã sở hữu</span>
+                            </div>
+                        }
+                    </div>
                 </div>
 
                 @if(_gameDetail.Status != 2)
@@ -79,10 +91,6 @@
 
                                         <button @onclick="AddToCart" class="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/20 text-white transition-all hover:bg-white/10">
                                             <MudIcon Icon="@Icons.Material.Filled.AddShoppingCart" Size="Size.Medium" />
-                                        </button>
-
-                                        <button class="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/20 text-white transition-all hover:bg-white/10">
-                                            <MudIcon Icon="@Icons.Material.Filled.FavoriteBorder" Size="Size.Medium" />
                                         </button>
                                     </div>
                                 </div>
@@ -408,7 +416,9 @@
                         <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
                             <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
                                 <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))" Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
-                                <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
+                                <MudIcon @onclick="@(() => HandleToggleWishlist(item.GameId))"
+                                         Class="@(_wishlistedGameIds.Contains(item.GameId) ? "cursor-pointer !text-red-500" : "cursor-pointer !text-white hover:!text-purple-500")"
+                                         Icon="@(_wishlistedGameIds.Contains(item.GameId) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" />
                             </div>
                         </div>
                     </div>
@@ -431,6 +441,7 @@
     PatchBasicDTO _patchDetail = new PatchBasicDTO();
     PatchVersionBasicDTO _patchVersionDetail = new PatchVersionBasicDTO();
     ReviewModel _reviewModel = new ReviewModel();
+    private HashSet<int> _wishlistedGameIds = new HashSet<int>();
 
     int _patchSelect = 0;
     bool _isReviewed = false;
@@ -442,6 +453,7 @@
     int _totalReviews = 0; 
     bool _isCheckingVirus = false;
     int[] _ratingCounts = new int[6];
+    bool _isWishlisted = false;
 
     CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
     private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
@@ -492,6 +504,8 @@
         if (response.IsSuccess)
         {
             _gameDetail = response.Data;
+            await CheckWishlistStatus();
+            await LoadUserWishlist();
             if(_gameDetail.Thumbnail != null && !string.IsNullOrEmpty(_gameDetail.Thumbnail))
             {
                 _imageDisplay = _gameDetail.Thumbnail;
@@ -526,6 +540,18 @@
                     await CheckOwnership(obj.PatchId);
                 }
             };
+        }
+    }
+
+    async Task LoadUserWishlist()
+    {
+        if (_mine != null)
+        {
+            var res = await _wishlistService.GetAllWishListByUserId(_mine.Id);
+            if (res.IsSuccess && res.Data != null)
+            {
+                _wishlistedGameIds = res.Data.Select(x => x.GameId).ToHashSet();
+            }
         }
     }
 
@@ -858,6 +884,33 @@
         } else
         {
             _snackbar.Add("Đã có lỗi xảy ra. Vui lòng thử lại!", MudBlazor.Severity.Error);
+        }
+    }
+
+    async Task CheckWishlistStatus()
+    {
+        if (_mine != null && id > 0)
+        {
+            var res = await _wishlistService.GetByCustomerAndGameId(_mine.Id, id);
+            _isWishlisted = res.IsSuccess && res.Data != null;
+        }
+    }
+
+    async Task HandleToggleWishlist(int gameId)
+    {
+        if (string.IsNullOrEmpty(_token) || _mine == null)
+        {
+            _snackbar.Add("Vui lòng đăng nhập", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        var res = await _wishlistService.ToggleWishlist(_mine.Id, gameId, _token);
+        if (res.IsSuccess)
+        {
+            if (res.Data) _wishlistedGameIds.Add(gameId);
+            else _wishlistedGameIds.Remove(gameId);
+
+            StateHasChanged();
         }
     }
 }

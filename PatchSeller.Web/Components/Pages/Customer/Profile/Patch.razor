@@ -36,7 +36,7 @@ Elevation="0"
         <MudTd DataLabel="Mã hóa đơn">@context.PatchName</MudTd>
         <MudTd DataLabel="Thời gian">@context.GameName</MudTd>
         <MudTd DataLabel="Ghi chú">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" aria-label="detail" OnClick="@(() => HandleGameDetail(context.GameId))"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowForward" OnClick="@(() => HandleGameDetail(context.GameId))"></MudIconButton>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

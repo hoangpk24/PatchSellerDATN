@@ -157,6 +157,12 @@
 
             //Patch
             public const string PatchVersionDownload = "/patch-version/download/:id";
+
+            // Wishlist
+            public const string GetAllWishListByUserId = "/wishlist/get-game-detail-by-user-id";
+            public const string GetByCustomerAndGameId = "/wishlist/get-by-customer-and-game/:customerId/:gameId";
+            public const string CreateWishList = "/wishlist/create";
+            public const string DeleteWishList = "/wishlist/delete/:id";
         }
     }
 }

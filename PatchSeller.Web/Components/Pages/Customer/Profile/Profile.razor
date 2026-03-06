@@ -41,7 +41,7 @@
                         <Patch LstPatch="@_user.PurchasedPatches" />
                     </MudTabPanel>
                     <MudTabPanel Text="Yêu Thích">
-                        <Favourites />
+                        <Favourites LstWishlist="@_lstWishlist" IsLoading="@_isWishlistLoading" />
                     </MudTabPanel>
                 </MudTabs>
             </div>
@@ -58,6 +58,9 @@
     public MineResponse _mine { get; set; }
 
     MeDetailResponse _user = new MeDetailResponse();
+    List<GameDetailResponse> _lstWishlist = new();
+
+    bool _isWishlistLoading = true;
 
     private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
@@ -68,12 +71,22 @@
 
     async Task LoadData()
     {
-        var resUser = await _mineService.GetMeDetailById(_mine.Id);
+        _isWishlistLoading = true;
 
-        if(resUser.IsSuccess)
+        var resUser = await _mineService.GetMeDetailById(_mine.Id);
+        if (resUser.IsSuccess)
         {
-            _user = resUser.Data;    
+            _user = resUser.Data;
         }
+
+        var resWishlist = await _wishlistService.GetAllWishListByUserId(_mine.Id);
+        if (resWishlist.IsSuccess)
+        {
+            _lstWishlist = resWishlist.Data;
+        }
+
+        _isWishlistLoading = false;
+        StateHasChanged();
     }
 
     private async Task HandleChangePassword()
