@@ -2,13 +2,6 @@
 
 <PageTitle>@Constant.PageTitleUser Home</PageTitle>
 
-@if (_isLoading)
-{
-    <div class="absolute bottom-0 left-0 right-0 top-0 z-20 overflow-hidden bg-black/50">
-        <Loading />
-    </div>
-}
-
 <section class="relative mx-auto max-w-[1520px] overflow-hidden rounded-2xl shadow-2xl shadow-purple-500/10 xs:mx-4 sm:mx-4 md:mt-6 lg:mt-6 sm:mt-0">
     <MudCarousel Class="mud-width-full aspect-[16/9] sm:aspect-[4/2.25] xs:aspect-[4/2.25]"
                  ShowArrows="true"
@@ -32,9 +25,21 @@
         </div>
 
         <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
+            @if (_isLoading)
+            {
+                @for (int i = 0; i < 6; i++)
+                {
+                    <div class="flex-shrink-0 lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Class="aspect-[1/1.5] w-full rounded-lg bg-white/5" Animation="Animation.Wave" />
+                        <MudSkeleton SkeletonType="SkeletonType.Text" Height="20px" Width="80%" Class="mt-2 bg-white/5" />
+                    </div>
+                }
+            }
+            else if (_gameForHome.LstCommingSoon.Any())
+            {
                 @foreach (var item in _gameForHome.LstCommingSoon)
                 {
-                    @if(item != null)
+                    @if (item != null)
                     {
                         <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
                             <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
@@ -45,6 +50,7 @@
                         </div>
                     }
                 }
+            }
         </div>
     </section>
 }
@@ -56,7 +62,7 @@
     </div>
 
     <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md border border-solid border-purple-500 px-3 py-4">
-        @for(int i = 0; i< 6; i++)
+        @for (int i = 0; i < 6; i++)
         {
             <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[325px] sm:w-[325px]">
                 <a href="@RouterConfig.Customer.Game" class="flex h-full w-full flex-col gap-4">
@@ -85,11 +91,22 @@
     </div>
 
     <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
-        @if(_gameForHome.LstNew.Any())
-        {   
-            @foreach(var item in _gameForHome.LstNew)
+        @if (_isLoading)
+        {
+            @for (int i = 0; i < 6; i++)
             {
-                if(item != null)
+                <div class="flex-shrink-0 lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Class="min-h-[327px] w-full rounded-lg !bg-white/5" Animation="Animation.Wave" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="36px" Width="90%" Class="mt-2 !bg-white/5" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="30px" Width="50%" Class="!bg-white/5" />
+                </div>
+            }
+        }
+        else if (_gameForHome.LstNew.Any())
+        {
+            @foreach (var item in _gameForHome.LstNew)
+            {
+                if (item != null)
                 {
                     <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
                         <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
@@ -198,8 +215,8 @@
         {
             _isLoading = true;
             await LoadData();
-        } 
-        catch(Exception){}
+        }
+        catch (Exception) { }
         finally
         {
             _isLoading = false;
@@ -210,9 +227,9 @@
     {
         var resGame = await _gameService.GetAllForHome();
 
-        if(resGame.IsSuccess)
+        if (resGame.IsSuccess)
         {
-            _gameForHome = resGame.Data; 
+            _gameForHome = resGame.Data;
             await LoadUserWishlist();
         }
     }
@@ -244,7 +261,7 @@
         {
             if (res.Data) _wishlistedGameIds.Add(gameId);
             else _wishlistedGameIds.Remove(gameId);
-            
+
             StateHasChanged();
         }
     }
@@ -330,7 +347,7 @@
         scrollbar-width: none;
     }
 
-    .hide-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
 </style>

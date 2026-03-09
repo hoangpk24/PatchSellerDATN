@@ -4,428 +4,429 @@
 @if (_isLoading)
 {
     <div class="absolute bottom-0 left-0 right-0 top-0 z-20 overflow-hidden bg-black/50">
-        <Loading />
+        <GameDetailSkeleton />
     </div>
-}
+} else
+{
+    <section class="bg-black-default2 px-3 py-10 lg:px-0">
+        <div class="mx-auto flex max-w-[1520px] flex-col items-start gap-6 lg:flex-row md:gap-8 lg:gap-10">
+            <div class="w-full lg:w-2/5">
+                <img src="@_imageDisplay" alt="game" class="aspect-[1/1.5] w-full rounded-lg object-cover shadow-2xl" />
+            </div>
 
-<section class="bg-black-default2 px-3 py-10 lg:px-0">
-    <div class="mx-auto flex max-w-[1520px] flex-col items-start gap-6 lg:flex-row md:gap-8 lg:gap-10">
-        <div class="w-full lg:w-2/5">
-            <img src="@_imageDisplay" alt="game" class="aspect-[1/1.5] w-full rounded-lg object-cover shadow-2xl" />
-        </div>
+            <div class="w-full lg:w-3/5">
+                <MudBreadcrumbs Class="custom-breadcrumb !mb-5 !mt-1 !p-0 !text-xs" Items="_itemBreadcrumbs" Separator="/" />
 
-        <div class="w-full lg:w-3/5">
-            <MudBreadcrumbs Class="custom-breadcrumb !mb-5 !mt-1 !p-0 !text-xs" Items="_itemBreadcrumbs" Separator="/" />
+                <div class="w-full">
+                    <div class="flex justify-between gap-6">
+                        <h2 class="max-w-[calc(100%-250px)] whitespace-pre-wrap break-words font-semibold leading-tight text-[32px] text-white">
+                            @_gameDetail.Title
+                        </h2>
 
-            <div class="w-full">
-                <div class="flex justify-between gap-6">
-                    <h2 class="max-w-[calc(100%-250px)] whitespace-pre-wrap break-words font-semibold leading-tight text-[32px] text-white">
-                        @_gameDetail.Title
-                    </h2>
+                        <div class="flex items-center gap-3">
+                            <button @onclick="@(() => HandleToggleWishlist(id))"
+                                    class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-all hover:border-purple-500/50 hover:bg-white/10">
+                                <MudIcon Icon="@(_wishlistedGameIds.Contains(id) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)"
+                                         Class="@(_wishlistedGameIds.Contains(id) ? "!text-red-500" : "!text-white/70")"
+                                         Size="Size.Medium" />
+                            </button>
 
-                    <div class="flex items-center gap-3">
-                        <button @onclick="@(() => HandleToggleWishlist(id))"
-                                class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-all hover:border-purple-500/50 hover:bg-white/10">
-                            <MudIcon Icon="@(_wishlistedGameIds.Contains(id) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)"
-                                     Class="@(_wishlistedGameIds.Contains(id) ? "!text-red-500" : "!text-white/70")"
-                                     Size="Size.Medium" />
-                        </button>
-
-                        @if (_isOwned)
-                        {
-                            <div class="flex h-fit w-fit flex-shrink-0 items-center gap-3 rounded-full border border-green-500/20 bg-green-500/10 px-6 py-3 shadow-sm">
-                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="text-green-500" />
-                                <span class="text-sm font-bold uppercase tracking-widest text-green-500">Đã sở hữu</span>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                @if(_gameDetail.Status != 2)
-                {
-                    <div class="mt-6">
-                        <MudSelect T="int" Variant="Variant.Outlined" Label="Patch Options" Value="_patchSelect" ValueChanged="async (int id) => await HandleChangePatch(id)">
-                            @if(_gameDetail.Patches != null && _gameDetail.Patches.Any())
+                            @if (_isOwned)
                             {
-                                foreach (var item in _gameDetail.Patches)
-                                {
-                                    <MudSelectItem Value="@item.PatchId">@item.Name</MudSelectItem>
-                                }
-                            } else
-                            {
-                                <MudSelectItem Value="0">Không có option</MudSelectItem>
+                                <div class="flex h-fit w-fit flex-shrink-0 items-center gap-3 rounded-full border border-green-500/20 bg-green-500/10 px-6 py-3 shadow-sm">
+                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="text-green-500" />
+                                    <span class="text-sm font-bold uppercase tracking-widest text-green-500">Đã sở hữu</span>
+                                </div>
                             }
-                        </MudSelect>
+                        </div>
                     </div>
 
-                    @if(_isOwned)
+                    @if(_gameDetail.Status != 2)
                     {
                         <div class="mt-6">
-                            <MudSelect T="int" Variant="Variant.Outlined" Label="Patch Version" Value="_patchVersionSelect" ValueChanged="HandleChangePatchVersion">
-                                @if (_patchDetail != null && _patchDetail.PatchVersions.Any())
+                            <MudSelect T="int" Variant="Variant.Outlined" Label="Patch Options" Value="_patchSelect" ValueChanged="async (int id) => await HandleChangePatch(id)">
+                                @if(_gameDetail.Patches != null && _gameDetail.Patches.Any())
                                 {
-                                    foreach (var item in _patchDetail.PatchVersions)
+                                    foreach (var item in _gameDetail.Patches)
                                     {
-                                        <MudSelectItem Value="@item.PatchVersionId">@item.VersionName</MudSelectItem>
+                                        <MudSelectItem Value="@item.PatchId">@item.Name</MudSelectItem>
                                     }
                                 } else
                                 {
-                                    <MudSelectItem Value="0">Không có version</MudSelectItem>
+                                    <MudSelectItem Value="0">Không có option</MudSelectItem>
                                 }
                             </MudSelect>
                         </div>
-                    }
 
-                    <div class="mt-6">
-                        @if(!_isOwned)
+                        @if(_isOwned)
                         {
-                            @if(_patchDetail != null)
+                            <div class="mt-6">
+                                <MudSelect T="int" Variant="Variant.Outlined" Label="Patch Version" Value="_patchVersionSelect" ValueChanged="HandleChangePatchVersion">
+                                    @if (_patchDetail != null && _patchDetail.PatchVersions.Any())
+                                    {
+                                        foreach (var item in _patchDetail.PatchVersions)
+                                        {
+                                            <MudSelectItem Value="@item.PatchVersionId">@item.VersionName</MudSelectItem>
+                                        }
+                                    } else
+                                    {
+                                        <MudSelectItem Value="0">Không có version</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </div>
+                        }
+
+                        <div class="mt-6">
+                            @if(!_isOwned)
                             {
-                                <div class="flex flex-col gap-6 rounded-2xl border border-white/10 bg-white/5 p-6">
-                                    <span class="text-4xl font-bold text-purple-500">@_patchDetail.Price.ToString("C0", vietnameseCulture)</span>
+                                @if(_patchDetail != null)
+                                {
+                                    <div class="flex flex-col gap-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+                                        <span class="text-4xl font-bold text-purple-500">@_patchDetail.Price.ToString("C0", vietnameseCulture)</span>
 
-                                    <div class="flex flex-wrap gap-4">
-                                        <button @onclick="BuyNow" class="flex-1 rounded-full bg-purple-600 py-3.5 text-base font-bold text-white transition-all hover:bg-purple-700 active:scale-95">
-                                            MUA NGAY
-                                        </button>
+                                        <div class="flex flex-wrap gap-4">
+                                            <button @onclick="BuyNow" disabled="@_isSubmitting" class="flex-1 rounded-full bg-purple-600 py-3.5 text-base font-bold text-white transition-all hover:bg-purple-700 active:scale-95">
+                                                MUA NGAY
+                                            </button>
 
-                                        <button @onclick="AddToCart" class="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/20 text-white transition-all hover:bg-white/10">
-                                            <MudIcon Icon="@Icons.Material.Filled.AddShoppingCart" Size="Size.Medium" />
-                                        </button>
+                                            <button @onclick="AddToCart" disabled="@_isSubmitting" class="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/20 text-white transition-all hover:bg-white/10">
+                                                <MudIcon Icon="@Icons.Material.Filled.AddShoppingCart" Size="Size.Medium" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <MudDivider Class="my-8 !border-white/10" />
+
+                        @if (_isOwned)
+                        {
+                            @if (_patchVersionDetail != null)
+                            {
+                                <div class="group overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a] transition-all hover:border-purple-500/50 hover:bg-[#222]">
+                                    <div class="flex items-center justify-between p-5">
+                                        <div class="flex items-center gap-4">
+                                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500">
+                                                <span class="text-xs font-bold uppercase">Ver</span>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-lg font-bold text-white">@_patchVersionDetail.VersionName</h3>
+                                                <p class="text-xs text-white/40">Cập nhật mới nhất</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-3">
+                                            <button @onclick="HandleCheckVirus" disabled="@_isCheckingVirus"
+                                                    class="flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-4 py-2 text-xs font-bold text-green-500 transition-all hover:bg-green-500/20 active:scale-95 disabled:opacity-50">
+                                                @if (_isCheckingVirus)
+                                                {
+                                                    <MudProgressCircular Color="Color.Success" Size="Size.Small" Indeterminate="true" />
+                                                    <span>ĐANG QUÉT...</span>
+                                                }
+                                                else
+                                                {
+                                                    <MudIcon Icon="@Icons.Material.Filled.Shield" Size="Size.Small" />
+                                                    <span>CHECK VIRUS</span>
+                                                }
+                                            </button>
+
+                                            <button @onclick="HandleDownload"
+                                                class="flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-purple-700 active:scale-95">
+                                                DOWNLOAD <MudIcon Icon="@Icons.Material.Filled.Download" Size="Size.Small" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 gap-6 border-t border-white/5 bg-black/20 p-6 md:grid-cols-3">
+                                        <div class="space-y-2">
+                                            <div class="flex items-center gap-2 text-purple-400">
+                                                <MudIcon Icon="@Icons.Material.Filled.History" Size="Size.Small" />
+                                                <span class="text-xs font-bold uppercase tracking-wider">Tóm tắt thay đổi</span>
+                                            </div>
+                                            <div class="text-sm leading-relaxed text-white/70">
+                                                @(!string.IsNullOrEmpty(_patchVersionDetail.Changelog) ? _patchVersionDetail.Changelog : "Không có")
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <div class="flex items-center gap-2 text-blue-400">
+                                                <MudIcon Icon="@Icons.Material.Filled.Terminal" Size="Size.Small" />
+                                                <span class="text-xs font-bold uppercase tracking-wider">Hướng dẫn cài đặt</span>
+                                            </div>
+                                            <div class="text-sm leading-relaxed text-white/70">
+                                                @((MarkupString)_patchVersionDetail.InstallationGuide)
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <div class="flex items-center gap-2 text-amber-400">
+                                                <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+                                                <span class="text-xs font-bold uppercase tracking-wider">Lưu ý quan trọng</span>
+                                            </div>
+                                            <div class="text-sm italic leading-relaxed text-white/70">
+                                                @(!string.IsNullOrEmpty(_patchVersionDetail.Note) ? _patchVersionDetail.Note : "Không có")
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <div class="flex items-center gap-2 text-red-400">
+                                                <MudIcon Icon="@Icons.Material.Filled.VpnKey" Size="Size.Small" />
+                                                <span class="text-xs font-bold uppercase tracking-wider">Mật khẩu giải nén</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <div class="flex-1 truncate rounded border border-white/10 bg-white/5 px-3 py-2 font-mono text-sm italic text-white/70">
+                                                    @(!string.IsNullOrEmpty(_patchVersionDetail.ExtractionPassword) ? _patchVersionDetail.ExtractionPassword : "Không có")
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(_patchVersionDetail.ExtractionPassword))
+                                                {
+                                                    <button @onclick="@(() => CopyToClipboard(_patchVersionDetail.ExtractionPassword))"
+                                                            class="flex h-9 w-9 items-center justify-center rounded bg-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-all">
+                                                        <MudIcon Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" />
+                                                    </button>
+                                                }
+                                            </div>
+                                            <p class="italic text-[10px] text-white/30">* Vui lòng dùng WinRAR/7-Zip mới nhất</p>
+                                        </div>
                                     </div>
                                 </div>
                             }
                         }
-                    </div>
-
-                    <MudDivider Class="my-8 !border-white/10" />
-
-                    @if (_isOwned)
-                    {
-                        @if (_patchVersionDetail != null)
-                        {
-                            <div class="group overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a] transition-all hover:border-purple-500/50 hover:bg-[#222]">
-                                <div class="flex items-center justify-between p-5">
-                                    <div class="flex items-center gap-4">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 text-purple-500">
-                                            <span class="text-xs font-bold uppercase">Ver</span>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-lg font-bold text-white">@_patchVersionDetail.VersionName</h3>
-                                            <p class="text-xs text-white/40">Cập nhật mới nhất</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center gap-3">
-                                        <button @onclick="HandleCheckVirus" disabled="@_isCheckingVirus"
-                                                class="flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-4 py-2 text-xs font-bold text-green-500 transition-all hover:bg-green-500/20 active:scale-95 disabled:opacity-50">
-                                            @if (_isCheckingVirus)
-                                            {
-                                                <MudProgressCircular Color="Color.Success" Size="Size.Small" Indeterminate="true" />
-                                                <span>ĐANG QUÉT...</span>
-                                            }
-                                            else
-                                            {
-                                                <MudIcon Icon="@Icons.Material.Filled.Shield" Size="Size.Small" />
-                                                <span>CHECK VIRUS</span>
-                                            }
-                                        </button>
-
-                                        <button @onclick="HandleDownload"
-                                            class="flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-purple-700 active:scale-95">
-                                            DOWNLOAD <MudIcon Icon="@Icons.Material.Filled.Download" Size="Size.Small" />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 gap-6 border-t border-white/5 bg-black/20 p-6 md:grid-cols-3">
-                                    <div class="space-y-2">
-                                        <div class="flex items-center gap-2 text-purple-400">
-                                            <MudIcon Icon="@Icons.Material.Filled.History" Size="Size.Small" />
-                                            <span class="text-xs font-bold uppercase tracking-wider">Tóm tắt thay đổi</span>
-                                        </div>
-                                        <div class="text-sm leading-relaxed text-white/70">
-                                            @(!string.IsNullOrEmpty(_patchVersionDetail.Changelog) ? _patchVersionDetail.Changelog : "Không có")
-                                        </div>
-                                    </div>
-
-                                    <div class="space-y-2">
-                                        <div class="flex items-center gap-2 text-blue-400">
-                                            <MudIcon Icon="@Icons.Material.Filled.Terminal" Size="Size.Small" />
-                                            <span class="text-xs font-bold uppercase tracking-wider">Hướng dẫn cài đặt</span>
-                                        </div>
-                                        <div class="text-sm leading-relaxed text-white/70">
-                                            @((MarkupString)_patchVersionDetail.InstallationGuide)
-                                        </div>
-                                    </div>
-
-                                    <div class="space-y-2">
-                                        <div class="flex items-center gap-2 text-amber-400">
-                                            <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
-                                            <span class="text-xs font-bold uppercase tracking-wider">Lưu ý quan trọng</span>
-                                        </div>
-                                        <div class="text-sm italic leading-relaxed text-white/70">
-                                            @(!string.IsNullOrEmpty(_patchVersionDetail.Note) ? _patchVersionDetail.Note : "Không có")
-                                        </div>
-                                    </div>
-
-                                    <div class="space-y-2">
-                                        <div class="flex items-center gap-2 text-red-400">
-                                            <MudIcon Icon="@Icons.Material.Filled.VpnKey" Size="Size.Small" />
-                                            <span class="text-xs font-bold uppercase tracking-wider">Mật khẩu giải nén</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <div class="flex-1 truncate rounded border border-white/10 bg-white/5 px-3 py-2 font-mono text-sm italic text-white/70">
-                                                @(!string.IsNullOrEmpty(_patchVersionDetail.ExtractionPassword) ? _patchVersionDetail.ExtractionPassword : "Không có")
-                                            </div>
-                                            @if (!string.IsNullOrEmpty(_patchVersionDetail.ExtractionPassword))
-                                            {
-                                                <button @onclick="@(() => CopyToClipboard(_patchVersionDetail.ExtractionPassword))"
-                                                        class="flex h-9 w-9 items-center justify-center rounded bg-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-all">
-                                                    <MudIcon Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" />
-                                                </button>
-                                            }
-                                        </div>
-                                        <p class="italic text-[10px] text-white/30">* Vui lòng dùng WinRAR/7-Zip mới nhất</p>
-                                    </div>
-                                </div>
-                            </div>
-                        }
                     }
-                }
-                else
-                {
-                    <div class="mt-6 overflow-hidden rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-900/20 to-transparent p-8 shadow-2xl backdrop-blur-sm">
-                        <div class="flex flex-col items-center text-center md:items-start md:text-left">
-                            <div class="mb-4 flex h-14 w-14 animate-bounce items-center justify-center rounded-2xl bg-purple-500/10 text-purple-500">
-                                <MudIcon Icon="@Icons.Material.Filled.HourglassEmpty" Size="Size.Large" />
-                            </div>
-
-                            <h3 class="font-black mb-2 text-3xl uppercase tracking-tighter text-white">
-                                Sắp ra mắt <span class="animate-pulse text-purple-500">...</span>
-                            </h3>
-
-                            <p class="max-w-md text-base leading-relaxed text-white/60">
-                                Siêu phẩm <strong class="text-white">@_gameDetail.Title</strong> đang trong giai đoạn hoàn thiện cuối cùng. Chúng tôi sẽ cập nhật các gói sản phẩm ngay khi game chính thức lên kệ.
-                            </p>
-
-                            <div class="mt-8 flex flex-wrap gap-4">
-                                <div class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5">
-                                    <div class="h-2 w-2 animate-ping rounded-full bg-purple-500"></div>
-                                    <span class="text-sm font-medium text-white/80">Dự kiến: Sớm thôi</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
-    <h3 class="text-2xl font-semibold text-white">Mô tả</h3>
-
-    <div class="reset-css mt-4">
-        @if(!string.IsNullOrEmpty(_gameDetail.Description))
-        {
-            @((MarkupString)_gameDetail.Description)
-        }
-    </div>
-</section>
-
-<section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
-    <div class="bg-[#9797971c] p-5">
-        <h3 class="text-2xl font-semibold text-white">Đánh giá</h3>
-        <span class="text-base text-white/70">(@_totalReviews reviews)</span>
-
-        <div class="mt-4 flex flex-col items-start gap-6 md:flex-row lg:flex-row md:gap-8 lg:gap-10">
-            <div class="flex w-full flex-col items-center justify-center gap-4 md:w-1/2 lg:w-1/2">
-                <div class="flex w-full flex-col gap-3">
-                    @for (int i = 5; i >= 1; i--)
+                    else
                     {
-                        <div class="flex items-center gap-4">
-                            <div class="flex min-w-[100px] items-center gap-1">
-                                @for (int j = 1; j <= 5; j++)
-                                {
-                                    if (j <= i)
-                                    {
-                                        <MudIcon Icon="@Icons.Material.Filled.Star" Class="!text-lg !text-yellow-500 md:!text-2xl lg:!text-2xl" />
-                                    }
-                                    else
-                                    {
-                                        <MudIcon Icon="@Icons.Material.Filled.Star" Class="!text-lg !text-gray-600 md:!text-2xl lg:!text-2xl" />
-                                    }
-                                }
-                            </div>
-
-                            <div class="relative h-2.5 flex-1 rounded-full bg-white/5">
-                                <div class="absolute inset-y-0 left-0 rounded-full bg-yellow-500"
-                                     style="width: @(_totalReviews > 0 ? (_ratingCounts[i] * 100 / _totalReviews) : 0)%">
-                                </div>
-                            </div>
-                            <span class="min-w-[20px] text-right text-base font-medium text-white/60">@_ratingCounts[i]</span>
-                        </div>
-                    }
-                </div>
-            </div>
-            <div class="w-full md:w-1/2 lg:w-1/2">
-                <div class="relative rounded-2xl border border-white/5 bg-white/5 p-6">
-
-                    @if (!_isOwned || _isReviewed)
-                    {
-                        <div class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-black/60 p-6 text-center backdrop-blur-[2px]">
-                            <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/20 text-purple-500">
-                                @if (!_isOwned)
-                                {
-                                    <MudIcon Icon="@Icons.Material.Filled.Lock" />
-                                }
-                                else
-                                {
-                                    <MudIcon Icon="@Icons.Material.Filled.Check" />
-                                }
-                        </div>
-
-                        <h4 class="text-lg font-bold text-white">
-                            @(!_isOwned ? "Chưa thể đánh giá" : "Cảm ơn bạn đã đánh giá!")
-                        </h4>
-
-                        <p class="mt-2 text-sm text-white/70">
-                            @(!_isOwned
-                                                        ? "Bạn cần sở hữu gói Việt hóa này để có thể gửi nhận xét."
-                                                        : "Hệ thống đã ghi nhận đánh giá của bạn cho bản Patch này.")
-                        </p>
-
-                        @if (!_isOwned)
-                            {
-                                <button @onclick="BuyNow" class="mt-4 rounded-full bg-purple-600 px-6 py-2 text-sm font-bold text-white transition-all hover:bg-purple-700">
-                                    MUA NGAY ĐỂ MỞ KHÓA
-                                </button>
-                            }
-                        </div>
-                    }
-
-                    <div class="@((!_isOwned || _isReviewed) ? "opacity-30 pointer-events-none select-none" : "")">
-                        <MudForm>
-                            <div class="mb-5 flex items-center gap-2">
-                                <label class="block text-sm font-medium text-white">Đánh giá của bạn <span class="text-xs text-red-600">*</span></label>
-                                <MudRating @bind-SelectedValue="@_reviewModel.Overall" />
-                            </div>
-
-                            <div class="mb-5">
-                                <label class="mb-2 block text-sm font-medium text-white">Họ và tên <span class="text-xs text-red-600">*</span></label>
-                                <MudTextField T="string" @bind-Value="@_reviewModel.UserName" Variant="Variant.Outlined" Margin="Margin.Dense" Class="custom-text-field" />
-                            </div>
-
-                            <div class="mb-5">
-                                <label class="mb-2 block text-sm font-medium text-white">Tiêu đề</label>
-                                <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@_reviewModel.Title" Margin="Margin.Dense" Class="custom-textarea" Placeholder="Tóm tắt cảm nhận..." />
-                            </div>
-
-                            <div class="mb-5">
-                                <label class="mb-2 block text-sm font-medium text-white">Nhận xét của bạn</label>
-                                <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@_reviewModel.Content" Lines="4" Margin="Margin.Dense" Class="custom-textarea" Placeholder="Bản dịch rất tốt, font chữ đẹp..." />
-                            </div>
-
-                            <MudButton Class="!rounded-full !bg-purple-500 px-8 py-2 !text-white" Variant="Variant.Filled" OnClick="HandleSubmitReview">
-                                Gửi đánh giá
-                            </MudButton>
-                        </MudForm>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-6">
-            <h4 class="text-lg font-medium text-white">Đánh giá của mọi người</h4>
-
-            @if (_lstReview.Any())
-            {
-                <div class="mt-6 flex flex-col gap-4">
-                    @foreach (var review in _lstReview)
-                    {
-                        <div class="rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:bg-white/[0.08]">
-                            <div class="flex items-start justify-between">
-                                <div class="flex items-center gap-4">
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 font-bold text-white">
-                                        @(string.IsNullOrEmpty(review.UserName) ? "U" : review.UserName[0].ToString().ToUpper())
-                                    </div>
-                                    <div>
-                                        <h5 class="font-bold text-white">@review.UserName</h5>
-                                        <div class="flex items-center gap-2">
-                                            <div class="relative">
-                                                <div class="absolute bottom-0 left-0 right-0 top-0 z-10"></div>
-                                                <MudRating SelectedValue="@review.Overall" ReadOnly="true" Size="Size.Small" />
-                                            </div>
-                                            <span class="uppercase tracking-tighter text-[10px] text-white/40">
-                                                @review.CreatedAt?.ToString("dd/MM/yyyy")
-                                            </span>
-                                        </div>
-                                    </div>
+                        <div class="mt-6 overflow-hidden rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-900/20 to-transparent p-8 shadow-2xl backdrop-blur-sm">
+                            <div class="flex flex-col items-center text-center md:items-start md:text-left">
+                                <div class="mb-4 flex h-14 w-14 animate-bounce items-center justify-center rounded-2xl bg-purple-500/10 text-purple-500">
+                                    <MudIcon Icon="@Icons.Material.Filled.HourglassEmpty" Size="Size.Large" />
                                 </div>
 
-                                @if (_mine != null && review.UserId == _mine.Id)
-                                {
-                                    <span class="rounded-full bg-purple-500/10 px-3 py-1 font-bold text-[10px] text-purple-400">ĐÁNH GIÁ CỦA BẠN</span>
-                                }
-                            </div>
+                                <h3 class="font-black mb-2 text-3xl uppercase tracking-tighter text-white">
+                                    Sắp ra mắt <span class="animate-pulse text-purple-500">...</span>
+                                </h3>
 
-                            <div class="mt-4">
-                                <p class="text-sm font-semibold text-purple-300">@review.Title</p>
-                                <p class="mt-1 text-sm leading-relaxed text-white/70">
-                                    @review.Content
+                                <p class="max-w-md text-base leading-relaxed text-white/60">
+                                    Siêu phẩm <strong class="text-white">@_gameDetail.Title</strong> đang trong giai đoạn hoàn thiện cuối cùng. Chúng tôi sẽ cập nhật các gói sản phẩm ngay khi game chính thức lên kệ.
                                 </p>
+
+                                <div class="mt-8 flex flex-wrap gap-4">
+                                    <div class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5">
+                                        <div class="h-2 w-2 animate-ping rounded-full bg-purple-500"></div>
+                                        <span class="text-sm font-medium text-white/80">Dự kiến: Sớm thôi</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     }
                 </div>
-            } else
-            {
-                <div class="mt-4">
-                    <p class="text-white">Chưa có đánh giá nào.</p>
-                </div>
-            }
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-@if(_gameDetail.GameSameCategories != null && _gameDetail.GameSameCategories.Any())
-{
-    <section class="mx-auto mb-10 mt-10 max-w-[1520px] px-3 lg:px-0">
-        <div class="mb-6 flex items-center gap-2">
-            <MudIcon Icon="@Icons.Material.Filled.Games" Class="!text-purple-500" Size="Size.Large" />
-            <h2 class="text-2xl font-bold text-white xs:text-2xl">Cùng thể loại</h2>
-        </div>
+    <section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
+        <h3 class="text-2xl font-semibold text-white">Mô tả</h3>
 
-        <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
-            @foreach (var item in _gameDetail.GameSameCategories)
+        <div class="reset-css mt-4">
+            @if(!string.IsNullOrEmpty(_gameDetail.Description))
             {
-                if (item != null)
-                {
-                    <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
-                        <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
-                            <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
-
-                            <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
-
-                            <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.Patches)">
-                                @GetPriceDisplay(item.Patches)
-                            </p>
-                        </a>
-
-                        <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
-                            <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
-                                <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))" Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
-                                <MudIcon @onclick="@(() => HandleToggleWishlist(item.GameId))"
-                                         Class="@(_wishlistedGameIds.Contains(item.GameId) ? "cursor-pointer !text-red-500" : "cursor-pointer !text-white hover:!text-purple-500")"
-                                         Icon="@(_wishlistedGameIds.Contains(item.GameId) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" />
-                            </div>
-                        </div>
-                    </div>
-                }
+                @((MarkupString)_gameDetail.Description)
             }
         </div>
     </section>
+
+    <section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
+        <div class="bg-[#9797971c] p-5">
+            <h3 class="text-2xl font-semibold text-white">Đánh giá</h3>
+            <span class="text-base text-white/70">(@_totalReviews reviews)</span>
+
+            <div class="mt-4 flex flex-col items-start gap-6 md:flex-row lg:flex-row md:gap-8 lg:gap-10">
+                <div class="flex w-full flex-col items-center justify-center gap-4 md:w-1/2 lg:w-1/2">
+                    <div class="flex w-full flex-col gap-3">
+                        @for (int i = 5; i >= 1; i--)
+                        {
+                            <div class="flex items-center gap-4">
+                                <div class="flex min-w-[100px] items-center gap-1">
+                                    @for (int j = 1; j <= 5; j++)
+                                    {
+                                        if (j <= i)
+                                        {
+                                            <MudIcon Icon="@Icons.Material.Filled.Star" Class="!text-lg !text-yellow-500 md:!text-2xl lg:!text-2xl" />
+                                        }
+                                        else
+                                        {
+                                            <MudIcon Icon="@Icons.Material.Filled.Star" Class="!text-lg !text-gray-600 md:!text-2xl lg:!text-2xl" />
+                                        }
+                                    }
+                                </div>
+
+                                <div class="relative h-2.5 flex-1 rounded-full bg-white/5">
+                                    <div class="absolute inset-y-0 left-0 rounded-full bg-yellow-500"
+                                         style="width: @(_totalReviews > 0 ? (_ratingCounts[i] * 100 / _totalReviews) : 0)%">
+                                    </div>
+                                </div>
+                                <span class="min-w-[20px] text-right text-base font-medium text-white/60">@_ratingCounts[i]</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 lg:w-1/2">
+                    <div class="relative rounded-2xl border border-white/5 bg-white/5 p-6">
+
+                        @if (!_isOwned || _isReviewed)
+                        {
+                            <div class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-black/60 p-6 text-center backdrop-blur-[2px]">
+                                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/20 text-purple-500">
+                                    @if (!_isOwned)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.Lock" />
+                                    }
+                                    else
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.Check" />
+                                    }
+                            </div>
+
+                            <h4 class="text-lg font-bold text-white">
+                                @(!_isOwned ? "Chưa thể đánh giá" : "Cảm ơn bạn đã đánh giá!")
+                            </h4>
+
+                            <p class="mt-2 text-sm text-white/70">
+                                @(!_isOwned
+                                                            ? "Bạn cần sở hữu gói Việt hóa này để có thể gửi nhận xét."
+                                                            : "Hệ thống đã ghi nhận đánh giá của bạn cho bản Patch này.")
+                            </p>
+
+                            @if (!_isOwned)
+                                {
+                                    <button @onclick="BuyNow" class="mt-4 rounded-full bg-purple-600 px-6 py-2 text-sm font-bold text-white transition-all hover:bg-purple-700">
+                                        MUA NGAY ĐỂ MỞ KHÓA
+                                    </button>
+                                }
+                            </div>
+                        }
+
+                        <div class="@((!_isOwned || _isReviewed) ? "opacity-30 pointer-events-none select-none" : "")">
+                            <MudForm>
+                                <div class="mb-5 flex items-center gap-2">
+                                    <label class="block text-sm font-medium text-white">Đánh giá của bạn <span class="text-xs text-red-600">*</span></label>
+                                    <MudRating @bind-SelectedValue="@_reviewModel.Overall" />
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="mb-2 block text-sm font-medium text-white">Họ và tên <span class="text-xs text-red-600">*</span></label>
+                                    <MudTextField T="string" @bind-Value="@_reviewModel.UserName" Variant="Variant.Outlined" Margin="Margin.Dense" Class="custom-text-field" />
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="mb-2 block text-sm font-medium text-white">Tiêu đề</label>
+                                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@_reviewModel.Title" Margin="Margin.Dense" Class="custom-textarea" Placeholder="Tóm tắt cảm nhận..." />
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="mb-2 block text-sm font-medium text-white">Nhận xét của bạn</label>
+                                    <MudTextField T="string" Variant="Variant.Outlined" @bind-Value="@_reviewModel.Content" Lines="4" Margin="Margin.Dense" Class="custom-textarea" Placeholder="Bản dịch rất tốt, font chữ đẹp..." />
+                                </div>
+
+                                <MudButton Class="!rounded-full !bg-purple-500 px-8 py-2 !text-white" Variant="Variant.Filled" Disabled="@_isSubmitting" OnClick="HandleSubmitReview">
+                                    Gửi đánh giá
+                                </MudButton>
+                            </MudForm>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h4 class="text-lg font-medium text-white">Đánh giá của mọi người</h4>
+
+                @if (_lstReview.Any())
+                {
+                    <div class="mt-6 flex flex-col gap-4">
+                        @foreach (var review in _lstReview)
+                        {
+                            <div class="rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:bg-white/[0.08]">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 font-bold text-white">
+                                            @(string.IsNullOrEmpty(review.UserName) ? "U" : review.UserName[0].ToString().ToUpper())
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-white">@review.UserName</h5>
+                                            <div class="flex items-center gap-2">
+                                                <div class="relative">
+                                                    <div class="absolute bottom-0 left-0 right-0 top-0 z-10"></div>
+                                                    <MudRating SelectedValue="@review.Overall" ReadOnly="true" Size="Size.Small" />
+                                                </div>
+                                                <span class="uppercase tracking-tighter text-[10px] text-white/40">
+                                                    @review.CreatedAt?.ToString("dd/MM/yyyy")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if (_mine != null && review.UserId == _mine.Id)
+                                    {
+                                        <span class="rounded-full bg-purple-500/10 px-3 py-1 font-bold text-[10px] text-purple-400">ĐÁNH GIÁ CỦA BẠN</span>
+                                    }
+                                </div>
+
+                                <div class="mt-4">
+                                    <p class="text-sm font-semibold text-purple-300">@review.Title</p>
+                                    <p class="mt-1 text-sm leading-relaxed text-white/70">
+                                        @review.Content
+                                    </p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                } else
+                {
+                    <div class="mt-4">
+                        <p class="text-white">Chưa có đánh giá nào.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    @if(_gameDetail.GameSameCategories != null && _gameDetail.GameSameCategories.Any())
+    {
+        <section class="mx-auto mb-10 mt-10 max-w-[1520px] px-3 lg:px-0">
+            <div class="mb-6 flex items-center gap-2">
+                <MudIcon Icon="@Icons.Material.Filled.Games" Class="!text-purple-500" Size="Size.Large" />
+                <h2 class="text-2xl font-bold text-white xs:text-2xl">Cùng thể loại</h2>
+            </div>
+
+            <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
+                @foreach (var item in _gameDetail.GameSameCategories)
+                {
+                    if (item != null)
+                    {
+                        <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                            <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
+                                <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
+
+                                <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
+
+                                <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.Patches)">
+                                    @GetPriceDisplay(item.Patches)
+                                </p>
+                            </a>
+
+                            <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
+                                <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
+                                    <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))" Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
+                                    <MudIcon @onclick="@(() => HandleToggleWishlist(item.GameId))"
+                                             Class="@(_wishlistedGameIds.Contains(item.GameId) ? "cursor-pointer !text-red-500" : "cursor-pointer !text-white hover:!text-purple-500")"
+                                             Icon="@(_wishlistedGameIds.Contains(item.GameId) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </section>
+    }
 }
 
 @code {
@@ -448,6 +449,7 @@
     int _patchVersionSelect = 0;
     bool _isOwned = false;
     bool _isLoading = false;
+    bool _isSubmitting = false; 
     string _imageDisplay = Constant.DefaultImages; 
     double _averageRating = 0;
     int _totalReviews = 0; 
@@ -626,7 +628,7 @@
     {
         try
         {
-            _isLoading = true;
+            _isSubmitting = true;
             _patchSelect = patchId;
 
             var obj = _gameDetail.Patches.FirstOrDefault(x => x.PatchId == patchId);
@@ -675,7 +677,7 @@
         catch (Exception) { }
         finally
         {
-            _isLoading = false;
+            _isSubmitting = false;
         }
     }
 
@@ -683,7 +685,7 @@
     {
         try
         {
-            _isLoading = true;
+            _isSubmitting = true;
             _patchVersionSelect = patchVersionId;
 
             var obj = _patchDetail.PatchVersions.FirstOrDefault(x => x.PatchVersionId == patchVersionId);
@@ -695,7 +697,7 @@
         catch (Exception) { }
         finally
         {
-            _isLoading = false;
+            _isSubmitting = false;
         }
     }
 

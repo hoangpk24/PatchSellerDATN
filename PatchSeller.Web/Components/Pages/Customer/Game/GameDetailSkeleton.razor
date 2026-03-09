@@ -1,0 +1,66 @@
+﻿<section class="bg-black-default2 px-3 py-10 lg:px-0">
+    <div class="mx-auto flex max-w-[1520px] flex-col items-start gap-6 lg:flex-row md:gap-8 lg:gap-10">
+        <div class="w-full lg:w-2/5">
+            <div class="w-full rounded-lg !bg-white/5" style="aspect-ratio: 1/1.5;">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100%" Width="100%" Animation="Animation.Wave" />
+            </div>
+        </div>
+
+        <div class="w-full lg:w-3/5">
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="30%" Height="24px" Class="mb-5 !bg-white/5" />
+            <div class="flex justify-between gap-6">
+                <MudSkeleton SkeletonType="SkeletonType.Text" Width="60%" Height="60px" Class="!bg-white/5" />
+                <div class="flex gap-3">
+                    <MudSkeleton SkeletonType="SkeletonType.Circle" Width="44px" Height="44px" Class="!bg-white/5" />
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="120px" Height="44px" Class="rounded-full !bg-white/5" />
+                </div>
+            </div>
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="56px" Class="mt-6 rounded !bg-white/5" />
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="180px" Class="mt-6 rounded-2xl !bg-white/5" />
+
+            <MudDivider Class="my-8 !border-white/10" />
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="120px" Class="rounded-2xl !bg-white/5" />
+        </div>
+    </div>
+</section>
+
+<section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
+    <MudSkeleton SkeletonType="SkeletonType.Text" Width="150px" Height="32px" Class="!bg-white/5" />
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="250px" Width="100%" Class="mt-4 rounded-lg !bg-white/5" Animation="Animation.Wave" />
+</section>
+
+<section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
+    <div class="bg-[#9797971c] p-5">
+        <MudSkeleton SkeletonType="SkeletonType.Text" Width="200px" Height="32px" Class="!bg-white/5" />
+        <div class="mt-4 flex flex-col gap-6 md:flex-row">
+            <div class="flex w-full flex-col gap-3 md:w-1/2">
+                @for (int i = 0; i < 5; i++)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="32px" Width="100%" Class="rounded !bg-white/5" />
+                }
+            </div>
+            <div class="w-full md:w-1/2">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="350px" Width="100%" Class="rounded-2xl !bg-white/5" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mx-auto mb-10 mt-10 max-w-[1520px] px-3 lg:px-0">
+    <div class="mb-6 flex items-center gap-2">
+        <MudSkeleton SkeletonType="SkeletonType.Circle" Width="32px" Height="32px" Class="!bg-white/5" />
+        <MudSkeleton SkeletonType="SkeletonType.Text" Width="200px" Height="32px" Class="!bg-white/5" />
+    </div>
+    <div class="flex flex-nowrap gap-4 overflow-hidden px-3">
+        @for (int i = 0; i < 6; i++)
+        {
+            <div class="flex-shrink-0 lg:w-[calc(100%/6-1rem)] md:w-[327px]">
+                <div class="w-full !bg-white/5" style="aspect-ratio: 1/1.5;">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100%" Width="100%" />
+                </div>
+                <MudSkeleton SkeletonType="SkeletonType.Text" Width="80%" Height="32px" Class="mt-4 !bg-white/5" />
+                <MudSkeleton SkeletonType="SkeletonType.Text" Width="40%" Height="24px" Class="!bg-white/5" />
+            </div>
+        }
+    </div>
+</section>
