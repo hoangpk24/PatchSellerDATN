@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PatchSeller.API.Utilities;
 using GoogleServiceLib;
+using PatchSeller.DAL.Repository;
 
 namespace PatchSeller.API.Controllers
 {
@@ -58,12 +59,24 @@ namespace PatchSeller.API.Controllers
             return null;
         }
 
+
+
         [HttpGet("move-to-trash")]
         public async Task<bool> MoveToTashFileOrFolder(string folderOrFileId)
         {
             var result = await _googleDriveService.MoveToTrashAsync(folderOrFileId);
             if (result == true)
+            {
+
+                PatchVersionRepository patchVersionRepository = new PatchVersionRepository();
+                var currentPatchVer = await patchVersionRepository.GetPatchByFileIdOnGoogleDrive(folderOrFileId); 
+                if (currentPatchVer != null)
+                {
+                   await  patchVersionRepository.Delete(currentPatchVer.PatchVersionId);
+                }    
                 return true;
+
+            }    
             return false;
         }
 

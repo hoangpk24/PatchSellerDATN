@@ -99,6 +99,24 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+
+        public async Task<PatchVersion> GetPatchByFileIdOnGoogleDrive(string idFile)
+        {
+            try
+            {
+                var version = await _context.PatchVersions.FirstOrDefaultAsync(x => x.Links.Contains(idFile));
+
+                if(version != null)
+                return version;
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+
         public async Task<PatchVersion> GetByIdForPublic(int id)
         {
             try
