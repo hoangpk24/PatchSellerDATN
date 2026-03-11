@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PatchSeller.DAL.Context;
 using PatchSeller.DAL.Models;
 using System;
@@ -340,6 +340,44 @@ namespace PatchSeller.DAL.Repository
             catch (Exception)
             {
                 return (null, 0);
+            }
+        }
+
+        public async Task<List<int>> GetHotGameIdsByDownloadsInLastMonth(int take = 6)
+        {
+            try
+            {
+                if (take <= 0) return new List<int>();
+
+                var fromDate = DateTime.UtcNow.AddMonths(-1);
+
+                return await _context.DownloadLogs
+                    .Where(dl => dl.DownloadedAt >= fromDate)
+                    .Join(_context.PatchVersions,
+                          dl => dl.PatchVersionId,
+                          pv => pv.PatchVersionId,
+                          (dl, pv) => new { dl, pv })
+                    .Join(_context.Patches,
+                          x => x.pv.PatchId,
+                          p => p.PatchId,
+                          (x, p) => new { x.dl, x.pv, p })
+                    .Join(_context.Games,
+                          x => x.p.GameId,
+                          g => g.GameId,
+                          (x, g) => new { x.dl, x.pv, x.p, g })
+                    .Where(x =>
+                        x.g.Delete != true && x.g.Status == 1 &&
+                        x.p.Delete != true && x.p.Status == 1 &&
+                        x.pv.Delete != true && x.pv.Status == 1)
+                    .GroupBy(x => x.g.GameId)
+                    .OrderByDescending(g => g.Count())
+                    .Select(g => g.Key)
+                    .Take(take)
+                    .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }

@@ -259,6 +259,62 @@ namespace PatchSeller.API.Controllers.Public
                 return StatusCode(500, Constant.ErrorCode.OtherError);
             }
         }
+
+
+        [HttpGet("get-game-hot-for-home")]
+        public async Task<ActionResult<GameForHomeDTO>> GetAllHotGamesHome()
+        {
+            try
+            {
+                List<Game> allGames = await _gameRepository.GetAllDetailForPublic("");
+
+                if (allGames == null)
+                {
+                    var emptyDto = new GameForHomeDTO
+                    {
+                        LstCommingSoon = new List<GameDetailDTO>(),
+                        LstNew = new List<GameDetailDTO>(),
+                        LstHot = new List<GameDetailDTO>()
+                    };
+                    return Ok(emptyDto);
+                }
+
+                var lstCommingSoon = allGames.Where(x => x.Status == 2).ToList();
+                var lstNew = allGames.Where(x => x.Status != 2).OrderByDescending(x => x.CreatedAt).ToList();
+
+                var hotGameIds = await _gameRepository.GetHotGameIdsByDownloadsInLastMonth(6);
+                if (hotGameIds == null)
+                {
+                    hotGameIds = new List<int>();
+                }
+
+                var lstHot = new List<GameDetailDTO>();
+
+                foreach (var gameId in hotGameIds)
+                {
+                    var game = await _gameRepository.GetByIdDetailForPublic(gameId);
+                    var dtoItem = MapToGameDetailDTO(game);
+                    if (dtoItem != null)
+                    {
+                        lstHot.Add(dtoItem);
+                    }
+                }
+
+                var dto = new GameForHomeDTO
+                {
+                    LstCommingSoon = lstCommingSoon.Select(MapToGameDetailDTO).Where(d => d != null).ToList(),
+                    LstNew = lstNew.Select(MapToGameDetailDTO).Where(d => d != null).ToList(),
+                    LstHot = lstHot
+                };
+
+                return Ok(dto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
+
         [HttpGet("get-for-search")]
         public async Task<ActionResult<GameSearchDTO>> GetAllForSearch(
             [FromQuery] string? keyword,
