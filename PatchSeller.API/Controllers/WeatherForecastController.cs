@@ -130,7 +130,7 @@ namespace PatchSeller.API.Controllers
         }
 
         [HttpPost("upload-with-folder")]
-        public async Task<IActionResult> UploadPatch(IFormFile file, string gameName, string patchName, string version)
+        public async Task<IActionResult> UploadPatch(IFormFile file, [FromForm] string gameName, [FromForm] string patchName, [FromForm] string version)
         {
             using var stream = file.OpenReadStream();
 

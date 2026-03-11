@@ -166,7 +166,7 @@
     public string _token { get; set; }
 
     MudForm _form = new MudForm();
-    List<DAL.Models.Patch> _lstPatch = [];
+    List<PatchDetailResponse> _lstPatch = [];
     List<DAL.Models.Staff> _lstStaff = [];
     UploadFileResponse _uploadFileResponse = null;
     CheckFileResponse _checkFileResponse = null;
@@ -197,7 +197,7 @@
 
     async Task LoadData()
     {
-        var response = await _adminPatchService.GetAll();
+        var response = await _adminPatchService.GetAllWithDetail();
         if (response.IsSuccess)
         {
             _lstPatch = response.Data;
@@ -263,21 +263,48 @@
     {
         if (file == null) return;
 
+        if (_model.PatchId == 0 || string.IsNullOrWhiteSpace(_model.VersionName))
+        {
+            _snackbar.Add("Dữ liệu phiên bản hoặc gói không hợp lệ. Vui lòng kiểm tra lại trước khi upload.", MudBlazor.Severity.Warning);
+            return;
+        }
+
         try
         {
             _isLoadingUpload = true;
+            long maxFileSize = 10L * 1024 * 1024 * 1024; // 10GB
 
-            using var stream = file.OpenReadStream(maxAllowedSize: 10L * 1024 * 1024 * 1024);
-            var res = await _adminUploadService.UploadFileAsync(stream, file.Name);
+            var selectedPatch = _lstPatch.FirstOrDefault(x => x.PatchId == _model.PatchId);
+            string gameName = selectedPatch?.Game != null && !string.IsNullOrEmpty(selectedPatch.Game.Title) ? selectedPatch.Game.Title : "UnknownGame";
+            string patchName = selectedPatch?.Name ?? "UnknownPatch";
+            string version = _model.VersionName;
+
+            using var stream = file.OpenReadStream(maxAllowedSize: maxFileSize);
+
+            var res = await _adminUploadService.UploadPatchWithFolderAsync(
+                stream,
+                file.Name,
+                gameName,
+                patchName,
+                version
+            );
 
             if (res.IsSuccess)
             {
                 _uploadFileResponse = res.Data;
                 _fileName = file.Name;
+
                 _snackbar.Add("Đã tải file mới lên thành công!", MudBlazor.Severity.Info);
             }
+            else
+            {
+                _snackbar.Add($"Lỗi upload: {res.ErrorMessage}", MudBlazor.Severity.Error);
+            }
         }
-        catch (Exception ex) { /* handle ex */ }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Có lỗi xảy ra: {ex.Message}", MudBlazor.Severity.Error);
+        }
         finally
         {
             _isLoadingUpload = false;
@@ -327,12 +354,11 @@
 
     async Task OnSubmit()
     {
-        if (_isLoading) return;
-
+        if (_isLoading || _isLoadingUpload) return;
 
         if (_uploadFileResponse == null)
         {
-            _snackbar.Add("Vui lòng tải lên file trước khi sửa phiên bản", MudBlazor.Severity.Warning);
+            _snackbar.Add("Phiên bản phải có file đính kèm", MudBlazor.Severity.Warning);
             return;
         }
 
@@ -340,7 +366,6 @@
         {
             _isLoading = true;
             await _form.Validate();
-
             if (!_form.IsValid) return;
 
             if (string.IsNullOrEmpty(_model.InstallationGuide))
@@ -349,20 +374,16 @@
                 return;
             }
 
-            if (_uploadFileResponse.LinkDownload != _oldFileLink)
-            {
-                if (!string.IsNullOrEmpty(_oldFileLink))
-                {
-                    var resDelete = await _adminUploadService.DeleteFileAsync(_oldFileLink);
-                }
-            }
-
             _model.VersionName = _model.VersionName.Trim();
-            if (_oldFileLink != _uploadFileResponse.LinkDownload)
+
+            bool isFileChanged = _uploadFileResponse.Link != _oldFileLink;
+
+            if (isFileChanged)
             {
                 _model.Links = _uploadFileResponse.LinkDownload;
-                _model.FileSize = _uploadFileResponse?.Size ?? 0;
+                _model.FileSize = _uploadFileResponse.Size ?? 0;
             }
+
             if (!string.IsNullOrEmpty(_model.InstallationGuide)) _model.InstallationGuide = _model.InstallationGuide.Trim();
             if (!string.IsNullOrEmpty(_model.Note)) _model.Note = _model.Note.Trim();
             if (!string.IsNullOrEmpty(_model.Changelog)) _model.Changelog = _model.Changelog.Trim();
@@ -371,17 +392,22 @@
 
             if (res.IsSuccess)
             {
-                _snackbar.Add("Sửa thành công", MudBlazor.Severity.Success);
+                if (isFileChanged && !string.IsNullOrEmpty(_oldFileLink))
+                {
+                    await _adminUploadService.DeleteFileAsync(_oldFileLink);
+                }
+
+                _snackbar.Add("Cập nhật thành công", MudBlazor.Severity.Success);
                 navigation.NavigateTo(RouterConfig.Admin.Version);
             }
             else
             {
-                _snackbar.Add("Sửa thất bại", MudBlazor.Severity.Error);
+                _snackbar.Add($"Cập nhật thất bại: {res.ErrorMessage}", MudBlazor.Severity.Error);
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            _isLoading = false;
+            _snackbar.Add($"Lỗi hệ thống: {ex.Message}", MudBlazor.Severity.Error);
         }
         finally
         {
