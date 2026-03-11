@@ -103,23 +103,30 @@
             <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tải lên file</label>
 
-                <MudFileUpload T="IBrowserFile" FilesChanged="@(async (file) => await UploadFile(file))">
+                <MudFileUpload T="IBrowserFile"
+                               FilesChanged="@(async (file) => await UploadFile(file))"
+                               Disabled="@(string.IsNullOrEmpty(_model.VersionName) || _model.PatchId == 0)">
                     <ActivatorContent>
                         <MudButton Variant="Variant.Filled"
                                    Color="Color.Primary"
-                                   Disabled="@(_uploadFileResponse != null || _isLoadingUpload || _isLoading)"
-                                   StartIcon="@Icons.Material.Filled.CloudUpload">                                  
+                                   Disabled="@(_uploadFileResponse != null || _isLoadingUpload || _isLoading || string.IsNullOrEmpty(_model.VersionName) || _model.PatchId == 0)"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload">
                             Upload Files
                         </MudButton>
                     </ActivatorContent>
                 </MudFileUpload>
+
+                @if (string.IsNullOrEmpty(_model.VersionName) || _model.PatchId == 0)
+                {
+                    <p class="mt-1 text-xs italic text-amber-600">* Vui lòng chọn gói và nhập phiên bản trước khi upload.</p>
+                }
 
                 @if(_uploadFileResponse != null)
                 {
                     <div class="mt-4 flex items-center gap-4 rounded border border-slate-200 bg-slate-50 p-4">
                         <div class="flex-1">
                             <div class="font-bold text-slate-700">@_fileName</div>
-                            <div class="text-sm text-slate-500">Kích thước: @_uploadFileResponse.SizeMb mb</div>
+                            <div class="text-sm text-slate-500">Kích thước: @(_uploadFileResponse.SizeMb > 0 ? _uploadFileResponse.SizeMb + "mb" : _uploadFileResponse.Size + "kb")</div>
                         </div>
                         <MudButton Variant="Variant.Text"
                                    Color="Color.Error"
@@ -161,7 +168,7 @@
     public string _token { get; set; }
     MudForm _form = new MudForm();
     UploadFileResponse _uploadFileResponse = null;
-    List<DAL.Models.Patch> _lstPatch = [];
+    List<PatchDetailResponse> _lstPatch = [];
     List<DAL.Models.Staff> _lstStaff = [];
     PatchVersionModel _model = new PatchVersionModel();
     PatchVersionSchema.CreateUpdate _schema = new PatchVersionSchema.CreateUpdate();
@@ -190,7 +197,7 @@
     async Task LoadData()
     {
         _model.PatchId = 0;
-        var response = await _adminPatchService.GetAll();
+        var response = await _adminPatchService.GetAllWithDetail();
         if (response.IsSuccess)
         {
             _lstPatch = response.Data;
@@ -206,14 +213,31 @@
     {
         if (file == null) return;
 
+        if (_model.PatchId == 0 || string.IsNullOrWhiteSpace(_model.VersionName))
+        {
+            _snackbar.Add("Vui lòng chọn 'Thuộc gói' và nhập 'Phiên bản' trước khi upload để sắp xếp thư mục!", MudBlazor.Severity.Warning);
+            return;
+        }
+
         try
         {
             _isLoadingUpload = true;
             long maxFileSize = 10L * 1024 * 1024 * 1024;
+            var selectedPatch = _lstPatch.FirstOrDefault(x => x.PatchId == _model.PatchId);
+            string gameName = selectedPatch?.Game != null && !string.IsNullOrEmpty(selectedPatch.Game.Title) ? selectedPatch.Game.Title :  "UnknownGame";
+
+            string patchName = selectedPatch?.Name ?? "UnknownPatch";
+            string version = _model.VersionName;
 
             using var stream = file.OpenReadStream(maxAllowedSize: maxFileSize);
 
-            var res = await _adminUploadService.UploadFileAsync(stream, file.Name);
+            var res = await _adminUploadService.UploadPatchWithFolderAsync(
+                stream,
+                file.Name,
+                gameName,
+                patchName,
+                version
+            );
 
             if (res.IsSuccess)
             {
