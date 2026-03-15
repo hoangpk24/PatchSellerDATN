@@ -155,6 +155,47 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+
+
+        public async Task<PatchVersion> GetByFileIdForPublic(string id)
+        {
+            try
+            {
+                var version = await GetPublicQueryWithIncludes()
+                    .FirstOrDefaultAsync(x => x.Links.Contains(id));
+
+                if (version == null)
+                {
+                    return null;
+                }
+
+                var isValid =
+                    version.Status == 1 &&
+                    version.Patch != null &&
+                    version.Patch.Delete != true &&
+                    version.Patch.Status == 1 &&
+                    version.Patch.Game != null &&
+                    version.Patch.Game.Delete != true &&
+                    version.Patch.Game.Status == 1 &&
+                    version.Patch.Game.Publisher != null &&
+                    version.Patch.Game.Publisher.Delete != true &&
+                    version.Patch.Game.Publisher.Status == 1 &&
+                    version.Patch.Game.GameCategories != null &&
+                    version.Patch.Game.GameCategories.Any(gc =>
+                        gc.Delete != true &&
+                        gc.Category != null &&
+                        gc.Category.Delete != true &&
+                        gc.Category.Status == 1);
+
+                return isValid ? version : null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+
         public async Task<List<PatchVersion>> GetByPatchId(int patchId)
         {
             try
