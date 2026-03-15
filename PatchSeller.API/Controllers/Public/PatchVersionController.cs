@@ -159,6 +159,30 @@ namespace PatchSeller.API.Controllers.Public
             }
         }
 
+        [HttpGet("get-by-file-id/{id}")]
+        public async Task<ActionResult<PatchVersionDetailDTO>> GetByFileId(string id)
+        {
+            try
+            {
+                var result = await _patchVersionRepository.GetByFileIdForPublic(id);
+                if (result == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+                }
+                var dto = MapToDetailDTO(result);
+                if (dto == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+                }
+                return Ok(dto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
+
+
         [HttpGet("get-by-patch-id/{patchId}")]
         public async Task<ActionResult<List<PatchVersionDetailDTO>>> GetByPatchId(int patchId)
         {
