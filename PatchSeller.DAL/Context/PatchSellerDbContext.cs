@@ -43,6 +43,8 @@ namespace PatchSeller.DAL.Context
         public DbSet<ActionLog> ActionLogs { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
 
+        public DbSet<InstallLog> InstallLogs { get; set; }
+
 
 
 
