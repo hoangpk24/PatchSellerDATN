@@ -63,6 +63,37 @@ namespace PatchSeller.Web.Services.Admin
             }
         }
 
+        public async Task<ServiceResult<UploadFileResponse>> UploadPatchWithFolderAsync(Stream fileStream, string fileName, string gameName, string patchName, string version)
+        {
+            using var content = new MultipartFormDataContent();
+
+            // File
+            var streamContent = new StreamContent(fileStream);
+            content.Add(streamContent, "file", fileName); // "file" khớp với IFormFile file
+
+            // String params - Đảm bảo không null để tránh lỗi 400
+            content.Add(new StringContent(gameName ?? ""), "gameName");
+            content.Add(new StringContent(patchName ?? ""), "patchName");
+            content.Add(new StringContent(version ?? ""), "version");
+
+            var response = await _httpClient.PostAsync("/WeatherForecast/upload-with-folder", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<UploadFileResponse>();
+                return ServiceResult<UploadFileResponse>.Success(result);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                ? Constant.Constant.Errors[errorCode ?? ""]
+                                : result;
+                return ServiceResult<UploadFileResponse>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
+
         public async Task<ServiceResult<bool>> DeleteFileAsync(string url)
         {
             var response = await _httpClient.GetAsync($"/WeatherForecast/delete-file-google?url={Uri.EscapeDataString(url)}");

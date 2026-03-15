@@ -55,35 +55,61 @@
     </section>
 }
 
-<section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
-    <div class="mb-6 flex items-center gap-2">
-        <MudIcon Icon="@Icons.Material.Filled.Whatshot" Class="!text-purple-500" Size="Size.Large" />
-        <h2 class="text-2xl font-bold text-white xs:text-2xl">Hot Nhất</h2>
-    </div>
+@if (_gameForHome.LstCommingSoon.Any())
+{
+    <section class="mx-auto mt-10 max-w-[1520px] px-3 lg:px-0">
+        <div class="mb-6 flex items-center gap-2">
+            <MudIcon Icon="@Icons.Material.Filled.Whatshot" Class="!text-purple-500" Size="Size.Large" />
+            <h2 class="text-2xl font-bold text-white xs:text-2xl">Hot Nhất</h2>
+        </div>
 
-    <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md border border-solid border-purple-500 px-3 py-4">
-        @for (int i = 0; i < 6; i++)
-        {
-            <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[325px] sm:w-[325px]">
-                <a href="@RouterConfig.Customer.Game" class="flex h-full w-full flex-col gap-4">
-                    <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" class="aspect-[1/1.5] object-cover" />
-
-                    <p class="line-clamp-2 h-12 text-base font-medium text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
-
-                    <p class="text-base text-purple-500">100.000đ</p>
-                </a>
-
-                <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
-                    <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
-                        <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
-                        <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
+        <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md border border-solid border-purple-500 px-3 py-4">
+            @if (_isLoading)
+            {
+                @for (int i = 0; i < 6; i++)
+                {
+                    <div class="flex-shrink-0 lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Class="min-h-[327px] w-full rounded-lg !bg-white/5" Animation="Animation.Wave" />
+                        <MudSkeleton SkeletonType="SkeletonType.Text" Height="36px" Width="90%" Class="mt-2 !bg-white/5" />
+                        <MudSkeleton SkeletonType="SkeletonType.Text" Height="30px" Width="50%" Class="!bg-white/5" />
                     </div>
-                </div>
-            </div>
-        }
-    </div>
-</section>
+                }
+            }
+            else if (_gameForHome.LstHot.Any())
+            {
+                @foreach (var item in _gameForHome.LstHot)
+                {
+                    if (item != null)
+                    {
+                        <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[325px] sm:w-[325px]">
+                            <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
+                                <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
 
+                                <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
+
+                                <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.Patches)">
+                                    @GetPriceDisplay(item?.Patches ?? [])
+                                </p>
+                            </a>
+
+                            <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
+                                <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
+                                    <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))"
+                                             Class="cursor-pointer !text-white transition-colors hover:!text-purple-500"
+                                             Icon="@Icons.Material.Filled.Search" />
+
+                                    <MudIcon @onclick="@(() => HandleToggleWishlist(item.GameId))"
+                                             Class="@(_wishlistedGameIds.Contains(item.GameId) ? "cursor-pointer !text-red-500" : "cursor-pointer !text-white hover:!text-purple-500")"
+                                             Icon="@(_wishlistedGameIds.Contains(item.GameId) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </section>
+}
 <section class="mx-auto mb-10 mt-10 max-w-[1520px] px-3 lg:px-0">
     <div class="mb-6 flex items-center gap-2">
         <MudIcon Icon="@Icons.Material.Filled.Games" Class="!text-purple-500" Size="Size.Large" />

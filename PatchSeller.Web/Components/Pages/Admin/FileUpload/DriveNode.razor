@@ -100,7 +100,7 @@
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var result = await _dialogService.ShowMessageBox(
             "Xác nhận",
-            "Bạn có chắc chắn muốn xóa mục này không?",
+            "Thao tác này cũng sẽ xoá bản vá này ra khỏi hệ thống, hãy thận trọng. Bạn có chắc chắn muốn xóa không?",
             yesText: "Xóa", cancelText: "Hủy");
 
         if (result == true)
