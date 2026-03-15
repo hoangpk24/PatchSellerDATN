@@ -17,7 +17,7 @@ namespace GoogleServiceLib
     {
 
 
-     
+
 
         private string GetIdFromUrl(string url)
         {
@@ -399,6 +399,62 @@ namespace GoogleServiceLib
                 DetailedUrl = $"https://www.virustotal.com/gui/file/{fileHash}",
                 Status = (int)stats.malicious > 0 ? "Malicious" : "Clean"
             };
+        }
+
+        public async Task DownloadFileAsync(string fileUrl, string folderPath, IProgress<double> progress)
+        {
+            var service = await GetServiceAsync(); 
+            var fileId = GetIdFromUrl(fileUrl);
+
+            if (string.IsNullOrEmpty(fileId)) return;
+
+            var requestMetadata = service.Files.Get(fileId);
+            requestMetadata.Fields = "name, size";
+            var file = await requestMetadata.ExecuteAsync();
+
+            string filePath = Path.Combine(folderPath, file.Name);
+            if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                var downloadRequest = service.Files.Get(fileId);
+
+                downloadRequest.MediaDownloader.ProgressChanged += (p) =>
+                {
+                    if (p.Status == Google.Apis.Download.DownloadStatus.Downloading)
+                    {
+                        double pct = (double)p.BytesDownloaded / (file.Size ?? 1) * 100;
+                        progress.Report(Math.Round(pct, 1));
+                    }
+                };
+
+                await downloadRequest.DownloadAsync(fileStream);
+            }
+        }
+
+        public async Task<List<Google.Apis.Drive.v3.Data.File>> FindFilesByChecksumAsync(string targetMd5)
+        {
+            var service = await GetServiceAsync();
+            var foundFiles = new List<Google.Apis.Drive.v3.Data.File>();
+
+            var request = service.Files.List();
+            request.Q = "trashed = false";
+     
+            request.Fields = "files(id, name, md5Checksum, size)";
+            request.PageSize = 100;
+
+            do
+            {
+                var result = await request.ExecuteAsync();
+                var matches = result.Files.Where(f => f.Md5Checksum != null &&
+                                                      f.Md5Checksum.Equals(targetMd5, StringComparison.OrdinalIgnoreCase));
+
+                foundFiles.AddRange(matches);
+                request.PageToken = result.NextPageToken;
+
+            } while (request.PageToken != null);
+
+            return foundFiles;
         }
     }
 

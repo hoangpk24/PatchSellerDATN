@@ -18,5 +18,9 @@ namespace GoogleServiceLib
         public Task<bool> MoveToTrashAsync(string fileOrFolderId);
         public Task<VirusScanReport> ScanFileByIdAsync(string fileId);
         public Task<bool> RenameNodeAsync(string id, string newName);
+
+        public Task DownloadFileAsync(string fileUrl, string folderPath, IProgress<double> progress);
+
+        public Task<List<Google.Apis.Drive.v3.Data.File>> FindFilesByChecksumAsync(string targetMd5);
     }
 }
