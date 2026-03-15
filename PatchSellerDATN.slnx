@@ -2,5 +2,6 @@
   <Project Path="GoogleServiceLib/GoogleServiceLib.csproj" Id="aeb4f663-6f43-4045-9e63-e7ca32b94ebd" />
   <Project Path="PatchSeller.API/PatchSeller.API.csproj" />
   <Project Path="PatchSeller.DAL/PatchSeller.DAL.csproj" />
+  <Project Path="PatchSeller.Launcher/PatchSeller.Launcher.csproj" Id="64b65444-51d9-4020-94ae-9f9e5c5485d5" />
   <Project Path="PatchSeller.Web/PatchSeller.Web.csproj" />
 </Solution>
