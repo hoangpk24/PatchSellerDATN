@@ -100,7 +100,14 @@
                                         <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] rounded-lg object-cover" />
                                         <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
                                         <p class="truncate text-base font-bold text-purple-500">
-                                            @GetPriceDisplay(item.Patches)
+                                            @if (_fullOwnershipStatus.ContainsKey(item.GameId) && _fullOwnershipStatus[item.GameId])
+                                            {
+                                                <span class="text-green-500">Đã sở hữu</span>
+                                            }
+                                            else
+                                            {
+                                                @GetPriceDisplay(item.GameId, item.Patches)
+                                            }
                                         </p>
                                     </a>
 
@@ -146,7 +153,8 @@
     private bool isLoading = true;
     private GameSearchResponse? _searchResult;
     private List<DAL.Models.Category> _lstCategory = [];
-    private List<DAL.Models.Platform> _lstPlatform = [];
+    private List<DAL.Models.Platform> _lstPlatform = []; 
+    private Dictionary<int, bool> _fullOwnershipStatus = new();
 
     private string? _keyword;
     private double? _startMoney;
@@ -187,7 +195,33 @@
     {
         isLoading = true;
         var result = await _gameService.SearchGames(_keyword, _categoryIds, _platformIds, _startMoney, _endMoney, _sort, _currentPage, _perPage);
-        if (result.IsSuccess) _searchResult = result.Data;
+
+        if (result.IsSuccess)
+        {
+            _searchResult = result.Data;
+
+            if (!string.IsNullOrEmpty(_token) && _searchResult?.Games != null)
+            {
+                foreach (var game in _searchResult.Games)
+                {
+                    if (game.Patches != null && game.Patches.Any())
+                    {
+                        bool hasUnownedPatch = false;
+                        foreach (var p in game.Patches)
+                        {
+                            bool isPurchased = await CheckOwnership(p.PatchId);
+                            if (!isPurchased)
+                            {
+                                hasUnownedPatch = true;
+                                break;
+                            }
+                        }
+                        _fullOwnershipStatus[game.GameId] = !hasUnownedPatch;
+                    }
+                }
+            }
+        }
+
         isLoading = false;
         StateHasChanged();
     }
@@ -235,9 +269,22 @@
         }
     }
 
-    private string GetPriceDisplay(List<PatchBasicDTO> patches)
+    async Task<bool> CheckOwnership(int patchId)
     {
+        if (string.IsNullOrEmpty(_token)) return false;
+        var checkPatch = await _userPurchaseService.CheckPatchPurchased(patchId, _token);
+        return checkPatch.IsSuccess && checkPatch.Data;
+    }
+
+    private string GetPriceDisplay(int gameId, List<PatchBasicDTO> patches)
+    {
+        if (_fullOwnershipStatus.ContainsKey(gameId) && _fullOwnershipStatus[gameId])
+        {
+            return "Đã sở hữu";
+        }
+
         if (patches == null || !patches.Any()) return "Liên hệ";
+
         var prices = patches.Select(p => p.Price).OrderBy(p => p).ToList();
         double minPrice = prices.First();
         double maxPrice = prices.Last();

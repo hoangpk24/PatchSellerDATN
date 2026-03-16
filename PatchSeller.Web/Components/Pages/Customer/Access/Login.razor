@@ -20,6 +20,7 @@
                 <MudTextField T="string"
                               @bind-Value="_model.UserName"
                               For="@(() => _model.UserName)"
+                              Placeholder="example@gmail.com"
                               Variant="Variant.Outlined"
                               Margin="Margin.Dense" />
             </div>
@@ -33,6 +34,7 @@
                               For="@(() => _model.PasswordHash)"
                               Variant="Variant.Outlined"
                               Margin="Margin.Dense"
+                              Placeholder="******"
                               InputType="@(_passwordVisibility ? InputType.Text : InputType.Password)"
                               Adornment="Adornment.End"
                               AdornmentIcon="@(_passwordVisibility ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"

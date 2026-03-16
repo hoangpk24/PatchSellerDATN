@@ -191,6 +191,58 @@
                                     </div>
                                 </div>
                             }
+                        } else
+                        {
+                            <div class="flex w-full flex-nowrap items-center gap-4 overflow-x-auto pb-2">
+                                @foreach (var item in _lstDiscount)
+                                {
+                                    <div class="relative flex min-h-[140px] min-w-[400px] max-w-[400px] overflow-hidden rounded-xl border border-white/5 bg-[#1e1e1e]">
+                                        <div class="flex w-32 flex-col items-center justify-center bg-purple-600 p-4 text-white">
+                                            <span class="text-xs font-medium uppercase opacity-80">Giảm</span>
+                                            <div class="flex items-baseline">
+                                                <span class="text-2xl font-bold">
+                                                    @(item.DiscountType == Constant.DiscountTypePercent ? $"{item.Value}%" : item.Value.ToString("N0"))
+                                                </span>
+                                                @if (item.DiscountType != Constant.DiscountTypePercent)
+                                                {
+                                                    <span class="ml-0.5 text-xs">đ</span>
+                                                }
+                                            </div>
+                                            <div class="mt-2 h-[1px] w-8 bg-white/30"></div>
+                                        </div>
+
+                                        <div class="absolute -top-3 left-[120px] h-6 w-6 rounded-full bg-[#121212]"></div>
+                                        <div class="absolute -bottom-3 left-[120px] h-6 w-6 rounded-full bg-[#121212]"></div>
+
+                                        <div class="flex flex-1 flex-col justify-between p-4 pl-6">
+                                            <div>
+                                                <h3 class="line-clamp-1 font-bold text-white">Mã: @item.Code</h3>
+                                                <div class="mt-1 space-y-1 text-xs text-gray-400">
+                                                    <p>• Đơn tối thiểu: <span class="text-white">@(item.MinOrderValue?.ToString("N0") ?? "0")đ</span></p>
+                                                    @if (item.MaxDiscount.HasValue)
+                                                    {
+                                                        <p>• Giảm tối đa: <span class="text-white">@item.MaxDiscount.Value.ToString("N0")đ</span></p>
+                                                    }
+                                                    <p>• Hạn dùng: <span class="text-purple-400">@item.EndDate.ToString("dd/MM/yyyy")</span></p>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
+                                                <div class="flex flex-col">
+                                                    <span class="uppercase text-[10px] text-gray-500">Đã dùng</span>
+                                                    <div class="h-1.5 w-24 overflow-hidden rounded-full bg-gray-800">
+                                                        <div class="h-full bg-purple-500" style="width: @(CalculateUsage(item))%"></div>
+                                                    </div>
+                                                </div>
+                                                <button @onclick="() => CopyDiscountToClipboard(item.Code)"
+                                                        class="rounded-lg bg-white/5 px-4 py-1.5 text-xs font-bold text-white transition-all hover:bg-purple-500">
+                                                    SAO CHÉP
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
                         }
                     }
                     else
@@ -443,6 +495,7 @@
     PatchVersionBasicDTO _patchVersionDetail = new PatchVersionBasicDTO();
     ReviewModel _reviewModel = new ReviewModel();
     private HashSet<int> _wishlistedGameIds = new HashSet<int>();
+    List<DAL.Models.Discount> _lstDiscount = [];
 
     int _patchSelect = 0;
     bool _isReviewed = false;
@@ -542,6 +595,12 @@
                     await CheckOwnership(obj.PatchId);
                 }
             };
+        }
+
+        var resDiscount = await _discountService.GetDiscountCodes(_token);
+        if (resDiscount.IsSuccess && resDiscount.Data != null)
+        {
+            _lstDiscount = resDiscount.Data;
         }
     }
 
@@ -914,6 +973,18 @@
 
             StateHasChanged();
         }
+    }
+
+    private double CalculateUsage(DAL.Models.Discount discount)
+    {
+        if (discount.UsageLimit <= 0) return 0;
+        return ((double)discount.UsedCount / discount.UsageLimit) * 100;
+    }
+
+    private async Task CopyDiscountToClipboard(string code)
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", code);
+        _snackbar.Add($"Đã sao chép mã {code}", MudBlazor.Severity.Success);
     }
 }
 

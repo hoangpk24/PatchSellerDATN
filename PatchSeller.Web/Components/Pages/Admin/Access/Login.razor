@@ -21,6 +21,7 @@ else
                         Tài khoản
                     </label>
                     <MudTextField T="string"
+                    Placeholder="admin"
                     @bind-Value="_model.UserName"
                     For="@(() => _model.UserName)"
                     Variant="Variant.Outlined"
@@ -33,6 +34,7 @@ else
                     </label>
                     <MudTextField T="string"
                     @bind-Value="_model.PasswordHash"
+                    Placeholder="*********"
                     For="@(() => _model.PasswordHash)"
                     Variant="Variant.Outlined"
                     Margin="Margin.Dense"

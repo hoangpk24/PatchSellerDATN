@@ -87,8 +87,8 @@
 
                                 <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
 
-                                <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.Patches)">
-                                    @GetPriceDisplay(item?.Patches ?? [])
+                                <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.GameId, item.Patches)">
+                                    @GetPriceDisplay(item.GameId, item?.Patches ?? [])
                                 </p>
                             </a>
 
@@ -140,8 +140,8 @@
 
                             <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
 
-                            <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.Patches)">
-                                @GetPriceDisplay(item?.Patches ?? [])
+                            <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.GameId, item.Patches)">
+                                @GetPriceDisplay(item.GameId, item?.Patches ?? [])
                             </p>
                         </a>
 
@@ -229,8 +229,10 @@
     public string _token { get; set; }
 
     GameForHomeResponse _gameForHome = new GameForHomeResponse();
+    private Dictionary<int, bool> _fullOwnershipStatus = new();
 
     bool _isLoading = false;
+    bool _isOwned = false;
 
     CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
     private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
@@ -256,6 +258,32 @@
         if (resGame.IsSuccess)
         {
             _gameForHome = resGame.Data;
+
+            if (!string.IsNullOrEmpty(_token))
+            {
+                var allGames = _gameForHome.LstHot
+                    .Concat(_gameForHome.LstNew)
+                    .Concat(_gameForHome.LstCommingSoon)
+                    .Where(g => g != null);
+
+                foreach (var game in allGames)
+                {
+                    if (game.Patches != null && game.Patches.Any())
+                    {
+                        bool hasUnownedPatch = false;
+                        foreach (var p in game.Patches)
+                        {
+                            bool isPurchased = await CheckOwnership(p.PatchId);
+                            if (!isPurchased)
+                            {
+                                hasUnownedPatch = true;
+                                break;
+                            }
+                        }
+                        _fullOwnershipStatus[game.GameId] = !hasUnownedPatch;
+                    }
+                }
+            }
             await LoadUserWishlist();
         }
     }
@@ -292,8 +320,32 @@
         }
     }
 
-    private string GetPriceDisplay(List<PatchBasicDTO> patches)
+    async Task<bool> CheckOwnership(int patchId)
     {
+        if (string.IsNullOrEmpty(_token))
+        {
+            return false;
+
+        }
+
+        var checkPatch = await _userPurchaseService.CheckPatchPurchased(patchId, _token);
+        if (checkPatch.IsSuccess)
+        {
+            return checkPatch.Data;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private string GetPriceDisplay(int gameId, List<PatchBasicDTO> patches)
+    {
+        if (_fullOwnershipStatus.ContainsKey(gameId) && _fullOwnershipStatus[gameId])
+        {
+            return "Đã sở hữu";
+        }
+
         if (patches == null || !patches.Any())
         {
             return "Liên hệ";
