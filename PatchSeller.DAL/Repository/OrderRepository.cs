@@ -29,11 +29,50 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<Order>> GetAllByKeyword(int? status, string? keyword, DateTime? startDate, DateTime? endDate)
+        {
+            try
+            {
+                var query = _context.Orders
+                    .Include(x => x.User)
+                    .Where(x => x.OrderId !=-1);
+
+                if (status.HasValue)
+                {
+                    query = query.Where(x => x.Status == status.Value);
+                }
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(x => x.OrderCode.Contains(keyword)
+                        || (x.User != null && (x.User.FullName.Contains(keyword)
+                                            || x.User.Email.Contains(keyword)
+                                            || x.User.PhoneNumber.Contains(keyword))));
+                }
+
+                if (startDate.HasValue)
+                {
+                    query = query.Where(x => x.OrderDate >= startDate.Value);
+                }
+
+                if (endDate.HasValue)
+                {
+                    query = query.Where(x => x.OrderDate <= endDate.Value);
+                }
+
+                return await query.OrderByDescending(x => x.OrderDate).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public async Task<List<Order>> GetAllByUserId(int userId)
         {
             try
             {
-                return await _context.Orders.Where(x=>x.UserId == userId).ToListAsync();
+                return await _context.Orders.Where(x => x.UserId == userId).ToListAsync();
             }
             catch (Exception)
             {

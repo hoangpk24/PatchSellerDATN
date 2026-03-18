@@ -146,6 +146,19 @@ namespace PatchSeller.API.Controllers.Admin
             return Ok(listOrderDetail);
         }
 
+        [HttpGet("get-all-by-keyword")]
+        public async Task<ActionResult<List<OrderDetailResponseDTO>>> GetAllOrderByKeyWord(int? status, string? keyword, DateTime? startDate, DateTime? endDate)
+        {          
+            var orders = await _orderRepository.GetAllByKeyword(status,keyword,startDate,endDate);
+            List<OrderDetailResponseDTO> listOrderDetail = new List<OrderDetailResponseDTO>();
+            foreach (var order in orders)
+            {
+                var obj = await _orderRepository.GetByIdWithDetails(order.OrderId);
+                listOrderDetail.Add(MapToOrderDetailResponse(obj));
+            }
+            return Ok(listOrderDetail);
+        }
+
 
 
     }
