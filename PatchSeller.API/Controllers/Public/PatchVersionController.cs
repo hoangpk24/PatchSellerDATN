@@ -74,6 +74,27 @@ namespace PatchSeller.API.Controllers.Public
                 return StatusCode(500, Constant.ErrorCode.OtherError);
             }
         }
+         [HttpGet("get-all-by-keyword/{keyword}")]
+         public async Task<ActionResult<List<PatchVersionDetailDTO>>> GetAllByKeyword(string keyword)
+         {
+            try
+            {
+                var result = await _patchVersionRepository.GetAllByKeyword(keyword);
+                if (result == null)
+                {
+                    return Ok(new List<PatchVersionDetailDTO>());
+                }
+                var dtos = result.Select(MapToDetailDTO)
+                                 .Where(dto => dto != null)
+                                 .ToList();
+                return Ok(dtos);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+
+         }
         [HttpGet("download/{id}")]
         public async Task<ActionResult<string>> DownloadPatchVersion(int id)
         {

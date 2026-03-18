@@ -35,6 +35,26 @@ namespace PatchSeller.DAL.Repository
                 .Include(pv => pv.PatchImages)
                 .Where(pv => pv.Delete != true);
         }
+        public async Task<List<PatchVersion>> GetAllByKeyword(string keyword)
+        {
+            try
+            {
+                var query = _context.PatchVersions
+                    .Where(pv => pv.Delete != true) 
+                    .Where(pv =>
+                        (pv.Patch != null && pv.Patch.Name.Contains(keyword)) ||
+                        (pv.VersionName.Contains(keyword)) ||
+                        (pv.Patch != null && pv.Patch.Game != null && pv.Patch.Game.Title.Contains(keyword))
+                    );
+
+                return await query.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+               
+                throw;
+            }
+        }
 
         public async Task<List<PatchVersion>> GetAll()
         {
