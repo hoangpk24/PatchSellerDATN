@@ -91,7 +91,7 @@
             public const string PatchVersionDelete = "/admin/patch-version/delete/:id";
 
             // Order
-            public const string Orders = "/admin/order/get-all";
+            public const string Orders = "/admin/order/get-all-by-keyword";
             public const string OrderDetail = "/admin/order/get-order-detail/:id";
 
             // Review

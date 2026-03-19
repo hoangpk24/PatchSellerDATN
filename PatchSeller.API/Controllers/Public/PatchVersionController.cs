@@ -75,7 +75,7 @@ namespace PatchSeller.API.Controllers.Public
             }
         }
          [HttpGet("get-all-by-keyword/{keyword}")]
-         public async Task<ActionResult<List<PatchVersionDetailDTO>>> GetAllByKeyword(string keyword)
+         public async Task<ActionResult<List<PatchVersionDetailDTO>>> GetAllByKeyword(string? keyword = null)
          {
             try
             {
