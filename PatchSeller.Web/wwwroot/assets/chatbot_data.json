@@ -1,0 +1,179 @@
+[
+  {
+    "Id": 1,
+    "Text": "Tôi muốn mua Game",
+    "Children": [
+      {
+        "Id": 11,
+        "Text": "Cách thanh toán qua Ngân hàng",
+        "Children": [
+          {
+            "Id": 111,
+            "Text": "Thanh toán qua QR Code",
+            "Response": "Bạn chỉ cần quét mã hiển thị ở bước thanh toán."
+          },
+          {
+            "Id": 112,
+            "Text": "Chuyển khoản thủ công",
+            "Response": "STK: 123456789 - Nội dung: Mã đơn hàng."
+          }
+        ]
+      },
+      {
+        "Id": 12,
+        "Text": "Chính sách hoàn tiền",
+        "Response": "Chúng tôi hoàn tiền nếu Game lỗi trong vòng 24h."
+      }
+    ]
+  },
+  {
+    "Id": 2,
+    "Text": "Hỗ trợ kỹ thuật",
+    "Children": [
+      {
+        "Id": 21,
+        "Text": "Lỗi cài đặt Việt Hóa",
+        "Children": [
+          {
+            "Id": 211,
+            "Text": "Lỗi văng game (Crash)",
+            "Response": "Bạn hãy kiểm tra lại phiên bản Game gốc có khớp với Patch không."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 3,
+    "Text": "Mua Patch Việt Hóa",
+    "Children": [
+      {
+        "Id": 31,
+        "Text": "Các game có sẵn",
+        "Response": "Chúng tôi có nhiều game việt hóa như: Elden Ring, Dark Souls, Witcher, Baldur's Gate 3 và nhiều game khác. Bạn có thể xem danh sách đầy đủ tại mục Game của chúng tôi."
+      },
+      {
+        "Id": 32,
+        "Text": "Giá Patch",
+        "Children": [
+          {
+            "Id": 321,
+            "Text": "Giá bao nhiêu?",
+            "Response": "Giá Patch dao động từ 50.000đ đến 200.000đ tùy theo độ lớn của game và công việc việt hóa. Bạn có thể xem chi tiết giá tại trang sản phẩm."
+          },
+          {
+            "Id": 322,
+            "Text": "Có giảm giá không?",
+            "Response": "Chúng tôi thường xuyên có các chương trình giảm giá vào dịp lễ. Bạn có thể theo dõi fanpage để cập nhật thông tin mới nhất."
+          }
+        ]
+      },
+      {
+        "Id": 33,
+        "Text": "Cách mua hàng",
+        "Response": "Bạn chọn game/patch -> Thêm vào giỏ hàng -> Thanh toán -> Tải về sau khi thanh toán thành công."
+      }
+    ]
+  },
+  {
+    "Id": 4,
+    "Text": "Tải và Cài đặt",
+    "Children": [
+      {
+        "Id": 41,
+        "Text": "Cách tải Patch",
+        "Response": "Sau khi mua thành công, vào mục 'Tải về' trong tài khoản của bạn để tải file Patch."
+      },
+      {
+        "Id": 42,
+        "Text": "Cài đặt Patch Việt Hóa",
+        "Children": [
+          {
+            "Id": 421,
+            "Text": "Hướng dẫn cài đặt",
+            "Response": "1. Giải nén file Patch.\n2. Copy các file vào thư mục cài đặt game.\n3. Chạy file setup để cài đặt.\n4. Khởi động game và tận hưởng."
+          },
+          {
+            "Id": 422,
+            "Text": "Yêu cầu phiên bản Game",
+            "Response": "Mỗi Patch yêu cầu phiên bản Game gốc cụ thể. Vui lòng kiểm tra thông tin phiên bản yêu cầu trong trang sản phẩm trước khi mua."
+          }
+        ]
+      },
+      {
+        "Id": 43,
+        "Text": "Lỗi thường gặp",
+        "Children": [
+          {
+            "Id": 431,
+            "Text": "Game bị crash khi chạy",
+            "Response": "Hãy kiểm tra: 1) Phiên bản game có khớp với Patch không. 2) Đã cài đặt các yêu cầu (VC++ Redist, DirectX). 3) Chạy game với quyền Administrator."
+          },
+          {
+            "Id": 432,
+            "Text": "Text vẫn còn tiếng Anh",
+            "Response": "Thử xóa file ngôn ngữ cũ trong thư mục game và cài đặt lại Patch. Đảm bảo không cài đặt thêm các mod language khác."
+          },
+          {
+            "Id": 433,
+            "Text": "Font chữ hiển thị sai",
+            "Response": "Vấn đề này thường do thiếu font tiếng Việt. Hãy tải và cài đặt bộ font tiếng Việt đi kèm theo Patch."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Id": 5,
+    "Text": "Tài khoản & Đơn hàng",
+    "Children": [
+      {
+        "Id": 51,
+        "Text": "Quản lý tài khoản",
+        "Children": [
+          {
+            "Id": 511,
+            "Text": "Đăng ký tài khoản",
+            "Response": "Bạn click vào nút 'Đăng ký' và điền thông tin: tên đăng nhập, email, mật khẩu. Sau đó xác nhận email để kích hoạt tài khoản."
+          },
+          {
+            "Id": 512,
+            "Text": "Quên mật khẩu",
+            "Response": "Click 'Quên mật khẩu' ở trang đăng nhập, nhập email đã đăng ký. Chúng tôi sẽ gửi link đặt lại mật khẩu cho bạn."
+          }
+        ]
+      },
+      {
+        "Id": 52,
+        "Text": "Xem lịch sử mua hàng",
+        "Response": "Vào mục 'Lịch sử mua hàng' trong tài khoản để xem tất cả các đơn hàng đã mua và trạng thái."
+      },
+      {
+        "Id": 53,
+        "Text": "Kiểm tra mã đơn hàng",
+        "Response": "Mã đơn hàng được gửi qua email sau khi thanh toán thành công. Bạn cũng có thể xem trong mục 'Đơn hàng' của tài khoản."
+      }
+    ]
+  },
+  {
+    "Id": 6,
+    "Text": "Chính sách & Hỗ trợ",
+    "Children": [
+      {
+        "Id": 61,
+        "Text": "Chính sách bảo hành",
+        "Response": "Chúng tôi bảo hành Patch trong vòng 7 ngày nếu có lỗi kỹ thuật. Vui liên hệ hotline hoặc chat để được hỗ trợ."
+      },
+      {
+        "Id": 62,
+        "Text": "Liên hệ hỗ trợ",
+        "Response": "Bạn có thể liên hệ qua: Email hỗ trợ, Chat trực tuyến, hoặc Fanpage chính thức. Thời gian hỗ trợ: 8h - 22h hàng ngày."
+      },
+      {
+        "Id": 63,
+        "Text": "Yêu cầu patch mới",
+        "Response": "Gửi yêu cầu qua email hoặc chat với chúng tôi. Chúng tôi sẽ đánh giá và phản hồi trong vòng 24-48 giờ."
+      }
+    ]
+  }
+]
