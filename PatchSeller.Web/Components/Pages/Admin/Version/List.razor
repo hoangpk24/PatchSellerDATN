@@ -9,8 +9,21 @@
         <a href="@RouterConfig.Admin.CreateVersion" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
     </div>
 
+    <div class="mt-8 rounded bg-white p-6 shadow-md">
+        <div class="grid w-full grid-cols-3 gap-x-6 gap-y-4">
+            <div>
+                <MudTextField T="string" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Value="@_searchValue"
+                              AdornmentIcon="@Icons.Material.Filled.Search" Variant="Variant.Outlined" IconSize="Size.Medium" Class="mt-0" Style="height: 44px" ValueChanged="onChangeSearch" Immediate=true></MudTextField>
+            </div>
+            <div class="flex items-center gap-2">
+                <MudButton Variant="Variant.Outlined" OnClick="OnSearch" Class="h-11 w-full"><MudIcon Icon="@Icons.Material.Filled.Search" Class="mr-2" /> Tìm kiếm</MudButton>
+                <MudButton Variant="Variant.Outlined" OnClick="OnReset" Class="h-11 w-full"><MudIcon Icon="@Icons.Material.Filled.Filter" Class="mr-2" /> Đặt lại</MudButton>
+            </div>
+        </div>
+    </div>
+
     <div class="mt-8 rounded bg-white shadow-md">
-        <MudTable Items="@_lstPatchVersion" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100lvh - 233px)">
+        <MudTable Items="@_lstPatchVersion" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100lvh - 357px)">
             <HeaderContent>
                 <MudTh Class="whitespace-nowrap" hidden><MudTableSortLabel SortLabel="Id" T="string" hidden>STT</MudTableSortLabel></MudTh>
                 <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Thuộc game</MudTableSortLabel></MudTh>
@@ -87,7 +100,7 @@
 
     async Task LoadData()
     {
-        var res = await _adminPatchVersionService.GetAll();
+        var res = await _adminPatchVersionService.GetAll(_searchValue);
         var data = res.Data;
         if (res.IsSuccess && data != null)
         {
@@ -104,6 +117,22 @@
             navigation.NavigateTo(RouterConfig.Admin.Category);
         }
         StateHasChanged();
+    }
+
+    private void onChangeSearch(string value)
+    {
+        _searchValue = value.Trim();
+    }
+
+    private async Task OnSearch()
+    {
+        await LoadData();
+    }
+
+    private async Task OnReset()
+    {
+        _searchValue = string.Empty;
+        await LoadData();
     }
 
     async Task OpenDialogDelete(int id)

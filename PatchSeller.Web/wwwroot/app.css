@@ -751,6 +751,10 @@ video {
   margin-left: 0px !important;
 }
 
+.\!mt-0 {
+  margin-top: 0px !important;
+}
+
 .\!mt-1 {
   margin-top: 0.25rem !important;
 }
@@ -2409,6 +2413,11 @@ video {
 .text-amber-600 {
   --tw-text-opacity: 1;
   color: rgb(217 119 6 / var(--tw-text-opacity, 1));
+}
+
+.text-black {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity, 1));
 }
 
 .text-black-default2 {
