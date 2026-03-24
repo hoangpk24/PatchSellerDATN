@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>rocket.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="rocket.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="SharpCompress" Version="0.47.0" />

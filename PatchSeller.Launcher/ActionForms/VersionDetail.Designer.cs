@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VersionDetail));
             parentTabControl = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
@@ -70,7 +71,11 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(parentTabControl);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "VersionDetail";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "VersionDetail";
             parentTabControl.ResumeLayout(false);
             ResumeLayout(false);

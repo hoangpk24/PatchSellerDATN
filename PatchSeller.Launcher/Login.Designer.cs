@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
             label1 = new Label();
             label2 = new Label();
             txtUserName = new TextBox();
             txtPassword = new TextBox();
             label3 = new Label();
             bntLogin = new Button();
-            label4 = new Label();
+            linkLabel1 = new LinkLabel();
             SuspendLayout();
             // 
             // label1
@@ -90,28 +91,33 @@
             bntLogin.UseVisualStyleBackColor = true;
             bntLogin.Click += bntLogin_Click;
             // 
-            // label4
+            // linkLabel1
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(50, 187);
-            label4.Name = "label4";
-            label4.Size = new Size(94, 15);
-            label4.TabIndex = 6;
-            label4.Text = "Quên mật khẩu?";
+            linkLabel1.AutoSize = true;
+            linkLabel1.Location = new Point(50, 191);
+            linkLabel1.Name = "linkLabel1";
+            linkLabel1.Size = new Size(94, 15);
+            linkLabel1.TabIndex = 6;
+            linkLabel1.TabStop = true;
+            linkLabel1.Text = "Quên mật khẩu?";
             // 
             // Login
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(399, 236);
-            Controls.Add(label4);
+            Controls.Add(linkLabel1);
             Controls.Add(bntLogin);
             Controls.Add(label3);
             Controls.Add(txtPassword);
             Controls.Add(txtUserName);
             Controls.Add(label2);
             Controls.Add(label1);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MinimizeBox = false;
             Name = "Login";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "ITeam Login";
             ResumeLayout(false);
             PerformLayout();
@@ -125,6 +131,6 @@
         private TextBox txtPassword;
         private Label label3;
         private Button bntLogin;
-        private Label label4;
+        private LinkLabel linkLabel1;
     }
 }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PatchDetail));
             bntSetup = new Button();
             dtgListVersion = new DataGridView();
             bntDetail = new Button();
@@ -144,7 +145,11 @@
             Controls.Add(bntDetail);
             Controls.Add(dtgListVersion);
             Controls.Add(bntSetup);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "PatchDetail";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Detail";
             ((System.ComponentModel.ISupportInitialize)dtgListVersion).EndInit();
             ResumeLayout(false);

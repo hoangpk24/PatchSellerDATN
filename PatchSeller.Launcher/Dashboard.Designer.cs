@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Dashboard));
             dtgListPatch = new DataGridView();
             lblWelcome = new Label();
             label2 = new Label();
@@ -156,7 +157,11 @@
             Controls.Add(label2);
             Controls.Add(lblWelcome);
             Controls.Add(dtgListPatch);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "Dashboard";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Dashboard";
             ((System.ComponentModel.ISupportInitialize)dtgListPatch).EndInit();
             ResumeLayout(false);

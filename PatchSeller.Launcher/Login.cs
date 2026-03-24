@@ -11,6 +11,19 @@ namespace PatchSeller.Launcher
         public Login()
         {
             InitializeComponent();
+            linkLabel1.Links.Add(0, linkLabel1.Text.Length, "http://localhost:5001/forgot-password");
+            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            
+            var url = e.Link.LinkData.ToString();
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
         }
 
         private async void bntLogin_Click(object sender, EventArgs e)
