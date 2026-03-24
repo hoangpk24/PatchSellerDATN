@@ -14,9 +14,13 @@ namespace PatchSeller.Web.Services.Admin
             _httpClient = httpClient;
         }
 
-        public async Task<ServiceResult<List<PatchVersionDetailResponse>>> GetAll()
+        public async Task<ServiceResult<List<PatchVersionDetailResponse>>> GetAll(string? keyword = null)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.PatchVersionGetAll);
+            var url = string.IsNullOrEmpty(keyword)
+                      ? Constant.EndPointApi.Admin.PatchVersionGetAll
+                      : $"{Constant.EndPointApi.Admin.PatchVersionGetAll}?keyword={keyword}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             var response = await _httpClient.SendAsync(request);
 

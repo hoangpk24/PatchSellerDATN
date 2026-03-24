@@ -35,23 +35,31 @@ namespace PatchSeller.DAL.Repository
                 .Include(pv => pv.PatchImages)
                 .Where(pv => pv.Delete != true);
         }
-        public async Task<List<PatchVersion>> GetAllByKeyword(string keyword)
+        public async Task<List<PatchVersion>> GetAllByKeyword(string? keyword = null)
         {
             try
             {
                 var query = _context.PatchVersions
-                    .Where(pv => pv.Delete != true) 
-                    .Where(pv =>
-                        (pv.Patch != null && pv.Patch.Name.Contains(keyword)) ||
-                        (pv.VersionName.Contains(keyword)) ||
-                        (pv.Patch != null && pv.Patch.Game != null && pv.Patch.Game.Title.Contains(keyword))
+                    .AsNoTracking()
+                    .Include(pv => pv.Patch)
+                    .ThenInclude(p => p.Game)
+                    .Where(pv => pv.Delete != true);
+
+                if (!string.IsNullOrWhiteSpace(keyword))
+                {
+                    var lowerKeyword = keyword.ToLower();
+
+                    query = query.Where(pv =>
+                        (pv.VersionName != null && pv.VersionName.ToLower().Contains(lowerKeyword)) ||
+                        (pv.Patch != null && pv.Patch.Name != null && pv.Patch.Name.ToLower().Contains(lowerKeyword)) ||
+                        (pv.Patch != null && pv.Patch.Game != null && pv.Patch.Game.Title != null && pv.Patch.Game.Title.ToLower().Contains(lowerKeyword))
                     );
+                }
 
                 return await query.ToListAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-               
                 throw;
             }
         }

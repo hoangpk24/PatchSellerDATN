@@ -56,11 +56,11 @@ namespace PatchSeller.API.Controllers.Admin
         }
 
         [HttpGet("get-all")]
-        public async Task<ActionResult<List<PatchVersionDetailDTO>>> GetAll()
+        public async Task<ActionResult<List<PatchVersionDetailDTO>>> GetAll(string? keyword = null)
         {
             try
             {
-                var result = await _patchVersionRepository.GetAll();
+                var result = await _patchVersionRepository.GetAllByKeyword(keyword);
                 if (result == null)
                 {
                     return NoContent();

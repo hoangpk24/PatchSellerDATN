@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json.Linq;
+using PatchSeller.DAL.Models;
 using PatchSeller.Web.DTOs;
 using PatchSeller.Web.Models;
 
@@ -13,10 +15,30 @@ namespace PatchSeller.Web.Services.Admin
             _httpClient = httpClient;
         }
 
-        public async Task<ServiceResult<List<OrderWithDetailResponse>>> GetAll(string token)
+        public async Task<ServiceResult<List<OrderWithDetailResponse>>> GetAllByKeyword(string token, int? status = null, string? keyword = null, DateTime? startDate = null, DateTime? endDate = null)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.Orders);
+            var queryParams = new Dictionary<string, string?>();
 
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                queryParams.Add("keyword", keyword);
+            }
+            if (status != null && status > 0)
+            {
+                queryParams.Add("status", status.ToString());
+            }
+            if (startDate.HasValue)
+            {
+                queryParams.Add("startDate", startDate?.ToString("o"));
+            }
+            if (endDate.HasValue)
+            {
+                queryParams.Add("endDate", endDate?.ToString("o"));
+            }
+
+            var url = QueryHelpers.AddQueryString(Constant.EndPointApi.Admin.Orders, queryParams);
+
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             if (!string.IsNullOrEmpty(token))
             {
