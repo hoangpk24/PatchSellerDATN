@@ -169,7 +169,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="space-y-2">
+                                        @* <div class="space-y-2">
                                             <div class="flex items-center gap-2 text-red-400">
                                                 <MudIcon Icon="@Icons.Material.Filled.VpnKey" Size="Size.Small" />
                                                 <span class="text-xs font-bold uppercase tracking-wider">Mật khẩu giải nén</span>
@@ -187,7 +187,7 @@
                                                 }
                                             </div>
                                             <p class="italic text-[10px] text-white/30">* Vui lòng dùng WinRAR/7-Zip mới nhất</p>
-                                        </div>
+                                        </div> *@
                                     </div>
                                 </div>
                             }
@@ -935,17 +935,17 @@
 
     async Task HandleDownload()
     {
-        if (_patchVersionDetail == null) return;
+        // if (_patchVersionDetail == null) return;
 
-        var res = await _gameService.DownloadPatch(_patchVersionDetail.PatchVersionId, _token);
+        // var res = await _gameService.DownloadPatch(_patchVersionDetail.PatchVersionId, _token);
 
-        if(res.IsSuccess)
-        {
-            await JS.InvokeVoidAsync("open", res.Data, "_blank");
-        } else
-        {
-            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng thử lại!", MudBlazor.Severity.Error);
-        }
+        // if(res.IsSuccess)
+        // {
+        await JS.InvokeVoidAsync("open", "https://drive.google.com/file/d/10RMjiNwK85I_4fUOIKYPu6amogIxN2Ug/view?usp=drive_link", "_blank");
+        // } else
+        // {
+        //     _snackbar.Add("Đã có lỗi xảy ra. Vui lòng thử lại!", MudBlazor.Severity.Error);
+        // }
     }
 
     async Task CheckWishlistStatus()
