@@ -328,6 +328,7 @@ namespace PatchSeller.API.Controllers.Public
             try
             {
                 OrderDetailRepository orderDetailRepository = new OrderDetailRepository();
+                RankRepository rankRepository = new RankRepository();
                 var order = await _orderRepository.GetById(orderId);
                 if (order == null)
                 {
@@ -336,6 +337,28 @@ namespace PatchSeller.API.Controllers.Public
                 order.PaymentStatus = Constant.PaymentStatus.PaymentCompleted;
                 order.Status = Constant.OrderStatus.OrderDone;
                 await _orderRepository.Update(order);
+                var userIdClaim = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
+                List<Order> listOrderInLast3Months = await _orderRepository.GetAllByUserId(int.Parse(userIdClaim.ToString()));
+
+                DateTime threeMonthsAgo = DateTime.Now.AddMonths(-3);
+                listOrderInLast3Months = listOrderInLast3Months.Where(x => x.OrderDate >= threeMonthsAgo).ToList();
+
+                double totalSpend = listOrderInLast3Months.Sum(x => x.FinalAmount);
+
+                List<Rank> listRank = await rankRepository.GetAll(null);
+
+                var highestRank = listRank
+                    .Where(r => r.Delete == false && r.Status == 1 && r.MiniumSpend <= totalSpend)
+                    .OrderByDescending(r => r.MiniumSpend)
+                    .FirstOrDefault();
+
+                if (highestRank != null)
+                {
+                    UserRepository userRepo = new UserRepository();
+                    var usr = await userRepo.GetById(int.Parse(userIdClaim.ToString()));
+                    usr.RankId = highestRank.RankId;
+                    await userRepo.Update(usr);
+                }
 
                 UserPurchaseRepository userPurchaseRepository = new UserPurchaseRepository();
                 List<OrderDetail> listOrderDetail = await orderDetailRepository.GetByOrderId(orderId);
