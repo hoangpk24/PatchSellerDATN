@@ -110,9 +110,15 @@ namespace PatchSeller.Web.Services.Customer
             }
         }
 
-        public async Task<ServiceResult<DAL.Models.Order>> PaymentSuccess(int orderId)
+        public async Task<ServiceResult<DAL.Models.Order>> PaymentSuccess(int orderId, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Put, Constant.EndPointApi.Customer.PaymentSuccess + $"?orderId={orderId}");
+            if(!string.IsNullOrEmpty(token))
+            {
+                var formatToken = token.Trim('"');
+                request.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", formatToken);
+            }
             var response = await _httpClient.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
