@@ -275,7 +275,7 @@ namespace PatchSeller.API.Controllers.Admin
                     Description = dto.Description,
                     Thumbnail = dto.Thumbnail,
                     ReleaseDate = dto.ReleaseDate,
-                    Status = dto.Status > 0 ? dto.Status : 1,
+                    Status = dto.Status > -1 ? dto.Status : 1,
                     Delete = dto.Delete,
                     PublisherId = dto.PublisherId >= 0 ? dto.PublisherId : -1
                 };

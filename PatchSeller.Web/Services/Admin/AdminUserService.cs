@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
 using PatchSeller.DAL.Models;
 using PatchSeller.Web.DTOs;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace PatchSeller.Web.Services.Admin
 {
@@ -11,6 +13,24 @@ namespace PatchSeller.Web.Services.Admin
         public AdminUserService(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public string HashPassword(string password)
+        {
+            // 4297F44B13955235245B2497399D7A93 (123123)
+            // 26dc318942685872cf79c5eb96c9bb13 (Admin@12345)
+            // b855e41c5c5f5061ecba4fd8613a7760 (User@12345)
+            MD5 md5 = MD5.Create();
+            byte[] inputBytes = Encoding.ASCII.GetBytes(password);
+            byte[] hash = md5.ComputeHash(inputBytes);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+            md5.Clear();
+            return sb.ToString();
+
         }
 
         public async Task<ServiceResult<List<User>>> GetAll(string? keyword = null, int? rankId = null)
@@ -73,6 +93,13 @@ namespace PatchSeller.Web.Services.Admin
         public async Task<ServiceResult<User>> CreateUser(User user)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, Constant.EndPointApi.Admin.UserCreate);
+
+            if (!string.IsNullOrEmpty(user.PasswordHash))
+            {
+                string passwordHash = HashPassword(user.PasswordHash);
+                user.PasswordHash = passwordHash;
+            }
+
             request.Content = JsonContent.Create(user);
             var response = await _httpClient.SendAsync(request);
             if (response.IsSuccessStatusCode)
