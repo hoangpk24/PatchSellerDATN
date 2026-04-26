@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PatchSeller.DAL.Models;
 using PatchSeller.DAL.Repository;
@@ -13,10 +13,14 @@ namespace PatchSeller.API.Controllers.Admin
     public class StaffController : ControllerBase
     {
         StaffRepository _staffRepository;
+        StaffPagePermissionRepository _staffPagePermissionRepository;
+        PagePermissionRepository _pagePermissionRepository;
 
         public StaffController()
         {
             _staffRepository = new StaffRepository();
+            _staffPagePermissionRepository = new StaffPagePermissionRepository();
+            _pagePermissionRepository = new PagePermissionRepository();
         }
 
         [HttpGet("get-all-staffs")]
@@ -60,6 +64,72 @@ namespace PatchSeller.API.Controllers.Admin
                 return Ok(result);
             }
             catch (Exception ex)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
+
+        [HttpGet("get-me")]
+        public async Task<ActionResult<StaffMeDetailDTO>> GetMe()
+        {
+            try
+            {
+                var staffIdClaim = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
+                if (!int.TryParse(staffIdClaim, out var staffId))
+                {
+                    return Unauthorized(Constant.ErrorCode.Unauthorized);
+                }
+
+                var staff = await _staffRepository.GetById(staffId);
+                if (staff == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+                }
+
+                var staffPagePermissions = await _staffPagePermissionRepository.GetAllByStaffId(staffId) ?? new List<StaffPagePermission>();
+                var pagePermissions = await _pagePermissionRepository.GetAll(null) ?? new List<PagePermission>();
+
+                var permissionOrder = new[] { "C", "R", "U", "D" };
+
+                var groupedPermissions = staffPagePermissions
+                    .Join(
+                        pagePermissions,
+                        spp => spp.PagePermissionId,
+                        pp => pp.Id,
+                        (spp, pp) => new { pp.PageCode, spp.PermissionCode })
+                    .Where(x => !string.IsNullOrWhiteSpace(x.PageCode) && !string.IsNullOrWhiteSpace(x.PermissionCode))
+                    .GroupBy(x => x.PageCode!)
+                    .Select(g =>
+                    {
+                        var codes = g
+                            .Select(x => x.PermissionCode.ToUpper())
+                            .Distinct()
+                            .ToList();
+
+                        return new PagePermissionDTO
+                        {
+                            PageCode = g.Key,
+                            PagePermissions = string.Concat(permissionOrder.Where(code => codes.Contains(code)))
+                        };
+                    })
+                    .OrderBy(x => x.PageCode)
+                    .ToList();
+
+                var result = new StaffMeDetailDTO
+                {
+                    StaffId = staff.StaffId,
+                    FullName = staff.FullName,
+                    UserName = staff.UserName,
+                    Email = staff.Email,
+                    PhoneNumber = staff.PhoneNumber,
+                    Role = staff.Role,
+                    CreatedAt = staff.CreatedAt,
+                    PagePermissions = groupedPermissions
+                };
+
+                return Ok(result);
+            }
+            catch (Exception)
             {
                 return StatusCode(500, Constant.ErrorCode.OtherError);
             }
