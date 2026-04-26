@@ -7,9 +7,6 @@ public static class PatchSellerDbSeeder
 {
     public static void Seed(ModelBuilder modelBuilder)
     {
-        // NOTE:
-        // - All values must be deterministic (no DateTime.Now) for EF Core HasData.
-        // - Non-nullable reference properties (Nullable enabled) must be populated.
 
         modelBuilder.Entity<Publisher>().HasData(
              new Publisher
@@ -239,6 +236,41 @@ public static class PatchSellerDbSeeder
                 FullName = "E Đít Tơ"
             }
         );
+
+        var pages = new List<PagePermission>
+        {
+            new PagePermission { Id = 1, PageCode = "DASHBOARD", PageRoute = "/admin/dashboard", AvailablePermissions = "R", DefaultPermissions = "R" },
+            new PagePermission { Id = 2, PageCode = "GAME_MNG", PageRoute = "/admin/games", AvailablePermissions = "C,R,U,D", DefaultPermissions = "C,R,U,D" },
+            new PagePermission { Id = 3, PageCode = "PATCH_MNG", PageRoute = "/admin/patches", AvailablePermissions = "C,R,U,D", DefaultPermissions = "C,R,U,D" },
+            new PagePermission { Id = 4, PageCode = "ORDER_MNG", PageRoute = "/admin/orders", AvailablePermissions = "R,U", DefaultPermissions = "R,U" },
+            new PagePermission { Id = 5, PageCode = "STAFF_MNG", PageRoute = "/admin/staffs", AvailablePermissions = "C,R,U,D", DefaultPermissions = "C,R,U,D" }
+        };
+        modelBuilder.Entity<PagePermission>().HasData(pages);
+
+        var staffPermissions = new List<StaffPagePermission>();
+        int permissionIdCounter = 1;
+        var staffIds = new List<int> { 1, 2 };
+
+        foreach (var staffId in staffIds)
+        {
+            foreach (var page in pages)
+            {
+                var codes = page.DefaultPermissions.Split(',');
+
+                foreach (var code in codes)
+                {
+                    staffPermissions.Add(new StaffPagePermission
+                    {
+                        Id = permissionIdCounter++,
+                        StaffId = staffId,
+                        PagePermissionId = page.Id,
+                        PermissionCode = code.Trim()
+                    });
+                }
+            }
+        }
+
+        modelBuilder.Entity<StaffPagePermission>().HasData(staffPermissions);
 
         modelBuilder.Entity<Game>().HasData(
             new Game

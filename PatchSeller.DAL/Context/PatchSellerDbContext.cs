@@ -19,6 +19,7 @@ namespace PatchSeller.DAL.Context
         {
 
         }
+
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Patch> Patches { get; set; }
@@ -44,6 +45,10 @@ namespace PatchSeller.DAL.Context
         public DbSet<Wishlist> Wishlists { get; set; }
 
         public DbSet<InstallLog> InstallLogs { get; set; }
+
+        public DbSet<PagePermission> PagePermissions { get; set; }
+
+        public DbSet<StaffPagePermission> StaffPagePermissions { get; set; }
 
 
 
