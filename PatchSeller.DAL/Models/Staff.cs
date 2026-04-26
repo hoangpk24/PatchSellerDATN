@@ -16,7 +16,7 @@ public class Staff
     public string PhoneNumber { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public DateTime? CreatedAt { get; set; }
-
+    public ICollection<StaffPagePermission>? StaffPagePermissions { get; set; }
     public ICollection<PatchVersion>? PatchVersions { get; set; }
     public ICollection<ActionLog>? ActionLogs { get; set; }
 }
