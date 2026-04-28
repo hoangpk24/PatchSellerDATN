@@ -8,13 +8,13 @@
             <MudBreadcrumbs Class="custom-breadcrumb !p-0 !text-xs" Items="_itemBreadcrumbs" Separator="/" />
         </div>
     </div>
-    <div class="flex w-full flex-col items-center justify-center gap-4 rounded-lg border border-solid border-slate-200 p-6 text-center shadow">
-        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Class="!text-4xl" />
+    <div class="flex w-full flex-col items-center justify-center gap-4 rounded-lg p-6 text-center shadow">
+        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="!text-4xl !text-purple-500" />
         <h2 class="text-2xl font-bold text-white">Đặt hàng thành công!</h2>
-        <p class="text-base"><span class="font-bold">Mã hóa đơn:</span> @_orderCodeSuccess</p>
+        <p class="text-base text-white/70"><span class="font-bold">Mã hóa đơn:</span> @_orderCodeSuccess</p>
         <div class="flex justify-center gap-3">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => navigation.NavigateTo(RouterConfig.Customer.Home))">Tiếp tục mua sắm</MudButton>
-            <MudButton Variant="Variant.Outlined" OnClick="@(() => navigation.NavigateTo(RouterConfig.Customer.OrderDetail.Replace(":id", _orderIdSuccess.ToString())))">Xem hóa đơn</MudButton>
+            <MudButton Variant="Variant.Filled" Class="!bg-purple-500" OnClick="@(() => navigation.NavigateTo(RouterConfig.Customer.Home))">Tiếp tục mua sắm</MudButton>
+            <MudButton Variant="Variant.Outlined" Class="!border-white/70 !text-white/70" OnClick="@(() => navigation.NavigateTo(RouterConfig.Customer.Profile))">Xem hóa đơn</MudButton>
         </div>
     </div>
 </section>
@@ -22,6 +22,9 @@
 @code {
     [SupplyParameterFromQuery(Name = "order-id")]
     public int _orderId { get; set; } = 0;
+
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
 
     private int _orderIdSuccess = -1;
     private string _orderCodeSuccess = string.Empty;
@@ -42,7 +45,7 @@
         if (_orderId > 0)
         {
             _orderIdSuccess = _orderId;
-            var result = await _orderService.PaymentSuccess(_orderId);
+            var result = await _orderService.PaymentSuccess(_orderId, _token);
             if (result.IsSuccess)
             {
                 _orderCodeSuccess = result.Data.OrderCode;
