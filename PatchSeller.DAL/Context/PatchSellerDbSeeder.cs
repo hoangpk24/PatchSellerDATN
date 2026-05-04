@@ -1,10 +1,81 @@
 using Microsoft.EntityFrameworkCore;
 using PatchSeller.DAL.Models;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace PatchSeller.DAL.Context;
 
 public static class PatchSellerDbSeeder
 {
+
+    private static List<PagePermission> GetPagesFromDirectory()
+    {
+        var pageList = new List<PagePermission>();
+
+        string solutionPath = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName ?? "";
+        string pagesPath = Path.Combine(solutionPath, "PatchSeller.Web", "Components", "Pages");
+
+        if (!Directory.Exists(pagesPath)) return pageList;
+
+        var files = Directory.GetFiles(pagesPath, "*.razor", SearchOption.AllDirectories);
+        int idCounter = 1;
+
+        foreach (var file in files)
+        {
+            string content = File.ReadAllText(file);
+
+            var match = Regex.Match(content, @"@page\s+""([^""]+)""");
+
+            if (match.Success)
+            {
+                string route = match.Groups[1].Value;
+                string fileName = Path.GetFileNameWithoutExtension(file);
+
+                string pageCode = "M" + idCounter;
+
+                pageList.Add(new PagePermission
+                {
+                    Id = idCounter++,
+                    PageCode = pageCode,
+                    PageRoute = route,
+                    AvailablePermissions = "C,R,U,D",
+                    DefaultPermissions = "R"
+                });
+            }
+        }
+
+        return pageList;
+    }
+
+    private static List<string> GetPageCodesFromDirectory()
+    {
+        var codes = new List<string>();
+        string solutionPath = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName ?? "";
+        string pagesPath = Path.Combine(solutionPath, "PatchSeller.Web", "Components", "Pages");
+
+        if (!Directory.Exists(pagesPath)) return new List<string> { "M1" };
+
+        var files = Directory.GetFiles(pagesPath, "*.razor", SearchOption.AllDirectories)
+                             .OrderBy(f => f)
+                             .ToList();
+
+        int idCounter = 1;
+
+        foreach (var file in files)
+        {
+            string content = File.ReadAllText(file);
+            if (Regex.IsMatch(content, @"@page\s+""([^""]+)"""))
+            {
+                codes.Add("M" + idCounter++);
+        }
+        }
+
+        return codes;
+    }
+
+
+
+
     public static void Seed(ModelBuilder modelBuilder)
     {
 
@@ -212,6 +283,37 @@ public static class PatchSellerDbSeeder
             }
         );
 
+
+        var listPageCodes = GetPageCodesFromDirectory();
+
+        var adminPerms = listPageCodes.Select(code => new
+        {
+            pageCode = code,
+            pagePermissions = "CRUD"
+        }).ToList();
+
+        var editorPerms = listPageCodes.Select(code => new
+        {
+            pageCode = code,
+            pagePermissions = "R"
+        }).ToList();
+
+        modelBuilder.Entity<Role>().HasData(
+            new Role
+            {
+                Id = 1,
+                RoleName = "Admin",
+                PagesPermission = JsonSerializer.Serialize(adminPerms),
+                Status = true
+            },
+            new Role
+            {
+                Id = 2,
+                RoleName = "Editor",
+                PagesPermission = JsonSerializer.Serialize(editorPerms),
+                Status = true
+            });
+
         modelBuilder.Entity<Staff>().HasData(
             new Staff
             {
@@ -220,6 +322,7 @@ public static class PatchSellerDbSeeder
                 PasswordHash = "26dc318942685872cf79c5eb96c9bb13",
                 Email = "admin@patchseller.local",
                 Role = "Admin",
+                RoleId = 1,
                 PhoneNumber = "0987675845",
                 CreatedAt = new DateTime(2020, 1, 1),
                 FullName = "Ass Min"
@@ -231,20 +334,14 @@ public static class PatchSellerDbSeeder
                 PasswordHash = "26dc318942685872cf79c5eb96c9bb13",
                 Email = "editor@patchseller.local",
                 Role = "Editor",
+                RoleId = 2,
                 PhoneNumber = "0987675866",
                 CreatedAt = new DateTime(2020, 1, 1),
                 FullName = "E Đít Tơ"
             }
         );
 
-        var pages = new List<PagePermission>
-        {
-            new PagePermission { Id = 1, PageCode = "DASHBOARD", PageRoute = "/admin/dashboard", AvailablePermissions = "R", DefaultPermissions = "R" },
-            new PagePermission { Id = 2, PageCode = "GAME_MNG", PageRoute = "/admin/games", AvailablePermissions = "C,R,U,D", DefaultPermissions = "C,R,U,D" },
-            new PagePermission { Id = 3, PageCode = "PATCH_MNG", PageRoute = "/admin/patches", AvailablePermissions = "C,R,U,D", DefaultPermissions = "C,R,U,D" },
-            new PagePermission { Id = 4, PageCode = "ORDER_MNG", PageRoute = "/admin/orders", AvailablePermissions = "R,U", DefaultPermissions = "R,U" },
-            new PagePermission { Id = 5, PageCode = "STAFF_MNG", PageRoute = "/admin/staffs", AvailablePermissions = "C,R,U,D", DefaultPermissions = "C,R,U,D" }
-        };
+        var pages = GetPagesFromDirectory();
         modelBuilder.Entity<PagePermission>().HasData(pages);
 
         var staffPermissions = new List<StaffPagePermission>();

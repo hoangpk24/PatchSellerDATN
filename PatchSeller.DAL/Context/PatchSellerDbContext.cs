@@ -43,11 +43,9 @@ namespace PatchSeller.DAL.Context
         public DbSet<Platform> Platforms { get; set; }
         public DbSet<ActionLog> ActionLogs { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
-
         public DbSet<InstallLog> InstallLogs { get; set; }
-
+        public DbSet<Role> Roles { get; set; }
         public DbSet<PagePermission> PagePermissions { get; set; }
-
         public DbSet<StaffPagePermission> StaffPagePermissions { get; set; }
 
 
