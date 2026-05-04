@@ -14,7 +14,7 @@ namespace PatchSeller.DAL.Models
         public string? PageCode { get; set; }
         public string? PageRoute { get; set; }
         public string AvailablePermissions { get; set; } = "C,R,U,D";
-        public string DefaultPermissions { get; set; } = "C,R,U,D";
+        public string DefaultPermissions { get; set; } = "R";
         public ICollection<StaffPagePermission>? StaffPagePermissions { get; set; }
     }
 }
