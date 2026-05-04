@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PatchSeller.API.DTOs;
 using PatchSeller.DAL.Models;
 using PatchSeller.DAL.Repository;
 using Pro219.API.DTOs;
 using System.Security.Claims;
+using Newtonsoft.Json;
 
 namespace PatchSeller.API.Controllers.Admin
 {
@@ -144,6 +146,11 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return BadRequest(Constant.ErrorCode.DataRequired);
                 }
+                RoleRepository roleRepository = new RoleRepository();
+                Role staffRole = await roleRepository.GetById(staff.RoleId);
+                if (staffRole == null)
+                    return BadRequest(Constant.ErrorCode.DataRequired);
+                staff.Role = staffRole.RoleName;
 
                 var result = await _staffRepository.Create(staff);
 
@@ -151,12 +158,31 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return StatusCode(500, Constant.ErrorCode.DatabaseError);
                 }
+                string jsonString = staffRole.PagesPermission;
+                if(jsonString!=null)
+                {
+                    List<PagePermissionDTO> pagePermissionDTOs = JsonConvert.DeserializeObject<List<PagePermissionDTO>>(jsonString) ?? new List<PagePermissionDTO>();
+                    var addPermissionResult = await _staffPagePermissionRepository.CreateRangeByPagePermissions(
+                        pagePermissionDTOs
+                            .Select(x => (x.PageCode, x.PagePermissions))
+                            .ToList(),
+                        result.StaffId);
+
+                    if (!addPermissionResult)
+                    {
+                        return StatusCode(500, Constant.ErrorCode.DatabaseError);
+                    }
+                }    
 
                 return Ok(result);
             }
             catch (InvalidOperationException ex) when (ex.Message == "DUPLICATE_NAME_OR_EMAIL")
             {
                 return BadRequest(Constant.ErrorCode.UserNameOrEmailAlreadyExit);
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "PAGE_CODE_NOT_FOUND" || ex.Message == "STAFF_NOT_FOUND")
+            {
+                return BadRequest(Constant.ErrorCode.InvalidData);
             }
             catch (Exception ex)
             {
