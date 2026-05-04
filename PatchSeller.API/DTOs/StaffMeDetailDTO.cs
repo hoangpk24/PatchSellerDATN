@@ -1,10 +1,7 @@
+using PatchSeller.API.DTOs;
+
 namespace Pro219.API.DTOs
-{
-    public class PagePermissionDTO
-    {
-        public string PageCode { get; set; } = string.Empty;
-        public string PagePermissions { get; set; } = string.Empty;
-    }
+{  
 
     public class StaffMeDetailDTO
     {
