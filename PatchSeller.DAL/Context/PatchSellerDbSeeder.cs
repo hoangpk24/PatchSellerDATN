@@ -28,21 +28,28 @@ public static class PatchSellerDbSeeder
 
         var adminModules = rawRoutes
             .Where(r => r.StartsWith("/admin"))
-            .Select(r => new {
-                Raw = r,
-                Base = "/" + string.Join("/", r.Split('/', StringSplitOptions.RemoveEmptyEntries).Take(2))
+            .Select(r => {
+                var segments = r.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                string moduleName = segments.Length > 1 ? segments[1] : "DASHBOARD";
+                return new
+                {
+                    Raw = r,
+                    ModuleCode = moduleName.ToUpper(),
+                    Base = "/admin/" + moduleName
+                };
             })
-            .GroupBy(x => x.Base) 
+            .GroupBy(x => x.ModuleCode)
             .OrderBy(g => g.Key)
             .ToList();
 
         int idCounter = 1;
         foreach (var group in adminModules)
         {
-            string baseRoute = group.Key;
+            string pageCode = group.Key;
+            string baseRoute = group.First().Base;
             string availablePerms = "R";
 
-            if (baseRoute == "/admin/file")
+            if (pageCode == "FILE" || pageCode == "PERMISSION" || pageCode == "REVIEW")
             {
                 availablePerms = "CRUD";
             }
@@ -61,8 +68,8 @@ public static class PatchSellerDbSeeder
 
             pageList.Add(new PagePermission
             {
-                Id = idCounter,
-                PageCode = "M" + idCounter++,
+                Id = idCounter++, 
+                PageCode = pageCode, 
                 PageRoute = baseRoute,
                 AvailablePermissions = FormatPermString(availablePerms),
                 DefaultPermissions = "R"
@@ -85,28 +92,11 @@ public static class PatchSellerDbSeeder
 
     private static List<string> GetPageCodesFromDirectory()
     {
-        var codes = new List<string>();
-        string solutionPath = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName ?? "";
-        string pagesPath = Path.Combine(solutionPath, "PatchSeller.Web", "Components", "Pages");
+       
+        var pages = GetPagesFromDirectory();
+        if (pages == null || pages.Count == 0) return new List<string> { "DASHBOARD" };
 
-        if (!Directory.Exists(pagesPath)) return new List<string> { "M1" };
-
-        var files = Directory.GetFiles(pagesPath, "*.razor", SearchOption.AllDirectories)
-                             .OrderBy(f => f)
-                             .ToList();
-
-        int idCounter = 1;
-
-        foreach (var file in files)
-        {
-            string content = File.ReadAllText(file);
-            if (Regex.IsMatch(content, @"@page\s+""([^""]+)"""))
-            {
-                codes.Add("M" + idCounter++);
-        }
-        }
-
-        return codes;
+        return pages.Select(x => x.PageCode).ToList();
     }
 
 
