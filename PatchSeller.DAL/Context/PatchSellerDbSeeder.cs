@@ -11,40 +11,76 @@ public static class PatchSellerDbSeeder
     private static List<PagePermission> GetPagesFromDirectory()
     {
         var pageList = new List<PagePermission>();
-
         string solutionPath = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName ?? "";
         string pagesPath = Path.Combine(solutionPath, "PatchSeller.Web", "Components", "Pages");
 
         if (!Directory.Exists(pagesPath)) return pageList;
 
         var files = Directory.GetFiles(pagesPath, "*.razor", SearchOption.AllDirectories);
-        int idCounter = 1;
+        var rawRoutes = new List<string>();
 
         foreach (var file in files)
         {
             string content = File.ReadAllText(file);
-
             var match = Regex.Match(content, @"@page\s+""([^""]+)""");
+            if (match.Success) rawRoutes.Add(match.Groups[1].Value);
+        }
 
-            if (match.Success)
+        var adminModules = rawRoutes
+            .Where(r => r.StartsWith("/admin"))
+            .Select(r => new {
+                Raw = r,
+                Base = "/" + string.Join("/", r.Split('/', StringSplitOptions.RemoveEmptyEntries).Take(2))
+            })
+            .GroupBy(x => x.Base) 
+            .OrderBy(g => g.Key)
+            .ToList();
+
+        int idCounter = 1;
+        foreach (var group in adminModules)
+        {
+            string baseRoute = group.Key;
+            string availablePerms = "R";
+
+            if (baseRoute == "/admin/file")
             {
-                string route = match.Groups[1].Value;
-                string fileName = Path.GetFileNameWithoutExtension(file);
-
-                string pageCode = "M" + idCounter;
-
-                pageList.Add(new PagePermission
-                {
-                    Id = idCounter++,
-                    PageCode = pageCode,
-                    PageRoute = route,
-                    AvailablePermissions = "C,R,U,D",
-                    DefaultPermissions = "R"
-                });
+                availablePerms = "CRUD";
             }
+            else if (group.Count() >= 2)
+            {
+                bool hasCreate = group.Any(x => x.Raw.Contains("/create"));
+                bool hasEdit = group.Any(x => x.Raw.Contains("/edit") || x.Raw.Contains("{id}"));
+
+                availablePerms = "R";
+                if (hasCreate) availablePerms += "C";
+                if (hasEdit) availablePerms += "U";
+
+                if (hasCreate && hasEdit) availablePerms = "CRUD";
+                else if (hasEdit) availablePerms = "RU";
+            }
+
+            pageList.Add(new PagePermission
+            {
+                Id = idCounter,
+                PageCode = "M" + idCounter++,
+                PageRoute = baseRoute,
+                AvailablePermissions = FormatPermString(availablePerms),
+                DefaultPermissions = "R"
+            });
         }
 
         return pageList;
+    }
+
+    private static string FormatPermString(string input)
+    {
+        if (input == "CRUD") return "CRUD";
+        string result = "";
+        if (input.Contains("C")) result += "C";
+        if (input.Contains("R")) result += "R";
+        if (input.Contains("U")) result += "U";
+        if (input.Contains("D")) result += "D";
+        return string.IsNullOrEmpty(result) ? "R" : result;
     }
 
     private static List<string> GetPageCodesFromDirectory()
@@ -352,16 +388,16 @@ public static class PatchSellerDbSeeder
         {
             foreach (var page in pages)
             {
-                var codes = page.DefaultPermissions.Split(',');
+                string permissionString = page.DefaultPermissions ?? "R";
 
-                foreach (var code in codes)
+                foreach (char code in permissionString)
                 {
                     staffPermissions.Add(new StaffPagePermission
                     {
                         Id = permissionIdCounter++,
                         StaffId = staffId,
                         PagePermissionId = page.Id,
-                        PermissionCode = code.Trim()
+                        PermissionCode = code.ToString()
                     });
                 }
             }
