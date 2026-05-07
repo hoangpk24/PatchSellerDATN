@@ -26,9 +26,6 @@
     [SupplyParameterFromQuery(Name = "order-id")]
     public int _orderId { get; set; } = 0;
 
-    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
-    public string _token { get; set; }
-
     private int _orderIdSuccess = -1;
     private string _orderCodeSuccess = string.Empty;
 
