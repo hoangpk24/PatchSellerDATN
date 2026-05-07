@@ -33,7 +33,7 @@ namespace PatchSeller.API.Utilities
                 Resource = Send.Resource,
             }
                .Property(Send.FromEmail, "hlk9@proton.me")
-               .Property(Send.FromName, "Adam Store")
+               .Property(Send.FromName, "ITeam")
                .Property(Send.Subject, subject)
                .Property(Send.TextPart, body)
                .Property(Send.HtmlPart, bodyHTML)
