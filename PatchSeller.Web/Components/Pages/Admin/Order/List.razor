@@ -5,7 +5,7 @@
 
 <section class="p-6">
     <div class="flex items-center justify-between">
-        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách hóa đơn</h1>
+        <h1 class="leading-[3rem] text-material-default h-12 text-3xl font-bold">Danh sách hóa đơn</h1>
     </div>
 
     <div class="mt-8 rounded bg-white p-6 shadow-md">
@@ -71,7 +71,9 @@
                 </MudTd>
                 <MudTd DataLabel="Ghi chú">@context.Note</MudTd>
                 <MudTd DataLabel="Ghi chú">
-                    <MudIconButton Icon="@Icons.Material.Filled.Menu" aria-label="detail" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.OrderDetail.Replace(":id", context.OrderId.ToString())))"></MudIconButton>
+                    <AuthorizeControl Action="@Constant.ActionButton.Read">
+                        <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Menu" aria-label="detail" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.OrderDetail.Replace(":id", context.OrderId.ToString())))"></MudIconButton>
+                    </AuthorizeControl>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>

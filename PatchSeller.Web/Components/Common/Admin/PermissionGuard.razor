@@ -1,0 +1,51 @@
+﻿@if (_isAuthorized)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public StaffGetMe Mine { get; set; }
+    private bool _isAuthorized = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await CheckPermission();
+    }
+
+    private async Task CheckPermission()
+    {
+        if(Mine == null)
+        {
+            _isAuthorized = false;
+            StateHasChanged();
+            return;
+        };
+
+        _isAuthorized = false;
+
+        var currentPath = new Uri(navigation.Uri).AbsolutePath;
+
+        string pageCode = PermissionHelper.GetPageCode(currentPath);
+
+        if (string.IsNullOrEmpty(pageCode))
+        {
+            _isAuthorized = true;
+            StateHasChanged();
+            return;
+        }
+
+        string requiredAction = PermissionHelper.GetActionFromPath(currentPath);
+
+        if (PermissionHelper.HasAccess(Mine, pageCode, requiredAction))
+        {
+            _isAuthorized = true;
+        }
+        else
+        {
+            navigation.NavigateTo(RouterConfig.AccessDenied);
+        }
+
+        StateHasChanged();
+    }
+}

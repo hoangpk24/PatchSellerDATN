@@ -12,7 +12,7 @@ namespace PatchSeller.API.DTOs
         public string GameThumbnail { get; set; } = string.Empty;
         public DateTime PurchasedAt { get; set; }
     }
-
+   
     public class UserMeDetailDTO
     {
         public int UserId { get; set; }

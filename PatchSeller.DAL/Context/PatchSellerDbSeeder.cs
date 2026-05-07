@@ -1,15 +1,109 @@
 using Microsoft.EntityFrameworkCore;
 using PatchSeller.DAL.Models;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace PatchSeller.DAL.Context;
 
 public static class PatchSellerDbSeeder
 {
+
+    private static List<PagePermission> GetPagesFromDirectory()
+    {
+        var pageList = new List<PagePermission>();
+        string solutionPath = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName ?? "";
+        string pagesPath = Path.Combine(solutionPath, "PatchSeller.Web", "Components", "Pages");
+
+        if (!Directory.Exists(pagesPath)) return pageList;
+
+        var files = Directory.GetFiles(pagesPath, "*.razor", SearchOption.AllDirectories);
+        var rawRoutes = new List<string>();
+
+        foreach (var file in files)
+        {
+            string content = File.ReadAllText(file);
+            var match = Regex.Match(content, @"@page\s+""([^""]+)""");
+            if (match.Success) rawRoutes.Add(match.Groups[1].Value);
+        }
+
+        var adminModules = rawRoutes
+            .Where(r => r.StartsWith("/admin"))
+            .Select(r => {
+                var segments = r.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                string moduleName = segments.Length > 1 ? segments[1] : "DASHBOARD";
+                return new
+                {
+                    Raw = r,
+                    ModuleCode = moduleName.ToUpper(),
+                    Base = "/admin/" + moduleName
+                };
+            })
+            .GroupBy(x => x.ModuleCode)
+            .OrderBy(g => g.Key)
+            .ToList();
+
+        int idCounter = 1;
+        foreach (var group in adminModules)
+        {
+            string pageCode = group.Key;
+            string baseRoute = group.First().Base;
+            string availablePerms = "R";
+
+            if (pageCode == "FILE" || pageCode == "PERMISSION" || pageCode == "REVIEW")
+            {
+                availablePerms = "CRUD";
+            }
+            else if (group.Count() >= 2)
+            {
+                bool hasCreate = group.Any(x => x.Raw.Contains("/create"));
+                bool hasEdit = group.Any(x => x.Raw.Contains("/edit") || x.Raw.Contains("{id}"));
+
+                availablePerms = "R";
+                if (hasCreate) availablePerms += "C";
+                if (hasEdit) availablePerms += "U";
+
+                if (hasCreate && hasEdit) availablePerms = "CRUD";
+                else if (hasEdit) availablePerms = "RU";
+            }
+
+            pageList.Add(new PagePermission
+            {
+                Id = idCounter++, 
+                PageCode = pageCode, 
+                PageRoute = baseRoute,
+                AvailablePermissions = FormatPermString(availablePerms),
+                DefaultPermissions = "R"
+            });
+        }
+
+        return pageList;
+    }
+
+    private static string FormatPermString(string input)
+    {
+        if (input == "CRUD") return "CRUD";
+        string result = "";
+        if (input.Contains("C")) result += "C";
+        if (input.Contains("R")) result += "R";
+        if (input.Contains("U")) result += "U";
+        if (input.Contains("D")) result += "D";
+        return string.IsNullOrEmpty(result) ? "R" : result;
+    }
+
+    private static List<string> GetPageCodesFromDirectory()
+    {
+       
+        var pages = GetPagesFromDirectory();
+        if (pages == null || pages.Count == 0) return new List<string> { "DASHBOARD" };
+
+        return pages.Select(x => x.PageCode).ToList();
+    }
+
+
+
+
     public static void Seed(ModelBuilder modelBuilder)
     {
-        // NOTE:
-        // - All values must be deterministic (no DateTime.Now) for EF Core HasData.
-        // - Non-nullable reference properties (Nullable enabled) must be populated.
 
         modelBuilder.Entity<Publisher>().HasData(
              new Publisher
@@ -215,6 +309,37 @@ public static class PatchSellerDbSeeder
             }
         );
 
+
+        var listPageCodes = GetPageCodesFromDirectory();
+
+        var adminPerms = listPageCodes.Select(code => new
+        {
+            pageCode = code,
+            pagePermissions = "CRUD"
+        }).ToList();
+
+        var editorPerms = listPageCodes.Select(code => new
+        {
+            pageCode = code,
+            pagePermissions = "R"
+        }).ToList();
+
+        modelBuilder.Entity<Role>().HasData(
+            new Role
+            {
+                Id = 1,
+                RoleName = "Admin",
+                PagesPermission = JsonSerializer.Serialize(adminPerms),
+                Status = true
+            },
+            new Role
+            {
+                Id = 2,
+                RoleName = "Editor",
+                PagesPermission = JsonSerializer.Serialize(editorPerms),
+                Status = true
+            });
+
         modelBuilder.Entity<Staff>().HasData(
             new Staff
             {
@@ -223,6 +348,7 @@ public static class PatchSellerDbSeeder
                 PasswordHash = "26dc318942685872cf79c5eb96c9bb13",
                 Email = "admin@patchseller.local",
                 Role = "Admin",
+                RoleId = 1,
                 PhoneNumber = "0987675845",
                 CreatedAt = new DateTime(2020, 1, 1),
                 FullName = "Ass Min"
@@ -234,11 +360,40 @@ public static class PatchSellerDbSeeder
                 PasswordHash = "26dc318942685872cf79c5eb96c9bb13",
                 Email = "editor@patchseller.local",
                 Role = "Editor",
+                RoleId = 2,
                 PhoneNumber = "0987675866",
                 CreatedAt = new DateTime(2020, 1, 1),
                 FullName = "E Đít Tơ"
             }
         );
+
+        var pages = GetPagesFromDirectory();
+        modelBuilder.Entity<PagePermission>().HasData(pages);
+
+        var staffPermissions = new List<StaffPagePermission>();
+        int permissionIdCounter = 1;
+        var staffIds = new List<int> { 1, 2 };
+
+        foreach (var staffId in staffIds)
+        {
+            foreach (var page in pages)
+            {
+                string permissionString = page.DefaultPermissions ?? "R";
+
+                foreach (char code in permissionString)
+                {
+                    staffPermissions.Add(new StaffPagePermission
+                    {
+                        Id = permissionIdCounter++,
+                        StaffId = staffId,
+                        PagePermissionId = page.Id,
+                        PermissionCode = code.ToString()
+                    });
+                }
+            }
+        }
+
+        modelBuilder.Entity<StaffPagePermission>().HasData(staffPermissions);
 
         modelBuilder.Entity<Game>().HasData(
             new Game

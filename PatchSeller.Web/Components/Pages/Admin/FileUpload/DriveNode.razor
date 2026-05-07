@@ -42,8 +42,12 @@
                                Color="Color.Info" href="@Item.LinkDownload" Target="_blank" />
             }
 
-            <MudIconButton Icon="@Icons.Material.Filled.DriveFileRenameOutline" Size="Size.Small" Color="Color.Warning" OnClick="@(() => OpenRenameDialog(Item))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" OnClick="@(() => DeleteItem(Item.Id))" />
+            <AuthorizeControl Action="@Constant.ActionButton.Edit">
+                <MudIconButton Icon="@Icons.Material.Filled.DriveFileRenameOutline" Size="Size.Small" Color="Color.Warning" OnClick="@(() => OpenRenameDialog(Item))" />
+            </AuthorizeControl>
+            <AuthorizeControl Action="@Constant.ActionButton.Delete">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" OnClick="@(() => DeleteItem(Item.Id))" />
+            </AuthorizeControl>
         </div>
     </div>
 

@@ -1,0 +1,21 @@
+﻿@if (_hasAccess)
+{
+    @ChildContent
+}
+@code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public StaffGetMe? _mine { get; set; }
+
+    [Parameter] public string Action { get; set; } = Constant.ActionButton.Read;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _hasAccess
+    {
+        get
+        {
+            var relativePath = navigation.ToBaseRelativePath(navigation.Uri);
+            var pageCode = PermissionHelper.GetPageCode(relativePath);
+            return PermissionHelper.HasAccess(_mine, pageCode, Action);
+        }
+    }
+}

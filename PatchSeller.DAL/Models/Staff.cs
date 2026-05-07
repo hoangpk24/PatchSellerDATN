@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PatchSeller.DAL.Models;
 
@@ -15,8 +16,9 @@ public class Staff
     [MaxLength(15)]
     public string PhoneNumber { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
+    public int RoleId { get; set; }
     public DateTime? CreatedAt { get; set; }
-
+    public ICollection<StaffPagePermission>? StaffPagePermissions { get; set; }
     public ICollection<PatchVersion>? PatchVersions { get; set; }
     public ICollection<ActionLog>? ActionLogs { get; set; }
 }

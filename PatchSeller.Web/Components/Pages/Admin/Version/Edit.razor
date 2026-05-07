@@ -142,14 +142,16 @@
                            OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Version)">
                     Quay lại
                 </MudButton>
-                <MudButton Variant="Variant.Filled"
+                <AuthorizeControl Action="@Constant.ActionButton.Edit">
+                    <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.Edit"
                            OnClick="@(async () => await OnSubmit())"
                            Disabled="@(_isLoading || _isLoadingUpload)"
                            Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
-                    Sửa
-                </MudButton>
+                        Sửa
+                    </MudButton>
+                </AuthorizeControl>
             </div>
         </MudForm>
     </div>
@@ -158,9 +160,6 @@
 @code {
     [Parameter]
     public int id { get; set; }
-
-    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
-    public MineResponse _mine { get; set; }
 
     [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
     public string _token { get; set; }

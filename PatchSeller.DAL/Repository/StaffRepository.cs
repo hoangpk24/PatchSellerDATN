@@ -52,6 +52,20 @@ namespace PatchSeller.DAL.Repository
             }
         }
 
+        public async Task<List<Staff>> GetAllByRoleId(int roleId)
+        {
+            try
+            {
+                return await _context.Staffs
+                    .Where(x => x.RoleId == roleId)
+                    .ToListAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<Staff> Create(Staff staff)
         {
             try
@@ -104,6 +118,7 @@ namespace PatchSeller.DAL.Repository
                 exitingStaff.Email = staff.Email;
                 exitingStaff.PhoneNumber = staff.PhoneNumber;
                 exitingStaff.Role = staff.Role;
+                exitingStaff.RoleId = staff.RoleId;
 
                 _context.Staffs.Update(exitingStaff);
                 await _context.SaveChangesAsync();

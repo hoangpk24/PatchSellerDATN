@@ -155,14 +155,16 @@
                            OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Voucher)">
                     Quay lại
                 </MudButton>
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           StartIcon="@Icons.Material.Filled.Add"
-                           OnClick="@(async () => await OnSubmit())"
-                           Disabled="@_isLoading"
-                           Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
-                    Tạo mới
-                </MudButton>
+                <AuthorizeControl Action="@Constant.ActionButton.Create">
+                    <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            StartIcon="@Icons.Material.Filled.Add"
+                            OnClick="@(async () => await OnSubmit())"
+                            Disabled="@_isLoading"
+                            Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
+                        Tạo mới
+                    </MudButton>
+                </AuthorizeControl>
             </div>
         </MudForm>
     </div>

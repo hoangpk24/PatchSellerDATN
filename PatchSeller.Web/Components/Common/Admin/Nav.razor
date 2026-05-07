@@ -4,11 +4,11 @@
         border-right: 2px solid #29A69A;
     }
 
-    .active-menu div svg,
-    .active-menu div div {
-        color: #29A69A !important;
-        font-weight: 700 !important;
-    }
+        .active-menu div svg,
+        .active-menu div div {
+            color: #29A69A !important;
+            font-weight: 700 !important;
+        }
 
     .mud-menu-item {
         min-width: 15rem;
@@ -27,40 +27,98 @@
 
         <div class="max-h-[calc(100lvh-190px)] flex flex-col gap-2 overflow-y-auto px-3">
             <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Home))" Class="@ActiveMenuClass(RouterConfig.Admin.Home)" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
-            <MudNavGroup Title="Quản lý game">
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Game))" Class="@ActiveMenuClass(RouterConfig.Admin.Game)" Icon="@Icons.Material.Filled.VideogameAsset">Game</MudNavLink>
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Category))" Class="@ActiveMenuClass(RouterConfig.Admin.Category)" Icon="@Icons.Material.Filled.Category">Thể loại</MudNavLink>
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Platform))" Class="@ActiveMenuClass(RouterConfig.Admin.Platform)" Icon="@Icons.Material.Filled.Airplay">Nền tảng</MudNavLink>
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Publisher))" Class="@ActiveMenuClass(RouterConfig.Admin.Publisher)" Icon="@Icons.Material.Filled.DeveloperMode">Nhà phát hành</MudNavLink>
-            </MudNavGroup>
-            <MudNavGroup Title="Quản lý gói">
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Patch))" Class="@ActiveMenuClass(RouterConfig.Admin.Patch)" Icon="@Icons.Material.Filled.Backpack">Gói</MudNavLink>
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Version))" Class="@ActiveMenuClass(RouterConfig.Admin.Version)" Icon="@Icons.Material.Filled.Difference">Phiên bản</MudNavLink>
-            </MudNavGroup>
-            <MudNavGroup Title="Quản lý tài khoản">
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Staff))" Class="@ActiveMenuClass(RouterConfig.Admin.Staff)" Icon="@Icons.Material.Filled.SupervisedUserCircle">Quản trị</MudNavLink>
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Customer))" Class="@ActiveMenuClass(RouterConfig.Admin.Customer)" Icon="@Icons.Material.Filled.Group">Khách hàng</MudNavLink>
-                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Rank))" Class="@ActiveMenuClass(RouterConfig.Admin.Rank)" Icon="@Icons.Material.Filled.KeyboardDoubleArrowUp">Cấp bậc</MudNavLink>
-            </MudNavGroup>
-            <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Voucher))" Class="@ActiveMenuClass(RouterConfig.Admin.Voucher)" Icon="@Icons.Material.Filled.PanoramaHorizontalSelect">Mã giảm giá</MudNavLink>
-            <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Order))" Class="@ActiveMenuClass(RouterConfig.Admin.Order)" Icon="@Icons.Material.Filled.Payments">Hóa đơn</MudNavLink>
-            <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Review))" Class="@ActiveMenuClass(RouterConfig.Admin.Review)" Icon="@Icons.Material.Filled.Reviews">Đánh giá</MudNavLink>
-            <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.File))" Class="@ActiveMenuClass(RouterConfig.Admin.File)" Icon="@Icons.Material.Filled.FileUpload">File upload</MudNavLink>
-            <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Statistical))" Class="@ActiveMenuClass(RouterConfig.Admin.Statistical)" Icon="@Icons.Material.Filled.SsidChart">Thống kê</MudNavLink>
+        
+            @if (HasRead(RouterConfig.Admin.Game) || HasRead(RouterConfig.Admin.Category) || HasRead(RouterConfig.Admin.Platform) || HasRead(RouterConfig.Admin.Publisher))
+            {
+                <MudNavGroup Title="Quản lý game" Expanded="true">
+                    @if (HasRead(RouterConfig.Admin.Game))
+                    {
+                        <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Game))" Class="@ActiveMenuClass(RouterConfig.Admin.Game)" Icon="@Icons.Material.Filled.VideogameAsset">Game</MudNavLink>
+                    }
+                    @if (HasRead(RouterConfig.Admin.Category))
+                    {
+                        <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Category))" Class="@ActiveMenuClass(RouterConfig.Admin.Category)" Icon="@Icons.Material.Filled.Category">Thể loại</MudNavLink>
+                    }
+                    @if (HasRead(RouterConfig.Admin.Platform))
+                    {
+                        <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Platform))" Class="@ActiveMenuClass(RouterConfig.Admin.Platform)" Icon="@Icons.Material.Filled.Airplay">Nền tảng</MudNavLink>
+                    }
+                    @if (HasRead(RouterConfig.Admin.Publisher))
+                    {
+                        <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Publisher))" Class="@ActiveMenuClass(RouterConfig.Admin.Publisher)" Icon="@Icons.Material.Filled.DeveloperMode">Nhà phát hành</MudNavLink>
+                    }
+                </MudNavGroup>
+            }
+
+            @if (HasRead(RouterConfig.Admin.Patch) || HasRead(RouterConfig.Admin.Version))
+            {
+                <MudNavGroup Title="Quản lý gói">
+                    @if (HasRead(RouterConfig.Admin.Patch))
+                    {
+                        <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Patch))" Class="@ActiveMenuClass(RouterConfig.Admin.Patch)" Icon="@Icons.Material.Filled.Backpack">Gói</MudNavLink>
+                    }
+                    @if (HasRead(RouterConfig.Admin.Version))
+                    {
+                        <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Version))" Class="@ActiveMenuClass(RouterConfig.Admin.Version)" Icon="@Icons.Material.Filled.Difference">Phiên bản</MudNavLink>
+                    }
+                </MudNavGroup>
+            }
+
+            @if (HasRead(RouterConfig.Admin.Staff) || HasRead(RouterConfig.Admin.Customer) || HasRead(RouterConfig.Admin.Rank))
+            {
+                <MudNavGroup Title="Quản lý tài khoản">
+                    @if (HasRead(RouterConfig.Admin.Staff))
+                    {
+                        <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Staff))" Class="@ActiveMenuClass(RouterConfig.Admin.Staff)" Icon="@Icons.Material.Filled.SupervisedUserCircle">Quản trị</MudNavLink>
+                    }
+                    @if (HasRead(RouterConfig.Admin.Customer))
+                    {
+                        <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Customer))" Class="@ActiveMenuClass(RouterConfig.Admin.Customer)" Icon="@Icons.Material.Filled.Group">Khách hàng</MudNavLink>
+                    }
+                    @if (HasRead(RouterConfig.Admin.Rank))
+                    {
+                        <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Rank))" Class="@ActiveMenuClass(RouterConfig.Admin.Rank)" Icon="@Icons.Material.Filled.KeyboardDoubleArrowUp">Cấp bậc</MudNavLink>
+                    }
+                </MudNavGroup>
+            }
+
+            @if (HasRead(RouterConfig.Admin.Voucher))
+            {
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Voucher))" Class="@ActiveMenuClass(RouterConfig.Admin.Voucher)" Icon="@Icons.Material.Filled.PanoramaHorizontalSelect">Mã giảm giá</MudNavLink>
+            }
+            @if (HasRead(RouterConfig.Admin.Order))
+            {
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Order))" Class="@ActiveMenuClass(RouterConfig.Admin.Order)" Icon="@Icons.Material.Filled.Payments">Hóa đơn</MudNavLink>
+            }
+            @if (HasRead(RouterConfig.Admin.Review))
+            {
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Review))" Class="@ActiveMenuClass(RouterConfig.Admin.Review)" Icon="@Icons.Material.Filled.Reviews">Đánh giá</MudNavLink>
+            }
+            @if (HasRead(RouterConfig.Admin.File))
+            {
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.File))" Class="@ActiveMenuClass(RouterConfig.Admin.File)" Icon="@Icons.Material.Filled.FileUpload">File upload</MudNavLink>
+            }
+            @if (HasRead(RouterConfig.Admin.Statistical))
+            {
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Statistical))" Class="@ActiveMenuClass(RouterConfig.Admin.Statistical)" Icon="@Icons.Material.Filled.SsidChart">Thống kê</MudNavLink>
+            }
+            @if (HasRead(RouterConfig.Admin.Permission))
+            {
+                <MudNavLink OnClick="@(() => HandleRedirect(RouterConfig.Admin.Permission))" Class="@ActiveMenuClass(RouterConfig.Admin.Permission)" Icon="@Icons.Material.Filled.DeviceHub">Quyền</MudNavLink>
+            }
         </div>
     </MudNavMenu>
 
     <div class="absolute bottom-4 left-0 right-0">
         <MudDivider Class="my-5 !border-slate-200" />
-
-        @if(_mine != null)
+        @if (_mine != null)
         {
             <MudMenu Class="w-full px-3" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.BottomLeft">
                 <ActivatorContent>
                     <div class="flex w-full cursor-pointer items-center gap-2 rounded-xl bg-white p-2 hover:bg-gray-100">
                         <MudAvatar Size="@Size.Medium" Class="!bg-material-default !font-bold !text-white">@GetInitials(_mine.FullName)</MudAvatar>
                         <div class="w-full">
-                            <p class="line-clamp-1 text-base font-medium text-material-default">@_mine.FullName</p>
+                            <p class="text-material-default line-clamp-1 text-base font-medium">@_mine.FullName</p>
                             <p class="line-clamp-1 text-sm font-medium text-gray-400">@_mine.Role</p>
                         </div>
                     </div>
@@ -72,12 +130,12 @@
                             <p class="whitespace-nowrap text-sm font-medium text-gray-900">@_mine.FullName</p>
                         </div>
                     </MudMenuItem>
-                    <MudDivider Class="!border-material-default"/>
-                    <MudMenuItem>
-                        <button @onclick="ChangePassword" class="flex w-full justify-start whitespace-nowrap px-1.5 py-1 text-sm font-medium text-[#666666] hover:bg-gray-100 hover:text-black">Đổi mật khẩu</button>
+                    <MudDivider Class="!border-material-default" />
+                    <MudMenuItem OnClick="ChangePassword">
+                        <div class="flex w-full justify-start px-1.5 py-1 text-sm font-medium text-[#666666]">Đổi mật khẩu</div>
                     </MudMenuItem>
-                    <MudMenuItem>
-                        <button @onclick="Logout" class="flex w-full justify-start whitespace-nowrap px-1.5 py-1 text-sm font-medium text-[#666666] hover:bg-gray-100 hover:text-black">Đăng Xuất</button>
+                    <MudMenuItem OnClick="Logout">
+                        <div class="flex w-full justify-start px-1.5 py-1 text-sm font-medium text-[#666666]">Đăng Xuất</div>
                     </MudMenuItem>
                 </ChildContent>
             </MudMenu>
@@ -87,44 +145,48 @@
 
 @code {
     [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
-    public MineResponse _mine { get; set; }
+    public StaffGetMe _mine { get; set; }
 
-    [Parameter]
-    public EventCallback OnLoggedOut { get; set; }
+    [Parameter] public EventCallback OnLoggedOut { get; set; }
+    [Parameter] public EventCallback OnChangePassword { get; set; }
 
-    [Parameter]
-    public EventCallback OnChangePassword { get; set; }
+    private bool HasRead(string path)
+    {
+        if (string.IsNullOrEmpty(path)) return false;
+
+        var pageCode = PermissionHelper.GetPageCode(path);
+        return PermissionHelper.HasAccess(_mine, pageCode, Constant.ActionButton.Read);
+    }
 
     private string ActiveMenuClass(string path)
     {
-        var contentUrl = "/" + navigation.ToBaseRelativePath(navigation.Uri);
+        if (string.IsNullOrEmpty(path)) return "item-menu";
 
-        if (contentUrl.Contains(path)) return "active-menu";
+        var contentUrl = "/" + navigation.ToBaseRelativePath(navigation.Uri).ToLower();
+        var targetPath = path.ToLower();
+
+        if (contentUrl.Length > 1) contentUrl = contentUrl.TrimEnd('/');
+        if (targetPath.Length > 1) targetPath = targetPath.TrimEnd('/');
+
+        if (contentUrl == targetPath || (targetPath != "/" && contentUrl.StartsWith(targetPath + "/")))
+            return "active-menu";
 
         return "item-menu";
     }
 
     void HandleRedirect(string path)
     {
-        if (path == "") return;
-
+        if (string.IsNullOrEmpty(path)) return;
         navigation.NavigateTo(path);
     }
 
     private string GetInitials(string name)
     {
-        if (string.IsNullOrWhiteSpace(name)) return "U";
+        if (string.IsNullOrWhiteSpace(name)) return "S";
         var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         return parts[^1][0].ToString().ToUpper();
     }
 
-    async Task Logout()
-    {
-        await OnLoggedOut.InvokeAsync();
-    }
-
-    async Task ChangePassword()
-    {
-        await OnChangePassword.InvokeAsync();
-    }
+    async Task Logout() => await OnLoggedOut.InvokeAsync();
+    async Task ChangePassword() => await OnChangePassword.InvokeAsync();
 }

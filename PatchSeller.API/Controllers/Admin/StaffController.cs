@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using PatchSeller.API.DTOs;
 using PatchSeller.DAL.Models;
 using PatchSeller.DAL.Repository;
 using Pro219.API.DTOs;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace PatchSeller.API.Controllers.Admin
 {
@@ -13,10 +16,16 @@ namespace PatchSeller.API.Controllers.Admin
     public class StaffController : ControllerBase
     {
         StaffRepository _staffRepository;
+        StaffPagePermissionRepository _staffPagePermissionRepository;
+        PagePermissionRepository _pagePermissionRepository;
+        RoleRepository _roleRepository;
 
         public StaffController()
         {
             _staffRepository = new StaffRepository();
+            _staffPagePermissionRepository = new StaffPagePermissionRepository();
+            _pagePermissionRepository = new PagePermissionRepository();
+            _roleRepository = new RoleRepository();
         }
 
         [HttpGet("get-all-staffs")]
@@ -65,6 +74,91 @@ namespace PatchSeller.API.Controllers.Admin
             }
         }
 
+        [HttpGet("get-me")]
+        public async Task<ActionResult<StaffMeDetailDTO>> GetMe()
+        {
+            try
+            {
+                var staffIdClaim = User.FindFirst(ClaimTypes.SerialNumber)?.Value;
+                var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+                if (!int.TryParse(staffIdClaim, out var staffId))
+                {
+                    return Unauthorized(Constant.ErrorCode.Unauthorized);
+                }
+
+                if (string.IsNullOrEmpty(roleClaim) || roleClaim.Equals("Customer", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Unauthorized(Constant.ErrorCode.Unauthorized);
+                }
+
+                var staff = await _staffRepository.GetById(staffId);
+                if (staff == null)
+                {
+                    return NotFound(Constant.ErrorCode.NotFound);
+                }
+
+                //var staffPagePermissions = await _staffPagePermissionRepository.GetAllByStaffId(staffId) ?? new List<StaffPagePermission>();
+                //var pagePermissions = await _pagePermissionRepository.GetAll(null) ?? new List<PagePermission>();
+
+                //var permissionOrder = new[] { "C", "R", "U", "D" };
+
+                //var groupedPermissions = staffPagePermissions
+                //    .Join(
+                //        pagePermissions,
+                //        spp => spp.PagePermissionId,
+                //        pp => pp.Id,
+                //        (spp, pp) => new { pp.PageCode, spp.PermissionCode })
+                //    .Where(x => !string.IsNullOrWhiteSpace(x.PageCode) && !string.IsNullOrWhiteSpace(x.PermissionCode))
+                //    .GroupBy(x => x.PageCode!)
+                //    .Select(g =>
+                //    {
+                //        var codes = g
+                //            .Select(x => x.PermissionCode.ToUpper())
+                //            .Distinct()
+                //            .ToList();
+
+                //        return new PagePermissionDTO
+                //        {
+                //            PageCode = g.Key,
+                //            PagePermissions = string.Concat(permissionOrder.Where(code => codes.Contains(code)))
+                //        };
+                //    })
+                //    .OrderBy(x => x.PageCode)
+                //    .ToList();
+
+                var roleByStaffId = await _roleRepository.GetById(staff.RoleId);
+                var pagePermissions = new List<PagePermissionDTO>();
+                if (roleByStaffId != null)
+                {
+                    string jsonString = roleByStaffId.PagesPermission;
+
+                    if(!string.IsNullOrEmpty(jsonString))
+                    {
+                        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                        pagePermissions = System.Text.Json.JsonSerializer.Deserialize<List<PagePermissionDTO>>(jsonString, options);
+                    }
+                }
+
+                var result = new StaffMeDetailDTO
+                {
+                    StaffId = staff.StaffId,
+                    FullName = staff.FullName,
+                    UserName = staff.UserName,
+                    Email = staff.Email,
+                    PhoneNumber = staff.PhoneNumber,
+                    Role = staff.Role,
+                    CreatedAt = staff.CreatedAt,
+                    PagePermissions = pagePermissions
+                };
+
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, Constant.ErrorCode.OtherError);
+            }
+        }
+
         [HttpPost("create")]
         public async Task<ActionResult<Staff>> CreateStaff([FromBody] Staff staff)
         {
@@ -74,6 +168,11 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return BadRequest(Constant.ErrorCode.DataRequired);
                 }
+                RoleRepository roleRepository = new RoleRepository();
+                Role staffRole = await roleRepository.GetById(staff.RoleId);
+                if (staffRole == null)
+                    return BadRequest(Constant.ErrorCode.DataRequired);
+                staff.Role = staffRole.RoleName;
 
                 var result = await _staffRepository.Create(staff);
 
@@ -81,12 +180,31 @@ namespace PatchSeller.API.Controllers.Admin
                 {
                     return StatusCode(500, Constant.ErrorCode.DatabaseError);
                 }
+                string jsonString = staffRole.PagesPermission;
+                if(jsonString!=null)
+                {
+                    List<PagePermissionDTO> pagePermissionDTOs = JsonConvert.DeserializeObject<List<PagePermissionDTO>>(jsonString) ?? new List<PagePermissionDTO>();
+                    var addPermissionResult = await _staffPagePermissionRepository.CreateRangeByPagePermissions(
+                        pagePermissionDTOs
+                            .Select(x => (x.PageCode, x.PagePermissions))
+                            .ToList(),
+                        result.StaffId);
+
+                    if (!addPermissionResult)
+                    {
+                        return StatusCode(500, Constant.ErrorCode.DatabaseError);
+                    }
+                }    
 
                 return Ok(result);
             }
             catch (InvalidOperationException ex) when (ex.Message == "DUPLICATE_NAME_OR_EMAIL")
             {
                 return BadRequest(Constant.ErrorCode.UserNameOrEmailAlreadyExit);
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "PAGE_CODE_NOT_FOUND" || ex.Message == "STAFF_NOT_FOUND")
+            {
+                return BadRequest(Constant.ErrorCode.InvalidData);
             }
             catch (Exception ex)
             {
@@ -112,7 +230,8 @@ namespace PatchSeller.API.Controllers.Admin
                     PasswordHash = staff.PasswordHash,
                     Email = staff.Email,
                     PhoneNumber = staff.PhoneNumber,
-                    Role = staff.Role
+                    Role = staff.Role,
+                    RoleId = staff.RoleId
                 };
 
                 var result = await _staffRepository.Update(staff);

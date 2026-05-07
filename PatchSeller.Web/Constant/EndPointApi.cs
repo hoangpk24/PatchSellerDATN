@@ -41,6 +41,7 @@
             public const string StaffCreate = "/admin/staff/create";
             public const string StaffUpdate = "/admin/staff/update";
             public const string StaffDelete = "/admin/staff/delete/:id";
+            public const string GetMeStaff = "/admin/staff/get-me";
 
             // User
             public const string UserGetAll = "/admin/user/get-all-users";
@@ -104,6 +105,13 @@
 
             //Statistic
             public const string Statistic = "/admin/report/overview";
+
+            // Permission
+            public const string GetAllRole = "/admin/role/get-all-roles";
+            public const string RoleGetById = "/admin/role/get-role-by-id/:id";
+            public const string RoleCreate = "/admin/role/create";
+            public const string RoleUpdate = "/admin/role/update";
+            public const string RoleDelete = "/admin/role/delete/:id";
         }
 
         public static class Customer

@@ -41,10 +41,14 @@
 
             <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Quyền</label>
-                <MudSelect Variant="Variant.Outlined" Margin="Margin.Dense" T="string" @bind-Value="_model.Role" For="@(() => _model.Role)">
-                    <MudSelectItem Value="@("admin")">Admin</MudSelectItem>
-                    <MudSelectItem Value="@("editor")">Editor</MudSelectItem>
-                    <MudSelectItem Value="@("staff")">Staff</MudSelectItem>
+                <MudSelect Disabled="@_isDisableRole" Variant="Variant.Outlined" Margin="Margin.Dense" T="int" Value="_model.RoleId" ValueChanged="OnRoleChanged" For="@(() => _model.RoleId)">
+                    @if (_lstRole.Any())
+                    {
+                        @foreach (var role in _lstRole)
+                        {
+                            <MudSelectItem Value="@role.Id">@role.RoleName</MudSelectItem>
+                        }
+                    }
                 </MudSelect>
             </div>
 
@@ -66,28 +70,36 @@
                            OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Staff)">
                     Quay lại
                 </MudButton>
-                <MudButton Variant="Variant.Filled"
+                <AuthorizeControl Action="@Constant.ActionButton.Edit">
+                    <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.Edit"
                            OnClick="@(async () => await OnSubmit())"
                            Disabled="@_isLoading"
                            Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
-                    Sửa
-                </MudButton>
+                        Sửa
+                    </MudButton>
+                </AuthorizeControl>
             </div>
         </MudForm>
     </div>
 </section>
 
 @code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Mine)]
+    public StaffGetMe _mine { get; set; }
+
     [Parameter]
     public int id { get; set; }
+
+    List<RoleResponse> _lstRole = new List<RoleResponse>();
 
     MudForm _form = new MudForm();
     DAL.Models.Staff _model = new DAL.Models.Staff();
     StaffSchema.CreateUpdate _staffSchema = new StaffSchema.CreateUpdate();
 
     private bool _isLoading = false;
+    private bool _isDisableRole = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -108,11 +120,20 @@
 
     async Task LoadData()
     {
+
+        var resRole = await _adminRoleService.GetAllRoles();
+        if (resRole.IsSuccess && resRole.Data.Any())
+        {
+            _lstRole = resRole.Data;
+        }
+
         var response = await _adminStaffService.GetById(id);
 
         if (response.IsSuccess && response.Data != null)
         {
             _model = response.Data;
+
+            _isDisableRole = _mine.StaffId == _model.StaffId;
         }
         else if (response.IsSuccess == false && response.StatusCode == "NotFound")
         {
@@ -123,6 +144,16 @@
         {
             _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho quản trị viên.", MudBlazor.Severity.Error);
             navigation.NavigateTo(RouterConfig.Admin.Staff);
+        }
+    }
+
+    private void OnRoleChanged(int selectedRoleId)
+    {
+        _model.RoleId = selectedRoleId;
+        var selectedRole = _lstRole.FirstOrDefault(x => x.Id == selectedRoleId);
+        if (selectedRole != null)
+        {
+            _model.Role = selectedRole.RoleName;
         }
     }
 

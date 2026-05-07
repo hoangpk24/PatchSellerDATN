@@ -5,8 +5,10 @@
 
 <section class="p-6">
     <div class="flex items-center justify-between">
-        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách mã giảm giá</h1>
-        <a href="@RouterConfig.Admin.CreateVoucher" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
+        <h1 class="leading-[3rem] text-material-default h-12 text-3xl font-bold">Danh sách mã giảm giá</h1>
+        <AuthorizeControl Action="@Constant.ActionButton.Create">
+            <a href="@RouterConfig.Admin.CreateVoucher" class="leading-[1.5rem] bg-material-default h-10 rounded px-6 py-2 text-white shadow-md">Tạo mới</a>
+        </AuthorizeControl>
     </div>
 
     <div class="mt-8 rounded bg-white p-6 shadow-md">
@@ -106,8 +108,12 @@
                     @{
                         bool isActiveNow = IsCouponActiveNow(context);
                     }
-                    <MudIconButton Disabled="@isActiveNow" Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditVoucher.Replace(":id", context.DiscountId.ToString())))"></MudIconButton>
-                    <MudIconButton Disabled="@isActiveNow" Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogDelete(context.DiscountId))"></MudIconButton>
+                    <AuthorizeControl Action="@Constant.ActionButton.Edit">
+                        <MudIconButton Color="Color.Warning" Disabled="@isActiveNow" Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditVoucher.Replace(":id", context.DiscountId.ToString())))"></MudIconButton>
+                    </AuthorizeControl>
+                    <AuthorizeControl Action="@Constant.ActionButton.Delete">
+                        <MudIconButton Color="Color.Error" Disabled="@isActiveNow" Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogDelete(context.DiscountId))"></MudIconButton>
+                    </AuthorizeControl>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>

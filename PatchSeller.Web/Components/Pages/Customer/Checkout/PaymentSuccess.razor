@@ -20,6 +20,9 @@
 </section>
 
 @code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
     [SupplyParameterFromQuery(Name = "order-id")]
     public int _orderId { get; set; } = 0;
 

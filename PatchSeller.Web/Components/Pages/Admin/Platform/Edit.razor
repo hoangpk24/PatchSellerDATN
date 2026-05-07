@@ -52,14 +52,16 @@
                            OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Platform)">
                     Quay lại
                 </MudButton>
-                <MudButton Variant="Variant.Filled"
+                <AuthorizeControl Action="@Constant.ActionButton.Edit">
+                    <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.Edit"
                            OnClick="@(async () => await OnSubmit())"
                            Disabled="@_isLoading"
                            Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
-                    Sửa
-                </MudButton>
+                        Sửa
+                    </MudButton>
+                </AuthorizeControl>
             </div>
         </MudForm>
     </div>
