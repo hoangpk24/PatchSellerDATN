@@ -19,10 +19,12 @@ namespace PatchSeller.API.Controllers.Public
 
         OrderRepository _orderRepository;
         private readonly IBackgroundJobClient _backgroundJobClient;
-        public OrderController(IBackgroundJobClient backgroundJobClient)
+        private readonly IConfiguration _configuration;
+        public OrderController(IBackgroundJobClient backgroundJobClient, IConfiguration configuration)
         {
             _orderRepository = new OrderRepository();
             _backgroundJobClient = backgroundJobClient;
+            _configuration = configuration;
         }
 
         private static OrderDetailResponseDTO MapToOrderDetailResponse(Order order)
@@ -375,7 +377,9 @@ namespace PatchSeller.API.Controllers.Public
                 var user = await userRepository.GetById(order.UserId);
                 if (user != null)
                 {
-                    user.RewardPoint += order.FinalAmount * 0.05;
+                    var rewardPercent = _configuration.GetValue<double?>("RewardPercent") ?? 5;
+                    rewardPercent = Math.Clamp(rewardPercent, 0, 100);
+                    user.RewardPoint += order.FinalAmount * (rewardPercent / 100.0);
                     await userRepository.Update(user);
                 }
                 return Ok(order);

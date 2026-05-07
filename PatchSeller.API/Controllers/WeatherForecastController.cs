@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PatchSeller.API.Utilities;
 using GoogleServiceLib;
 using PatchSeller.DAL.Repository;
+using System.Text.Json;
 
 namespace PatchSeller.API.Controllers
 {
@@ -11,10 +12,14 @@ namespace PatchSeller.API.Controllers
     {
        
         private readonly IGoogleDriveService _googleDriveService;
+        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
 
-        public WeatherForecastController(IGoogleDriveService googleDriveService)
+        public WeatherForecastController(IGoogleDriveService googleDriveService, IConfiguration configuration, IWebHostEnvironment environment)
         {
             _googleDriveService = googleDriveService;
+            _configuration = configuration;
+            _environment = environment;
         }
 
 
@@ -127,6 +132,47 @@ namespace PatchSeller.API.Controllers
         {
             var tree = await _googleDriveService.GetDriveTreeAsync();
             return Ok(tree);
+        }
+
+        [HttpGet("reward-percent")]
+        public IActionResult GetRewardPercent()
+        {
+            var rewardPercent = _configuration.GetValue<double?>("RewardPercent") ?? 5;
+            return Ok(new { RewardPercent = rewardPercent });
+        }
+
+        [HttpPut("reward-percent")]
+        public async Task<IActionResult> UpdateRewardPercent([FromQuery] double rewardPercent)
+        {
+            if (rewardPercent < 0 || rewardPercent > 100)
+            {
+                return BadRequest(Constant.ErrorCode.InvalidData);
+            }
+
+            var appSettingsPath = Path.Combine(_environment.ContentRootPath, "appsettings.json");
+            if (!System.IO.File.Exists(appSettingsPath))
+            {
+                return NotFound(Constant.ErrorCode.NotFound);
+            }
+
+            var json = await System.IO.File.ReadAllTextAsync(appSettingsPath);
+            using var document = JsonDocument.Parse(json);
+
+            var root = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+            foreach (var property in document.RootElement.EnumerateObject())
+            {
+                root[property.Name] = JsonSerializer.Deserialize<object>(property.Value.GetRawText());
+            }
+
+            root["RewardPercent"] = rewardPercent;
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            await System.IO.File.WriteAllTextAsync(appSettingsPath, JsonSerializer.Serialize(root, options));
+            return Ok(new { RewardPercent = rewardPercent });
         }
 
         [HttpPost("upload-with-folder")]
