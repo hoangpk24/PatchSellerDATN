@@ -122,6 +122,11 @@
 
             // File
             public const string File = "/admin/file";
+
+            // Permission
+            public const string Permission = "/admin/permissions";
+            public const string CreatePermission = "/admin/permissions/create";
+            public const string EditPermission = "/admin/permissions/:id/edit";
         }
     }
 }

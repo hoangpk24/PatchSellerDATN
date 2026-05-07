@@ -144,5 +144,13 @@
             public const int OrderCanceled = 3; // Huỷ
             public const int OrderDone = 1; // Hoàn thành
         }
+
+        public static class ActionButton
+        {
+            public const string Create = "C";
+            public const string Edit = "U";
+            public const string Delete = "D";
+            public const string Read = "R";
+        }
     }
 }

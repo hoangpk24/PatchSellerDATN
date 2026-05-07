@@ -42,13 +42,15 @@
                 <MudTd DataLabel="Tên">@context.Content</MudTd>
                 <MudTd DataLabel="Tên">@(context.Status == 1 ? "Công khai" : "Đã bị ẩn")</MudTd>
                 <MudTd Class="!flex-nowrap" DataLabel="Thao tác">
-                    @if(context.Status == 1)
-                    {
-                        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@(() => UpdateStatus(context, true))">Ẩn</MudButton>
-                    } else
-                    {
-                        <MudButton Variant="Variant.Text" OnClick="@(() => UpdateStatus(context, false))">Hiện</MudButton>
-                    }
+                    <AuthorizeControl Action="@Constant.ActionButton.Edit">
+                        @if(context.Status == 1)
+                        {
+                            <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@(() => UpdateStatus(context, true))">Ẩn</MudButton>
+                        } else
+                        {
+                            <MudButton Variant="Variant.Text" OnClick="@(() => UpdateStatus(context, false))">Hiện</MudButton>
+                        }
+                    </AuthorizeControl>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>

@@ -41,10 +41,14 @@
 
             <div class="mb-6">
                 <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Quyền</label>
-                <MudSelect Margin="Margin.Dense" Variant="Variant.Outlined" T="string" @bind-Value="_model.Role" For="@(() => _model.Role)">
-                    <MudSelectItem Value="@("admin")">Admin</MudSelectItem>
-                    <MudSelectItem Value="@("editor")">Editor</MudSelectItem>
-                    <MudSelectItem Value="@("staff")">Staff</MudSelectItem>
+                <MudSelect Margin="Margin.Dense" Variant="Variant.Outlined" T="int" Value="_model.RoleId" ValueChanged="OnRoleChanged" For="@(() => _model.RoleId)">
+                    @if (_lstRole.Any())
+                    {
+                        @foreach (var role in _lstRole)
+                        {
+                            <MudSelectItem Value="@role.Id">@role.RoleName</MudSelectItem>
+                        }
+                    }
                 </MudSelect>
             </div>
 
@@ -82,14 +86,16 @@
                            OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Staff)">
                     Quay lại
                 </MudButton>
-                <MudButton Variant="Variant.Filled"
+                <AuthorizeControl Action="@Constant.ActionButton.Create">
+                    <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.Add"
                            OnClick="@(async () => await OnSubmit())"
                            Disabled="@_isLoading"
                            Class="px-8 py-2.5 font-bold shadow-lg shadow-material-default/20">
-                    Tạo mới
-                </MudButton>
+                        Tạo mới
+                    </MudButton>
+                </AuthorizeControl>
             </div>
         </MudForm>
     </div>
@@ -97,6 +103,7 @@
 
 @code {
     MudForm _form = new MudForm();
+    List<RoleResponse> _lstRole = new List<RoleResponse>();
     DAL.Models.Staff _model = new DAL.Models.Staff();
     StaffSchema.CreateUpdate _staffSchema = new StaffSchema.CreateUpdate();
 
@@ -105,9 +112,45 @@
 
     private void TogglePasswordVisibility() => _passwordVisibility = !_passwordVisibility;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        _model.Role = "admin";
+        try
+        {
+            _isLoading = true;
+            await LoadData();
+        } catch(Exception)
+        {
+            _isLoading = false;
+        } finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task LoadData()
+    {
+        var resRole = await _adminRoleService.GetAllRoles();
+        if(resRole.IsSuccess && resRole.Data.Any())
+        {
+            _lstRole = resRole.Data;
+            var firstRole = _lstRole.FirstOrDefault();
+            if (firstRole != null)
+            {
+                _model.RoleId = firstRole.Id;
+                _model.Role = firstRole.RoleName;
+            }
+        }
+    }
+
+    private void OnRoleChanged(int selectedRoleId)
+    {
+        _model.RoleId = selectedRoleId;
+
+        var selectedRole = _lstRole.FirstOrDefault(x => x.Id == selectedRoleId);
+        if (selectedRole != null)
+        {
+            _model.Role = selectedRole.RoleName;
+        }
     }
 
     async Task OnSubmit()

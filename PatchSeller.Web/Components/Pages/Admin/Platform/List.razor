@@ -5,8 +5,10 @@
 
 <section class="p-6">
     <div class="flex items-center justify-between">
-        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách nền tảng</h1>
-        <a href="@RouterConfig.Admin.CreatePlatform" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
+        <h1 class="leading-[3rem] text-material-default h-12 text-3xl font-bold">Danh sách nền tảng</h1>
+        <AuthorizeControl Action="@Constant.ActionButton.Create">
+            <a href="@RouterConfig.Admin.CreatePlatform" class="leading-[1.5rem] bg-material-default h-10 rounded px-6 py-2 text-white shadow-md">Tạo mới</a>
+        </AuthorizeControl>
     </div>
 
     <div class="mt-8 rounded bg-white p-6 shadow-md">
@@ -38,7 +40,7 @@
                 <MudTd DataLabel="Trạng thái">
                     @if(context.Status == Constant.StatusDefault.Active)
                     {
-                        <span class="font-medium uppercase text-material-default">Hoạt động</span>
+                        <span class="text-material-default font-medium uppercase">Hoạt động</span>
                     } else
                     {
 
@@ -46,8 +48,12 @@
                     }
                 </MudTd>
                 <MudTd DataLabel="Thao tác">
-                    <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditPlatform.Replace(":id", context.PlatformId.ToString())))"></MudIconButton>
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogDelete(context.PlatformId))"></MudIconButton>
+                    <AuthorizeControl Action="@Constant.ActionButton.Edit">
+                        <MudIconButton Color="Color.Warning" Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditPlatform.Replace(":id", context.PlatformId.ToString())))"></MudIconButton>
+                    </AuthorizeControl>
+                    <AuthorizeControl Action="@Constant.ActionButton.Delete">
+                        <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogDelete(context.PlatformId))"></MudIconButton>
+                    </AuthorizeControl>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>

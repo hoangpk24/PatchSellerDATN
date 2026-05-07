@@ -1,0 +1,202 @@
+﻿@page "/admin/permissions/create"
+@layout AdminLayout
+@using System.Text.Json
+
+<PageTitle>@Constant.PageTitleAdmin Permission Create</PageTitle>
+
+<section class="mx-auto max-w-[1280px] p-6">
+    <h1 class="leading-[3rem] mb-4 h-12 text-3xl font-bold text-material-default">Tạo quyền mới</h1>
+
+    <div class="rounded bg-white p-10 shadow-md">
+        <MudForm @ref="_form" @bind-IsValid="@_success">
+            <div class="mb-6">
+                <label class="mb-2 text-sm font-bold uppercase tracking-wider text-slate-700">Tên quyền</label> <span class="ml-1 text-red-500">*</span>
+                <MudTextField T="string"
+                              @bind-Value="_roleName"
+                              Required="true"
+                              RequiredError="Vui lòng nhập tên quyền"
+                              Variant="Variant.Outlined"
+                              Placeholder="Ví dụ: Quản trị hệ thống"
+                              Margin="Margin.Dense" />
+            </div>
+
+            <div class="mb-6 border-b border-solid border-slate-200">
+                <label class="text-sm font-bold uppercase tracking-wider text-slate-700">Chi tiết phân quyền</label>
+                <p class="mb-2 mt-1 text-xs text-slate-400">Chọn các hành động được phép thực hiện cho từng chức năng</p>
+
+                <MudSimpleTable Hover="true" Striped="false" Dense="true" FixedHeader="true" Elevation="0">
+                    <thead class="!bg-slate-50">
+                        <tr>
+                            <th class="py-4 pl-6 text-left font-bold text-slate-600">Chức năng</th>
+                            <th class="text-center font-bold text-slate-600">Xem</th>
+                            <th class="text-center font-bold text-slate-600">Thêm</th>
+                            <th class="text-center font-bold text-slate-600">Sửa</th>
+                            <th class="text-center font-bold text-slate-600">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in _permissions)
+                        {
+                            <tr class="border-t border-slate-100">
+                                <td class="py-3 pl-6 font-bold text-slate-700">@item.DisplayName</td>
+
+                                <td class="text-center">
+                                    <MudCheckBox @bind-Value="@item.CanRead" Color="Color.Primary" Dense="true"></MudCheckBox>
+                                </td>
+
+                                <td class="text-center">
+                                    @if (item.PageCode != "ORDER" && item.PageCode != "STATISTICAL" && item.PageCode != "REVIEW")
+                                    {
+                                        <MudCheckBox @bind-Value="@item.CanCreate" Color="Color.Success" Dense="true"></MudCheckBox>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    @if (item.PageCode != "ORDER" && item.PageCode != "STATISTICAL")
+                                    {
+                                        <MudCheckBox @bind-Value="@item.CanUpdate" Color="Color.Warning" Dense="true"></MudCheckBox>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    @if (item.PageCode != "ORDER" && item.PageCode != "STATISTICAL" && item.PageCode != "REVIEW")
+                                    {
+                                        <MudCheckBox @bind-Value="@item.CanDelete" Color="Color.Error" Dense="true"></MudCheckBox>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            </div>
+
+            <div class="flex items-center justify-end gap-3">
+                <MudButton Variant="Variant.Text" OnClick="() => navigation.NavigateTo(RouterConfig.Admin.Permission)">Quay lại</MudButton>
+                <AuthorizeControl Action="@Constant.ActionButton.Create">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSubmit" Class="font-bold">Tạo mới</MudButton>
+                </AuthorizeControl>
+            </div>
+        </MudForm>
+    </div>
+</section>
+
+@code {
+    MudForm _form = new MudForm();
+    bool _success;
+    string _roleName = string.Empty;
+    private List<PagePermissionViewModel> _permissions = new();
+    bool _isLoading = false;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            _isLoading = true;
+            var modules = PermissionHelper.GetModules();
+            foreach (var entry in modules)
+            {
+                _permissions.Add(new PagePermissionViewModel
+                {
+                    PageCode = entry.Value,
+                    DisplayName = GetVietnameseName(entry.Value)
+                });
+            }
+        }
+        catch (Exception)
+        {
+            _isLoading = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (_isLoading) return;
+
+        try
+        {
+            _isLoading = true;
+
+            await _form.Validate();
+            if (!_form.IsValid) return;
+
+            var permissionData = _permissions
+                .Where(p => p.CanCreate || p.CanRead || p.CanUpdate || p.CanDelete)
+                .Select(p => new { pageCode = p.PageCode, pagePermissions = p.GetPermissionString() })
+                .ToList();
+
+            string jsonResult = JsonSerializer.Serialize(permissionData);
+
+            var payload = new RoleModel
+            {
+                RoleName = _roleName,
+                PagesPermission = jsonResult,
+                Status = true,
+            };
+
+            var response = await _adminRoleService.CreateRole(payload);
+
+            if (response.IsSuccess)
+            {
+                _snackbar.Add("Tạo thành công!", MudBlazor.Severity.Success);
+                navigation.NavigateTo(RouterConfig.Admin.Permission );
+            }
+            else
+            {
+                var mess = string.IsNullOrEmpty(response.ErrorMessage) ? "Tạo thất bại" : response.ErrorMessage;
+                _snackbar.Add(mess, MudBlazor.Severity.Error);
+            }
+        } catch (Exception)
+        {
+            _isLoading = false;
+        } finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    public class PagePermissionViewModel
+    {
+        public string PageCode { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public bool CanCreate { get; set; }
+        public bool CanRead { get; set; }
+        public bool CanUpdate { get; set; }
+        public bool CanDelete { get; set; }
+
+        public string GetPermissionString()
+        {
+            string p = "";
+            if (CanCreate) p += Constant.ActionButton.Create;
+            if (CanRead) p += Constant.ActionButton.Read;
+            if (CanUpdate) p += Constant.ActionButton.Edit;
+            if (CanDelete) p += Constant.ActionButton.Delete;
+            return p;
+        }
+    }
+
+
+    private string GetVietnameseName(string code) => code switch
+    {
+        "CATEGORY" => "Danh mục",
+        "CUSTOMER" => "Khách hàng",
+        "FILE" => "Quản lý file",
+        "GAME" => "Game",
+        "ORDER" => "Đơn hàng",
+        "PATCH" => "Patch",
+        "PERMISSIONS" => "Phân quyền",
+        "PLATFORM" => "Nền tảng",
+        "PUBLISHER" => "Nhà phát hành",
+        "RANK" => "Xếp hạng",
+        "REVIEW" => "Đánh giá",
+        "STAFF" => "Nhân viên",
+        "STATISTICAL" => "Thống kê",
+        "VERSION" => "Phiên bản",
+        "VOUCHER" => "Mã giảm giá",
+        _ => code
+    };
+
+}

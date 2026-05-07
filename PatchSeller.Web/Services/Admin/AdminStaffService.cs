@@ -90,6 +90,32 @@ namespace PatchSeller.Web.Services.Admin
             }
         }
 
+        public async Task<StaffGetMe> GetMe(string token)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.GetMeStaff);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                var formatToken = token.Trim('"');
+                request.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", formatToken);
+            }
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseDTO = await response.Content.ReadFromJsonAsync<StaffGetMe>();
+
+                if(responseDTO != null)
+                {
+                    responseDTO.IsStaff = true;
+                }
+                return responseDTO;
+            }
+            return new StaffGetMe { IsStaff = false };
+        }
+
         public async Task<ServiceResult<Staff>> CreateStaff(Staff staff)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, Constant.EndPointApi.Admin.StaffCreate);

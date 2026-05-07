@@ -118,6 +118,7 @@ namespace PatchSeller.DAL.Repository
                 exitingStaff.Email = staff.Email;
                 exitingStaff.PhoneNumber = staff.PhoneNumber;
                 exitingStaff.Role = staff.Role;
+                exitingStaff.RoleId = staff.RoleId;
 
                 _context.Staffs.Update(exitingStaff);
                 await _context.SaveChangesAsync();

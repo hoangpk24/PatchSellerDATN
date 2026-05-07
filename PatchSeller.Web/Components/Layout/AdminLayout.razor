@@ -16,17 +16,19 @@
 {
     <CascadingValue Value="_mine" Name="@Constant.CascadingNameParams.Mine">
         <CascadingValue Value="_token" Name="@Constant.CascadingNameParams.Token">
-            <main class="hidden h-screen w-screen overflow-hidden lg:flex">
-                <Nav OnLoggedOut="HandleLogout" OnChangePassword="HandleChangePassword" />
+                <main class="hidden h-screen w-screen overflow-hidden lg:flex">
+                    <Nav OnLoggedOut="HandleLogout" OnChangePassword="HandleChangePassword" />
 
-                <section class="max-w-[calc(100lvw-18.75rem)] h-screen w-full overflow-auto bg-slate-50">
-                    <div class="border-b border-solid border-slate-200 bg-white px-6 py-4">
-                        <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator="/"></MudBreadcrumbs>
-                    </div>
+                    <section class="max-w-[calc(100lvw-18.75rem)] h-screen w-full overflow-auto bg-slate-50">
+                        <div class="border-b border-solid border-slate-200 bg-white px-6 py-4">
+                            <MudBreadcrumbs Class="!p-0 !text-sm" Items="_itemBreadcrumbs" Separator="/"></MudBreadcrumbs>
+                        </div>
 
-                    @Body
-                </section>
-            </main>
+                        <PermissionGuard Mine="@_mine">
+                            @Body
+                        </PermissionGuard>
+                    </section>
+                </main>
         </CascadingValue>
     </CascadingValue>
 }
@@ -45,7 +47,7 @@
         new("Trang Chủ", href: RouterConfig.Admin.Home)
     ];
 
-    private MineResponse _mine = null;
+    private StaffGetMe _mine = null;
     private bool _isLoading = true;
     private string _token = string.Empty;
 
@@ -119,12 +121,17 @@
 
             try
             {
-                _mine = await _accessService.AccessCheck(_token.Trim('"'));
-            }
-            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is HttpRequestException)
-            {
-                await ClearLocalStorageAndNavigate(RouterConfig.Admin.Login);
-                return;
+                _mine = await _adminStaffService.GetMe(_token.Trim('"'));
+
+                if (_mine == null || !_mine.IsStaff || _mine.Role == Constant.Role.Customer)
+                {
+                    navigation.NavigateTo(RouterConfig.AccessDenied);
+                    _isLoading = false;
+                    return;
+                }
+
+                var userInfoJson = JsonSerializer.Serialize(_mine);
+                await _localStorage.SetItemAsStringAsync(Constant.UserInfoLocalStorage, userInfoJson);
             }
             catch (Exception)
             {
@@ -132,24 +139,24 @@
                 return;
             }
 
-            if (_mine != null && _mine.IsExpired)
-            {
-                await ClearLocalStorageAndNavigate(RouterConfig.Admin.Login);
-                return;
-            }
+            // if (_mine != null && _mine.IsExpired)
+            // {
+            //     await ClearLocalStorageAndNavigate(RouterConfig.Admin.Login);
+            //     return;
+            // }
 
-            if (_mine != null && _mine.Role == Constant.Role.Customer)
-            {
-                navigation.NavigateTo(RouterConfig.AccessDenied, true);
-                _isLoading = false;
-                return;
-            }
+            // if (_mine != null && _mine.Role == Constant.Role.Customer)
+            // {
+            //     navigation.NavigateTo(RouterConfig.AccessDenied, true);
+            //     _isLoading = false;
+            //     return;
+            // }
 
-            if (_mine != null)
-            {
-                var userInfoJson = JsonSerializer.Serialize(_mine);
-                await _localStorage.SetItemAsStringAsync(Constant.UserInfoLocalStorage, userInfoJson);
-            }
+            // if (_mine != null)
+            // {
+            //     var userInfoJson = JsonSerializer.Serialize(_mine);
+            //     await _localStorage.SetItemAsStringAsync(Constant.UserInfoLocalStorage, userInfoJson);
+            // }
         }
         catch (Exception e) {}
     }
@@ -173,10 +180,12 @@
     {
         await _localStorage.RemoveItemAsync(Constant.TokenNameLocalStorage);
         await _localStorage.RemoveItemAsync(Constant.TokenExpiredLocalStorage);
-            await _localStorage.RemoveItemAsync(Constant.UserInfoLocalStorage);
-            await _localStorage.RemoveItemAsync(Constant.UserFirstLoginLocalStorage);
+        await _localStorage.RemoveItemAsync(Constant.UserInfoLocalStorage);
+        await _localStorage.RemoveItemAsync(Constant.UserFirstLoginLocalStorage);
 
         _isLoading = false;
+        _mine = null;
+        _token = string.Empty;
         navigation.NavigateTo(route, true);
     }
 
@@ -415,6 +424,22 @@
         { RouterConfig.Admin.File, new List<BreadcrumbItem> {
             new("Trang Chủ", href: RouterConfig.Admin.Home),
             new("File Upload", href: null, disabled: true)
+        }},
+
+        // --- PERMISSION ---
+        { RouterConfig.Admin.Permission, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Phân Quyền", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.CreatePermission, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Phân Quyền", href: RouterConfig.Admin.Permission),
+            new("Tạo Phân Quyền", href: null, disabled: true)
+        }},
+        { RouterConfig.Admin.EditPermission, new List<BreadcrumbItem> {
+            new("Trang Chủ", href: RouterConfig.Admin.Home),
+            new("Phân Quyền", href: RouterConfig.Admin.Permission),
+            new("Cập Nhật Phân Quyền", href: null, disabled: true)
         }}
     };
 }

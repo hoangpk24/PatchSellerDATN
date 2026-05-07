@@ -20,6 +20,9 @@
 </section>
 
 @code {
+    [CascadingParameter(Name = Constant.CascadingNameParams.Token)]
+    public string _token { get; set; }
+
     [SupplyParameterFromQuery(Name = "order-id")]
     public int _orderId { get; set; } = 0;
 
@@ -42,7 +45,7 @@
         if (_orderId > 0)
         {
             _orderIdSuccess = _orderId;
-            var result = await _orderService.PaymentSuccess(_orderId);
+            var result = await _orderService.PaymentSuccess(_orderId, _token);
             if (result.IsSuccess)
             {
                 _orderCodeSuccess = result.Data.OrderCode;

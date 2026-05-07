@@ -1,0 +1,212 @@
+﻿@page "/admin/permissions"
+@layout AdminLayout
+@using System.Text.Json
+@using System.Globalization
+
+<PageTitle>@Constant.PageTitleAdmin Permission</PageTitle>
+
+<section class="p-6">
+    <div class="flex items-center justify-between">
+        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách quyền</h1>
+        <AuthorizeControl Action="@Constant.ActionButton.Create">
+            <a href="@RouterConfig.Admin.CreatePermission" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
+        </AuthorizeControl>
+    </div>
+
+    @* <div class="mt-8 rounded bg-white p-6 shadow-md">
+        <div class="grid w-full grid-cols-3 gap-x-6 gap-y-4">
+            <div>
+                <MudTextField T="string" Placeholder="Tìm kiếm" Adornment="Adornment.Start" Value="@_searchValue"
+                              AdornmentIcon="@Icons.Material.Filled.Search" Variant="Variant.Outlined" IconSize="Size.Medium" Class="mt-0" Style="height: 44px" ValueChanged="onChangeSearch" Immediate=true></MudTextField>
+            </div>
+            <div class="flex items-center gap-2">
+                <MudButton Variant="Variant.Outlined" OnClick="OnSearch" Class="h-11 w-full"><MudIcon Icon="@Icons.Material.Filled.Search" Class="mr-2" /> Tìm kiếm</MudButton>
+                <MudButton Variant="Variant.Outlined" OnClick="OnReset" Class="h-11 w-full"><MudIcon Icon="@Icons.Material.Filled.Filter" Class="mr-2" /> Đặt lại</MudButton>
+            </div>
+        </div>
+    </div> *@
+
+    <div class="mt-8 rounded bg-white shadow-md">
+        <MudTable Items="@_lstRole" Elevation="0" Loading="@_isLoading" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100lvh - 235px)">
+            <HeaderContent>
+                <MudTh hidden><MudTableSortLabel SortLabel="Id" T="string" hidden>STT</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Tên" T="string">Tên</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Các quyền" T="string">Các quyền</MudTableSortLabel></MudTh>
+                <MudTh Class="!whitespace-nowrap"><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id" hidden>@context.Id</MudTd>
+                <MudTd DataLabel="Tên">@context.RoleName</MudTd>
+                <MudTd DataLabel="Quyền hạn">
+                    <div class="flex flex-wrap gap-1">
+                        @if (!string.IsNullOrEmpty(context.PagesPermission))
+                        {
+                            var permissions = JsonSerializer.Deserialize<List<PagePermissionItemResponse>>(
+                            context.PagesPermission,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                            );
+
+                            if (permissions != null)
+                            {
+                                foreach (var p in permissions.Take(10))
+                                {
+                                    <MudChip T="string" Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Class="border border-solid border-blue-100 bg-blue-50 px-2">
+                                        <span class="font-bold">@GetVietnameseName(p.PageCode):</span>
+                                        <span class="ml-1">@GetVietnameseCRUD(p.PagePermissions)</span>
+                                    </MudChip>
+                                }
+
+                                if (permissions.Count > 10)
+                                {
+                                    <MudTooltip Text="@GetFullPermissionTooltip(permissions)">
+                                        <MudChip T="string" Variant="Variant.Filled" Color="Color.Default" Size="Size.Small">
+                                            +@(permissions.Count - 10)
+                                        </MudChip>
+                                    </MudTooltip>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <span class="italic text-gray-400">Không có quyền</span>
+                        }
+                    </div>
+                </MudTd>
+                <MudTd DataLabel="Thao tác">
+                    <div class="flex gap-2">
+                        <AuthorizeControl Action="@Constant.ActionButton.Edit">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                        Color="Color.Warning"
+                                        OnClick="@(() => navigation.NavigateTo(RouterConfig.Admin.EditPermission.Replace(":id", context.Id.ToString())))"
+                                        Size="Size.Small" />
+                        </AuthorizeControl>
+                        <AuthorizeControl Action="@Constant.ActionButton.Delete">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                        Color="Color.Error"
+                                        OnClick="@(() => OpenDialogDelete(context.Id))"
+                                        Size="Size.Small" />
+                        </AuthorizeControl>
+                    </div>
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText Class="my-4">Không có dữ liệu.</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <div class="flex w-full flex-col gap-3">
+                    @{
+                        for (var i = 0; i < 5; i++)
+                        {
+                            <div class="flex items-center justify-between gap-2 px-2">
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                                <MudSkeleton Width="100%" Height="5rem" />
+                            </div>
+                        }
+                    }
+                </div>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    </div>
+</section>
+
+@code {
+    List<RoleResponse> _lstRole = [];
+    private bool _isLoading = true;
+    CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadData();
+        }
+        catch (Exception)
+        {
+            _isLoading = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    async Task LoadData()
+    {
+        var resRole = await _adminRoleService.GetAllRoles();
+        if (resRole.IsSuccess && resRole.Data != null)
+        {
+            _lstRole = resRole.Data;
+        }
+        else if (resRole.IsSuccess == false && resRole.StatusCode == "NotFound")
+        {
+            _snackbar.Add("Không tìm thấy dữ liệu.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.Admin.Home);
+        }
+        else
+        {
+            _snackbar.Add("Đã có lỗi xảy ra. Vui lòng báo cho quản trị viên.", MudBlazor.Severity.Error);
+            navigation.NavigateTo(RouterConfig.Admin.Home);
+        }
+        StateHasChanged();
+    }
+
+    async Task OpenDialogDelete(int id)
+    {
+        var deleteParaeters = new DialogParameters<Admin.Permission.ConfirmDeleteDialog>
+        {
+            {x => x.id, id}
+        };
+
+        var dialog = await _dialogService.ShowAsync<Admin.Permission.ConfirmDeleteDialog>("Options Dialog", deleteParaeters, _dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+
+    private string GetVietnameseName(string code) => code switch
+    {
+        "CATEGORY" => "Danh mục",
+        "CUSTOMER" => "Khách hàng",
+        "FILE" => "File",
+        "GAME" => "Game",
+        "ORDER" => "Đơn hàng",
+        "PATCH" => "Bản vá",
+        "PERMISSIONS" => "Phân quyền",
+        "PLATFORM" => "Nền tảng",
+        "PUBLISHER" => "Nhà phát hành",
+        "RANK" => "Xếp hạng",
+        "REVIEW" => "Đánh giá",
+        "STAFF" => "Nhân viên",
+        "STATISTICAL" => "Thống kê",
+        "VERSION" => "Phiên bản",
+        "VOUCHER" => "Giảm giá",
+        _ => code
+    };
+
+    private string GetVietnameseCRUD(string permissions)
+    {
+        if (string.IsNullOrEmpty(permissions)) return "";
+        var result = new List<string>();
+        if (permissions.Contains("R")) result.Add("Xem");
+        if (permissions.Contains("C")) result.Add("Thêm");
+        if (permissions.Contains("U")) result.Add("Sửa");
+        if (permissions.Contains("D")) result.Add("Xóa");
+        return string.Join("|", result);
+    }
+
+    private string GetFullPermissionTooltip(List<PagePermissionItemResponse> permissions)
+    {
+        return string.Join(", ", permissions.Skip(10).Select(x => $"{GetVietnameseName(x.PageCode)}({GetVietnameseCRUD(x.PagePermissions)})"));
+    }
+}
