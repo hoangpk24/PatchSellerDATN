@@ -351,7 +351,7 @@ public static class PatchSellerDbSeeder
                 RoleId = 1,
                 PhoneNumber = "0987675845",
                 CreatedAt = new DateTime(2020, 1, 1),
-                FullName = "Ass Min"
+                FullName = "Quan Tri A"
             },
             new Staff
             {
@@ -363,7 +363,7 @@ public static class PatchSellerDbSeeder
                 RoleId = 2,
                 PhoneNumber = "0987675866",
                 CreatedAt = new DateTime(2020, 1, 1),
-                FullName = "E Đít Tơ"
+                FullName = "Ky thuat vien A"
             }
         );
 
@@ -896,7 +896,7 @@ public static class PatchSellerDbSeeder
             {
                 UserId = 4,
                 UserName = "hoangnam",
-                FullName = "Hạo Nam Hạo Nam",
+                FullName = "Hạo Nam",
                 Email = "hoangnam@gmail.com",
                 PhoneNumber = "0904000444",
                 PasswordHash = "B855E41C5C5F5061ECBA4FD8613A7760",
