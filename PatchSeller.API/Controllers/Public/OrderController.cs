@@ -139,11 +139,11 @@ namespace PatchSeller.API.Controllers.Public
             UserRepository userRepository = new UserRepository();
             if (userIdClaim == null)
             {
-                return BadRequest("Âu nâu, đăng nhập đi bạn êi");
+                return BadRequest("Hãy đăng nhập");
             }
             DiscountRepository discountRepository = new DiscountRepository();
 
-            PayOS payOS = new PayOS("09b8a42b-6105-4cd4-a4ee-8492e42e909c", "15cfbaf8-79a4-48a0-908f-248c30538001", "00b20c6b94e21bf27e6cb0ae2f26515637c93d70b2eeb832e7b51e299cba433d");
+            PayOS payOS = new PayOS("366cdecd-c422-44a9-887a-ebaec06dca29", "8607b22b-bd70-46c7-ac67-b9234b998591", "cb30ee3b0b77108b5b69c2aac59f52f37b93aa5dec8a0e75e59706e83826b85c");
             List<ItemData> items = new List<ItemData>();
             foreach (var product in checkoutParam.ListItemCheckout)
             {
