@@ -119,5 +119,40 @@ namespace PatchSeller.Web.Services.Admin
                 return false;
             }
         }
+
+        public async Task<ServiceResult<ChangePercentResponse>> GetPercentPoint()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, Constant.EndPointApi.Admin.ChangePercentPoint);
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ChangePercentResponse>();
+                return ServiceResult<ChangePercentResponse>.Success(result);
+            }
+            else
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var errorCode = result;
+                var errorMess = Constant.Constant.Errors.ContainsKey(errorCode ?? "")
+                                    ? Constant.Constant.Errors[errorCode ?? ""]
+                                    : result;
+                return ServiceResult<ChangePercentResponse>.Failure(result, errorMess, response.StatusCode.ToString());
+            }
+        }
+
+        public async Task<bool> ChangePercentPoint(double percent)
+        {
+            var url = $"{Constant.EndPointApi.Admin.ChangePercentPoint}?rewardPercent={percent.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+
+            var response = await _httpClient.PutAsync(url, null);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

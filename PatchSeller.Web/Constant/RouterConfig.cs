@@ -4,7 +4,7 @@
     {
 
         public const string AccessDenied = "/access-denined";
-        public const string NotFound = "/not-found";
+        public const string NotFound = "/404";
 
         public static class Customer
         {

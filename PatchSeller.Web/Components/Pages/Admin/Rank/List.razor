@@ -5,10 +5,15 @@
 
 <section class="p-6">
     <div class="flex items-center justify-between">
-        <h1 class="leading-[3rem] text-material-default h-12 text-3xl font-bold">Danh sách cấp bậc</h1> 
-        <AuthorizeControl Action="@Constant.ActionButton.Create">
-            <a href="@RouterConfig.Admin.CreateRank" class="leading-[1.5rem] bg-material-default h-10 rounded px-6 py-2 text-white shadow-md">Tạo mới</a>
-        </AuthorizeControl>
+        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách cấp bậc</h1> 
+        <div class="flex items-center gap-4">
+            <AuthorizeControl Action="@Constant.ActionButton.Create">
+                <a href="@RouterConfig.Admin.CreateRank" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
+            </AuthorizeControl>
+            <AuthorizeControl Action="@Constant.ActionButton.Edit">
+                <a @onclick="OpenDialogChangePercentPoint" class="leading-[1.5rem] h-10 cursor-pointer rounded bg-slate-400 px-6 py-2 text-white shadow-md">Đổi phần trăm quy đổi</a>
+            </AuthorizeControl>
+        </div>
     </div>
 
     <div class="mt-8 rounded bg-white p-6 shadow-md">
@@ -42,7 +47,7 @@
                 <MudTd DataLabel="Trạng thái">
                     @if(context.Status == Constant.StatusDefault.Active)
                     {
-                        <span class="text-material-default font-medium uppercase">Hoạt động</span>
+                        <span class="font-medium uppercase text-material-default">Hoạt động</span>
                     } else
                     {
 
@@ -161,5 +166,10 @@
             await LoadData();
             StateHasChanged();
         }
+    }
+
+    async Task OpenDialogChangePercentPoint()
+    {
+        var dialog = await _dialogService.ShowAsync<Admin.Rank.ChangePercentPointDialogi>("Options Dialog", _dialogOptions);
     }
 }

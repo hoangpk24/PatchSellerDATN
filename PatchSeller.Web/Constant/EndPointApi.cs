@@ -63,6 +63,7 @@
             public const string RankCreate = "/admin/rank/create";
             public const string RankUpdate = "/admin/rank/update";
             public const string RankDelete = "/admin/rank/delete/:id";
+            public const string ChangePercentPoint = "/WeatherForecast/reward-percent";
 
             // Game
             public const string GameGetAll = "/admin/game/get-all-games";

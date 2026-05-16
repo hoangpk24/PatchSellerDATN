@@ -1,0 +1,77 @@
+﻿<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Cập nhật phần trăm đổi điểm</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText Class="mb-2">Phần trăm đổi điểm hiện tại: @_currentPercentPoint%</MudText>
+        <MudNumericField @bind-Value="_percentPoint" For="@(() => _percentPoint)" Variant="Variant.Outlined" Placeholder="20" Format="F0" Step="10"
+                         AdornmentText="%"
+                         Margin="Margin.Dense"
+                         Adornment="Adornment.End"
+                         HideSpinButtons="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="MudBlazor.Color.Surface" OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="MudBlazor.Color.Error" OnClick="OnSubmit">Cập nhật</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    double _percentPoint = 0;
+    double _currentPercentPoint = 0;
+    bool _isProcessing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        var res = await _adminRankService.GetPercentPoint();
+        if (res.IsSuccess)
+        {
+            _currentPercentPoint = res.Data.RewardPercent;
+        }
+        else
+        {
+            _snackbar.Add("Không thể tải dữ liệu, vui lòng mở lại!", MudBlazor.Severity.Error);
+            Cancel();
+        }
+    }
+
+    async Task OnSubmit()
+    {
+        if (_isProcessing) return;
+
+        if(_percentPoint < 0 || _percentPoint > 100)
+        {
+            _snackbar.Add("Vui lòng nhập giá trị trong khoảng 0 đến 100", MudBlazor.Severity.Warning);
+            return;
+        }
+        try
+        {
+            _isProcessing = true;
+            var res = await _adminRankService.ChangePercentPoint(_percentPoint);
+
+            if (res)
+            {
+                _snackbar.Add("Cập nhật thành công", MudBlazor.Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                _snackbar.Add("Cập nhật thất bại", MudBlazor.Severity.Error);
+            }
+        }
+        finally
+        {
+            _isProcessing = false;
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
