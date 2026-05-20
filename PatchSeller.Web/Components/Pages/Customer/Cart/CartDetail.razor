@@ -106,28 +106,52 @@
 <section class="mx-auto mb-10 mt-10 max-w-[1520px] px-3 lg:px-0">
     <div class="mb-6 flex items-center gap-2">
         <MudIcon Icon="@Icons.Material.Filled.Favorite" Class="!text-purple-500" Size="Size.Large" />
-        <h2 class="text-2xl font-bold text-white xs:text-2xl">Có Thể Bạn Thích</h2>
+        <h2 class="text-2xl font-bold text-white xs:text-2xl">Có thể bạn sẽ thích</h2>
     </div>
 
     <div class="hide-scrollbar flex flex-nowrap gap-4 overflow-x-auto rounded-md px-3">
-        @for (int i = 0; i < 6; i++)
+        @if (_isLoading)
         {
-            <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
-                <a href="@RouterConfig.Customer.Home" class="flex h-full w-full flex-col gap-4">
-                    <img src="https://avigames.net/wp-content/uploads/2025/07/wuchangavi.jpg" alt="product" class="aspect-[1/1.5] object-cover" />
-
-                    <p class="line-clamp-2 text-base font-medium text-white">Wuchang: Fallen Feathers – Deluxe Edition</p>
-
-                    <p class="text-base text-purple-500">100.000đ</p>
-                </a>
-
-                <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
-                    <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
-                        <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.Search" />
-                        <MudIcon Class="cursor-pointer !text-white transition-colors hover:!text-purple-500" Icon="@Icons.Material.Filled.FavoriteBorder" />
-                    </div>
+            @for (int i = 0; i < 6; i++)
+            {
+                <div class="flex-shrink-0 lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Class="min-h-[327px] w-full rounded-lg !bg-white/5" Animation="Animation.Wave" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="36px" Width="90%" Class="mt-2 !bg-white/5" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="30px" Width="50%" Class="!bg-white/5" />
                 </div>
-            </div>
+            }
+        }
+        else if (_gameNew.LstNew.Any())
+        {
+            @foreach (var item in _gameNew.LstNew)
+            {
+                if (item != null)
+                {
+                    <div class="group relative flex-shrink-0 overflow-hidden lg:w-[calc(100%/6-1rem)] md:w-[327px] sm:w-[327px]">
+                        <a href="@RouterConfig.Customer.Game.Replace(":id", item.GameId.ToString())" class="flex h-full w-full flex-col gap-4">
+                            <img src="@item.Thumbnail" alt="game" class="aspect-[1/1.5] object-cover" />
+
+                            <p class="line-clamp-2 h-12 text-base font-medium text-white">@item.Title</p>
+
+                            <p class="truncate text-base font-bold text-purple-500" title="@GetPriceDisplay(item.GameId, item.Patches)">
+                                @GetPriceDisplay(item.GameId, item?.Patches ?? [])
+                            </p>
+                        </a>
+
+                        <div class="absolute right-2 top-2 translate-x-12 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:opacity-100">
+                            <div class="flex flex-col gap-3 rounded-md bg-black-default2 p-2">
+                                <MudIcon @onclick="@(() => OpenDialogFastAddCart(item.GameId))"
+                                         Class="cursor-pointer !text-white transition-colors hover:!text-purple-500"
+                                         Icon="@Icons.Material.Filled.Search" />
+
+                                <MudIcon @onclick="@(() => HandleToggleWishlist(item.GameId))"
+                                         Class="@(_wishlistedGameIds.Contains(item.GameId) ? "cursor-pointer !text-red-500" : "cursor-pointer !text-white hover:!text-purple-500")"
+                                         Icon="@(_wishlistedGameIds.Contains(item.GameId) ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)" />
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
         }
     </div>
 </section>
@@ -140,10 +164,14 @@
     public string _token { get; set; }
 
     List<CartItemDetailResponse> _lstCartItem = [];
+    GameForHomeResponse _gameNew = new GameForHomeResponse();
+    private Dictionary<int, bool> _fullOwnershipStatus = new();
+    private HashSet<int> _wishlistedGameIds = new HashSet<int>();
 
     bool _isLoading = false;
 
     CultureInfo vietnameseCulture = new CultureInfo("vi-VN");
+    private readonly DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 
     protected override async Task OnInitializedAsync()
     {
@@ -151,6 +179,7 @@
         {
             _isLoading = true;
             await LoadData();
+            await LoadUserWishlist();
         } catch(Exception) {}
         finally
         {
@@ -160,10 +189,26 @@
     async Task LoadData()
     {
         var res = await _cartService.GetCart(_mine.Id);
-
         if(res.IsSuccess)
         {
             _lstCartItem = res.Data;
+        }
+        var resGame = await _gameService.GetAllForHome();
+        if(resGame.IsSuccess)
+        {
+            _gameNew = resGame.Data;
+        }
+    }
+
+    async Task LoadUserWishlist()
+    {
+        if (_mine != null)
+        {
+            var res = await _wishlistService.GetAllWishListByUserId(_mine.Id);
+            if (res.IsSuccess && res.Data != null)
+            {
+                _wishlistedGameIds = res.Data.Select(x => x.GameId).ToHashSet();
+            }
         }
     }
 
@@ -195,6 +240,71 @@
         }
 
         navigation.NavigateTo(RouterConfig.Customer.Checkout);
+    }
+
+    async Task HandleToggleWishlist(int gameId)
+    {
+        if (string.IsNullOrEmpty(_token) || _mine == null)
+        {
+            _snackbar.Add("Vui lòng đăng nhập để thực hiện", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        var res = await _wishlistService.ToggleWishlist(_mine.Id, gameId, _token);
+        if (res.IsSuccess)
+        {
+            if (res.Data) _wishlistedGameIds.Add(gameId);
+            else _wishlistedGameIds.Remove(gameId);
+
+            StateHasChanged();
+        }
+    }
+
+    private string GetPriceDisplay(int gameId, List<PatchBasicDTO> patches)
+    {
+        if (_fullOwnershipStatus.ContainsKey(gameId) && _fullOwnershipStatus[gameId])
+        {
+            return "Đã sở hữu";
+        }
+
+        if (patches == null || !patches.Any())
+        {
+            return "Liên hệ";
+        }
+
+        var prices = patches.Select(p => p.Price).OrderBy(p => p).ToList();
+        double minPrice = prices.First();
+        double maxPrice = prices.Last();
+
+        string format = "C0";
+
+        if (minPrice == maxPrice)
+        {
+            return minPrice <= 0 ? "Miễn phí" : $"{minPrice.ToString(format, vietnameseCulture)}";
+        }
+
+        return $"{minPrice.ToString(format, vietnameseCulture)} - {maxPrice.ToString(format, vietnameseCulture)}";
+    }
+
+    async Task OpenDialogFastAddCart(int gameId)
+    {
+        var paraeters = new DialogParameters<Components.Common.Customer.FastAddCart>
+        {
+            {x => x.gameId, gameId},
+            {x => x.cartId, _mine.cartId},
+            {x => x.userId, _mine.Id},
+            {x => x.token, _token}
+        };
+
+        var dialog = await _dialogService.ShowAsync<Components.Common.Customer.FastAddCart>("Options Dialog", paraeters, _dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadData();
+            await _cartActionService.LoadCartAsync(_mine.Id);
+            StateHasChanged();
+        }
     }
 
     private List<BreadcrumbItem> _itemBreadcrumbs = [
