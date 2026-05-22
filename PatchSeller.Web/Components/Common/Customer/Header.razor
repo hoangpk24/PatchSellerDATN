@@ -125,10 +125,6 @@
                     </a>
                 }
 
-                <div class="group cursor-pointer">
-                    <MudIcon Icon="@Icons.Material.Outlined.FavoriteBorder" Class="text-white group-hover:text-purple-500" />
-                </div>
-
                 <div @onclick="OpenCartDrawer" class="group relative flex cursor-pointer items-center gap-3">
                     <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Class="text-white group-hover:text-purple-500" />
                     <span class="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 font-bold text-[10px] text-white">@_cartActionService.CartDetails.TotalItemCount</span>

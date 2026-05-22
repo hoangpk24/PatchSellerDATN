@@ -5,9 +5,9 @@
 
 <section class="p-6">
     <div class="flex items-center justify-between">
-        <h1 class="leading-[3rem] text-material-default h-12 text-3xl font-bold">Danh sách nền tảng</h1>
+        <h1 class="leading-[3rem] h-12 text-3xl font-bold text-material-default">Danh sách nền tảng</h1>
         <AuthorizeControl Action="@Constant.ActionButton.Create">
-            <a href="@RouterConfig.Admin.CreatePlatform" class="leading-[1.5rem] bg-material-default h-10 rounded px-6 py-2 text-white shadow-md">Tạo mới</a>
+            <a href="@RouterConfig.Admin.CreatePlatform" class="leading-[1.5rem] h-10 rounded bg-material-default px-6 py-2 text-white shadow-md">Tạo mới</a>
         </AuthorizeControl>
     </div>
 
@@ -40,7 +40,7 @@
                 <MudTd DataLabel="Trạng thái">
                     @if(context.Status == Constant.StatusDefault.Active)
                     {
-                        <span class="text-material-default font-medium uppercase">Hoạt động</span>
+                        <span class="font-medium uppercase text-material-default">Hoạt động</span>
                     } else
                     {
 
@@ -143,12 +143,12 @@
 
     async Task OpenDialogDelete(int id)
     {
-        var deleteParaeters = new DialogParameters<Admin.Publisher.ConfirmDeleteDialog>
+        var deleteParaeters = new DialogParameters<Admin.Platform.ConfirmDeleteDialog>
         {
             {x => x.id, id}
         };
 
-        var dialog = await _dialogService.ShowAsync<Admin.Publisher.ConfirmDeleteDialog>("Options Dialog", deleteParaeters, _dialogOptions);
+        var dialog = await _dialogService.ShowAsync<Admin.Platform.ConfirmDeleteDialog>("Options Dialog", deleteParaeters, _dialogOptions);
         var result = await dialog.Result;
 
         if (!result.Canceled)
