@@ -341,7 +341,7 @@ namespace PatchSeller.Launcher
 
                 var url = $"/install-log/get-by-user-and-patch-id?userId={userId}&patchId={patchId}";
 
-                InstallLog? ins = null;
+                InstallLog? ins =null;
 
                 try
                 {
@@ -391,20 +391,25 @@ namespace PatchSeller.Launcher
                     else if (ins.BIOSSerialNumber == GetSerialNumber())
                         return true;
                 }
-
-
-                ins.UserId = _userId;
-                ins.PatchId = patchId;
-                ins.PatchVersionId = currentVersionDetail.PatchVersionId;
-                ins.BIOSSerialNumber = GetSerialNumber();
-                ins.InstallDate = DateTime.Now;
-                var urlCreate = $"/install-log/create";
-                var responseCreate = await client.PostAsJsonAsync(urlCreate, ins);
-                if (!responseCreate.IsSuccessStatusCode)
+                else
                 {
-                    MessageBox.Show("Lỗi khi tạo bản ghi cài đặt");
-                    return false;
+                    InstallLog newIns = new InstallLog();
+                    newIns.UserId = _userId;
+                    newIns.PatchId = patchId;
+                    newIns.PatchVersionId = currentVersionDetail.PatchVersionId;
+                    newIns.BIOSSerialNumber = GetSerialNumber();
+                    newIns.InstallDate = DateTime.Now;
+                    var urlCreate = $"/install-log/create";
+                    var responseCreate = await client.PostAsJsonAsync(urlCreate, newIns);
+                    if (!responseCreate.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Lỗi khi tạo bản ghi cài đặt");
+                        return false;
+                    }
                 }
+
+
+
                 return true;
             }
             catch (Exception ex)

@@ -128,7 +128,7 @@ namespace PatchSeller.API.Controllers.Public
                     orderDtos.Add(MapToOrderDetailResponse(fullOrder));
 
                     if (fullOrder.Status == Constant.OrderStatus.OrderDone &&
-                        fullOrder.PaymentStatus == Constant.PaymentStatus.PaymentCompleted)
+                        fullOrder.PaymentStatus == Constant.PaymentStatus.PaymentCompleted && fullOrder.UserId == userId)
                     {
                         totalSpent += fullOrder.FinalAmount;
 

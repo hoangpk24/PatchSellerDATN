@@ -144,7 +144,7 @@ namespace PatchSeller.Launcher
         public string? RankId { get; set; }
         public int CartId { get; set; }
         public string? RankName { get; set; }
-        public int RewardPoint { get; set; }
+        public double RewardPoint { get; set; }
         public DateTime? ExpirationTime { get; set; }
         public bool IsExpired { get; set; }
     }
