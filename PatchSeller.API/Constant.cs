@@ -56,7 +56,7 @@ namespace PatchSeller.API
 
         public static class DiscountType
         {
-            public const string Fixed = "Fixed";
+            public const string Fixed = "Amount";
             public const string Percent = "Percent";
 
         }
